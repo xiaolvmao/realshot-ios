@@ -414,7 +414,7 @@ if seededRenders.count >= 2 {
     }
 
     // 同种子重渲染：必须逐像素一致，否则「预览 = 保存」这个承诺就不成立
-    if let again = engine.makeFinal(source, request: seededRequest(seed: first.seed)),
+    if let again = engine.makeFinal(source, request: seededRequest(first.seed)),
        let st = pixelStats(first.image, again) {
         print(String(format: "  同种子重复渲染 → RMS %.2f%%  maxΔ %d  %@",
                      st.rms * 100, st.maxDelta,
