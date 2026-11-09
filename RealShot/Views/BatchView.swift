@@ -6,7 +6,7 @@ struct BatchView: View {
 
     private let columns = Array(repeating: GridItem(.flexible(), spacing: 8), count: 3)
 
-    @State private var viewing: BatchItem?
+    @State private var viewerSeed: ViewerSeed?
     @State private var showParams = false
 
     var body: some View {
@@ -20,18 +20,13 @@ struct BatchView: View {
         .overlay(alignment: .top) { toast }
         .animation(.easeInOut(duration: 0.2), value: model.message)
         .sheet(isPresented: $showParams) { parameterSheet }
-        .fullScreenCover(item: $viewing) { item in
-            BatchPreview(item: item,
-                         position: position(of: item),
-                         total: model.items.count,
-                         canDelete: !model.isRunning) {
-                model.remove(item.id)
-            }
+        .fullScreenCover(item: $viewerSeed) { seed in
+            BatchViewer(model: model, startID: seed.id)
         }
     }
 
-    private func position(of item: BatchItem) -> Int {
-        (model.items.firstIndex { $0.id == item.id } ?? 0) + 1
+    private struct ViewerSeed: Identifiable {
+        let id: UUID
     }
 
     // MARK: 顶栏
@@ -76,7 +71,7 @@ struct BatchView: View {
     }
 
     private var hint: some View {
-        Text("点开看大图 · 长按删除")
+        Text("点开可比对原图 · 长按删除")
             .font(.system(size: 10.5))
             .foregroundStyle(Theme.faint)
             .frame(maxWidth: .infinity, alignment: .leading)
@@ -102,7 +97,7 @@ struct BatchView: View {
 
     private func cell(_ item: BatchItem) -> some View {
         Button {
-            viewing = item
+            viewerSeed = ViewerSeed(id: item.id)
             Haptics.tap()
         } label: {
             Image(uiImage: item.thumb)
@@ -276,149 +271,6 @@ struct BatchView: View {
                     .shadow(color: .black.opacity(0.3), radius: 10, y: 4)
                     .padding(.top, 52)
                     .transition(.move(edge: .top).combined(with: .opacity))
-            }
-        }
-    }
-}
-
-// MARK: - 单张全屏
-
-private struct BatchPreview: View {
-    let item: BatchItem
-    let position: Int
-    let total: Int
-    let canDelete: Bool
-    let onDelete: () -> Void
-
-    @Environment(\.dismiss) private var dismiss
-    @State private var image: UIImage?
-    @State private var confirmDelete = false
-
-    var body: some View {
-        ZStack {
-            Color.black.ignoresSafeArea()
-
-            if let image {
-                Image(uiImage: image)
-                    .resizable()
-                    .aspectRatio(contentMode: .fit)
-                    .padding(.horizontal, 4)
-            } else {
-                ProgressView()
-                    .tint(Theme.accent)
-                    .scaleEffect(1.2)
-            }
-
-            VStack(spacing: 0) {
-                topBar
-                Spacer(minLength: 0)
-                bottomBar
-            }
-        }
-        .statusBarHidden()
-        .task {
-            image = await decode()
-        }
-        .confirmationDialog("删除这张照片？", isPresented: $confirmDelete, titleVisibility: .visible) {
-            Button("删除", role: .destructive) {
-                onDelete()
-                dismiss()
-            }
-            Button("取消", role: .cancel) {}
-        } message: {
-            Text("只是从这次的批量队列里移除，相册里的原图不受影响。")
-        }
-    }
-
-    private var topBar: some View {
-        HStack {
-            Button {
-                dismiss()
-            } label: {
-                Image(systemName: "xmark")
-                    .font(.system(size: 13, weight: .bold))
-                    .foregroundStyle(.white)
-                    .frame(width: 34, height: 34)
-                    .background(.white.opacity(0.16), in: Circle())
-            }
-            .buttonStyle(.plain)
-
-            Spacer()
-
-            Text("第 \(position) / \(total) 张")
-                .font(.system(size: 11.5, weight: .medium, design: .rounded))
-                .foregroundStyle(.white.opacity(0.8))
-                .monospacedDigit()
-
-            Spacer()
-
-            Button {
-                confirmDelete = true
-                Haptics.tap()
-            } label: {
-                Image(systemName: "trash")
-                    .font(.system(size: 13, weight: .medium))
-                    .foregroundStyle(.white)
-                    .frame(width: 34, height: 34)
-                    .background(.white.opacity(0.16), in: Circle())
-            }
-            .buttonStyle(.plain)
-            .disabled(!canDelete)
-            .opacity(canDelete ? 1 : 0.35)
-        }
-        .padding(.horizontal, 16)
-        .padding(.top, 10)
-    }
-
-    private var bottomBar: some View {
-        HStack(spacing: 7) {
-            Circle()
-                .fill(statusColor)
-                .frame(width: 7, height: 7)
-
-            Text(statusText)
-                .font(.system(size: 11.5, weight: .medium))
-                .foregroundStyle(.white.opacity(0.85))
-
-            Spacer()
-
-            if let image {
-                Text("\(Int(image.pixelSize.width)) × \(Int(image.pixelSize.height))")
-                    .font(.system(size: 10.5, weight: .medium, design: .rounded))
-                    .foregroundStyle(.white.opacity(0.5))
-                    .monospacedDigit()
-            }
-        }
-        .padding(.horizontal, 20)
-        .padding(.vertical, 12)
-        .background(
-            LinearGradient(colors: [.clear, .black.opacity(0.55)],
-                           startPoint: .top, endPoint: .bottom)
-                .ignoresSafeArea(edges: .bottom)
-        )
-    }
-
-    private var statusText: String {
-        switch item.state {
-        case .pending: return "待处理"
-        case .done: return "已保存到相册"
-        case .failed: return "处理失败"
-        }
-    }
-
-    private var statusColor: Color {
-        switch item.state {
-        case .pending: return Theme.faint
-        case .done: return Theme.accent
-        case .failed: return Color.orange
-        }
-    }
-
-    /// 缩略图只有 640px，全屏会糊，这里按屏幕尺寸重新解一张。
-    private func decode() async -> UIImage? {
-        await withCheckedContinuation { (continuation: CheckedContinuation<UIImage?, Never>) in
-            DispatchQueue.global(qos: .userInitiated).async {
-                continuation.resume(returning: ImageLoader.image(from: item.data, maxPixel: 2200))
             }
         }
     }
