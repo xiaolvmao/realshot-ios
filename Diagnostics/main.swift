@@ -587,3 +587,98 @@ if let centerCrop, let zoomCrop {
 // 把两种对齐的样张留下来，肉眼也能确认裁的是不同的一边
 if let leftCrop { writePNG(CIImage(cgImage: leftCrop), to: "\(outDir)/crop-left.png") }
 if let rightCrop { writePNG(CIImage(cgImage: rightCrop), to: "\(outDir)/crop-right.png") }
+
+// MARK: - 撤回 / 恢复
+//
+// 两个页面共用同一个 ReversibleHistory，这里直接测它的语义：
+// 记一步 → 撤回 → 恢复，状态必须回到原位；撤回之后再操作要截断 redo 分支。
+// 界面上这两次点击是不是真的调到了这里，靠 CI 编译 + 下面的断言一起看。
+
+print("\n=== 撤回 / 恢复 ===")
+
+var hist = ReversibleHistory<Int>(limit: 3)
+var state = 0
+func remember() { hist.record(state) }
+func stepBack() { if let s = hist.undo(current: state) { state = s } }
+func stepForward() { if let s = hist.redo(current: state) { state = s } }
+
+print("  初始：canUndo=\(hist.canUndo)  canRedo=\(hist.canRedo)  "
+      + ((!hist.canUndo && !hist.canRedo) ? "✓ 两个按钮都是灰的" : "✗"))
+
+remember(); state = 1
+remember(); state = 2
+print("  记两步后 state=\(state)  canUndo=\(hist.canUndo)  canRedo=\(hist.canRedo)  "
+      + ((state == 2 && hist.canUndo && !hist.canRedo) ? "✓ 只能撤回" : "✗"))
+
+stepBack()
+print("  撤回一次 → state=\(state)  "
+      + ((state == 1 && hist.canUndo && hist.canRedo) ? "✓ 撤回后恢复可用" : "✗"))
+
+stepBack()
+print("  再撤回一次 → state=\(state)  "
+      + ((state == 0 && !hist.canUndo && hist.canRedo) ? "✓ 退到头了" : "✗"))
+
+stepForward()
+stepForward()
+print("  连续恢复两次 → state=\(state)  "
+      + ((state == 2 && hist.canUndo && !hist.canRedo) ? "✓ 回到原处" : "✗"))
+
+stepForward()
+print("  没有可恢复的再点恢复 → state=\(state)  "
+      + (state == 2 ? "✓ 不越界" : "✗ 状态被改坏了"))
+
+stepBack()          // 现在 state 应该是 1
+remember(); state = 9
+print("  撤回后做新操作 → canRedo=\(hist.canRedo)  "
+      + (hist.canRedo ? "✗ redo 分支没被截断" : "✓ redo 分支已清空"))
+
+// 深度上限：limit=3，连记 5 步后 past 只留最近 3 步
+var deep = ReversibleHistory<Int>(limit: 3)
+for i in 0..<5 { deep.record(i) }
+print("  上限 3 连记 5 步 → 可撤回 \(deep.undoDepth) 步  "
+      + (deep.undoDepth == 3 ? "✓ 按上限截断" : "✗ 没截断"))
+
+// 编辑器 / 批量页的参数快照是可拷贝的值类型：撤回后继续改参数不会污染历史里的那份
+let snapBase = CameraPreset.phone.baseParameters
+let snapHistory = snapBase
+var live = snapHistory
+live.grain = 0.05
+print("  快照与实时参数互不影响  "
+      + (snapBase.grain > 0.2 && live.grain == 0.05 ? "✓ 值类型语义正常" : "✗ 快照被改动了"))
+
+// MARK: - 追加照片吃的是「当前参数 + 自己的种子」
+//
+// 全屏查看器里的加号把新图追加到队尾，预览 / 导出都会重新取当前 params
+// 再按该张自己的 seed 扰动。这里把这条链路的三个前提各测一遍。
+
+print("\n=== 追加照片的参数 ===")
+
+let addBase = CameraPreset.phone.baseParameters.clamped()
+let seedNew: UInt64 = 20261109
+
+let firstTry = addBase.jittered(seed: seedNew)
+let again = addBase.jittered(seed: seedNew)
+print("  同一张同一种子两次 → \(firstTry == again ? "✓ 完全一致（预览 = 保存）" : "✗ 不一致")")
+print("  种子写进了参数 → 参数 seed=\(firstTry.seed)  \(firstTry.seed == seedNew ? "✓" : "✗")")
+
+// 换了基准参数（模拟用户刚拖过滑杆），同一种子必须跟着变
+var brighter = addBase
+brighter.exposure = 0.30
+brighter.grain = 0.90
+let afterEdit = brighter.clamped().jittered(seed: seedNew)
+let moved = abs(afterEdit.grain - firstTry.grain) > 0.2 && afterEdit.exposure > firstTry.exposure
+print(String(format: "  基准 grain %.2f→%.2f  曝光 %+.2f→%+.2f  %@",
+             firstTry.grain, afterEdit.grain,
+             firstTry.exposure, afterEdit.exposure,
+             moved ? "✓ 新参数确实生效" : "✗ 还在用旧参数"))
+
+// 队伍里每张的种子不同 → 同一套参数也不会刷出 N 份一模一样的颗粒
+var distinctSeeds = Set<UInt64>()
+var distinctGrain = Set<Int>()
+for i in 0..<20 {
+    let p = addBase.jittered(seed: seedNew &+ UInt64(i))
+    distinctSeeds.insert(p.seed)
+    distinctGrain.insert(Int((p.grain * 1000).rounded()))
+}
+print("  20 张不同种子 → 参数种子 \(distinctSeeds.count) 种、颗粒 \(distinctGrain.count) 档  "
+      + ((distinctSeeds.count == 20 && distinctGrain.count >= 15) ? "✓ 各不相同" : "✗ 撞车太多"))

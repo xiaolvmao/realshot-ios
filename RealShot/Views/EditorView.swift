@@ -21,21 +21,9 @@ struct EditorView: View {
     // MARK: 顶栏
 
     private var topBar: some View {
-        HStack {
-            Button {
-                model.closeEditor()
-                Haptics.tap()
-            } label: {
-                Image(systemName: "xmark")
-                    .font(.system(size: 13, weight: .bold))
-                    .foregroundStyle(Theme.text)
-                    .frame(width: 34, height: 34)
-                    .background(Theme.surfaceRaised, in: Circle())
-            }
-            .buttonStyle(.plain)
-
-            Spacer()
-
+        // 标题放在 ZStack 里绝对居中：左右两侧各自排布，
+        // 右侧多出撤回 / 恢复两个按钮也不会把标题挤偏。
+        ZStack {
             VStack(spacing: 0) {
                 Text(model.preset.title)
                     .font(.system(size: 13, weight: .semibold))
@@ -45,24 +33,63 @@ struct EditorView: View {
                     .foregroundStyle(Theme.faint)
             }
 
-            Spacer()
+            HStack(spacing: 8) {
+                Button {
+                    model.closeEditor()
+                    Haptics.tap()
+                } label: {
+                    Image(systemName: "xmark")
+                        .font(.system(size: 13, weight: .bold))
+                        .foregroundStyle(Theme.text)
+                        .frame(width: 34, height: 34)
+                        .background(Theme.surfaceRaised, in: Circle())
+                }
+                .buttonStyle(.plain)
 
-            Button {
-                Task { await model.saveToLibrary() }
-            } label: {
-                Text("保存")
-                    .font(.system(size: 13.5, weight: .semibold))
-                    .foregroundStyle(Color.black)
-                    .padding(.horizontal, 16)
-                    .frame(height: 34)
-                    .background(Theme.accent, in: Capsule())
+                Spacer()
+
+                historyButton("arrow.uturn.backward", enabled: model.canUndo, label: "撤回") {
+                    model.undo()
+                }
+                historyButton("arrow.uturn.forward", enabled: model.canRedo, label: "恢复") {
+                    model.redo()
+                }
+
+                Button {
+                    Task { await model.saveToLibrary() }
+                } label: {
+                    Text("保存")
+                        .font(.system(size: 13.5, weight: .semibold))
+                        .foregroundStyle(Color.black)
+                        .padding(.horizontal, 16)
+                        .frame(height: 34)
+                        .background(Theme.accent, in: Capsule())
+                }
+                .buttonStyle(.plain)
+                .disabled(model.isBusy)
+                .opacity(model.isBusy ? 0.55 : 1)
             }
-            .buttonStyle(.plain)
-            .disabled(model.isBusy)
-            .opacity(model.isBusy ? 0.55 : 1)
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 8)
+    }
+
+    /// 撤回 / 恢复共用的小圆钮。没得退的时候置灰，但仍然占位，避免按钮左右跳。
+    private func historyButton(_ symbol: String,
+                               enabled: Bool,
+                               label: String,
+                               action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            Image(systemName: symbol)
+                .font(.system(size: 12, weight: .semibold))
+                .foregroundStyle(enabled ? Theme.text : Theme.faint)
+                .frame(width: 30, height: 30)
+                .background(Theme.surfaceRaised, in: Circle())
+        }
+        .buttonStyle(.plain)
+        .disabled(!enabled)
+        .opacity(enabled ? 1 : 0.35)
+        .accessibilityLabel(label)
     }
 
     private var subtitle: String {
@@ -135,20 +162,6 @@ struct EditorView: View {
                     .background(Theme.surfaceRaised, in: Capsule())
                 }
                 .buttonStyle(.plain)
-
-                // 回退到上一次随机的那组参数。换随机是探索，撤销是保底。
-                Button {
-                    model.undo()
-                } label: {
-                    Image(systemName: "arrow.uturn.backward")
-                        .font(.system(size: 12, weight: .semibold))
-                        .foregroundStyle(model.canUndo ? Theme.text : Theme.faint)
-                        .frame(width: 30, height: 30)
-                        .background(Theme.surfaceRaised, in: Circle())
-                }
-                .buttonStyle(.plain)
-                .disabled(!model.canUndo)
-                .opacity(model.canUndo ? 1 : 0.4)
 
                 Button {
                     model.compare = model.compare > 0.5 ? 0.0 : 1.0

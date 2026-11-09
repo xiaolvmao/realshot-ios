@@ -23,6 +23,21 @@ struct BatchItem: Identifiable {
     var seed: UInt64 = UInt64.random(in: 1...UInt64.max)
 }
 
+/// 一次批量操作之前的完整快照，用来支撑撤回 / 恢复。
+///
+/// items 存的是结构体数组，里面的 Data 和缩略图都是引用计数共享的，
+/// 所以记十步也不会真把十份原图拷进内存；只有被删掉的那张会多留一份。
+struct BatchUndoState {
+    var items: [BatchItem]
+    var preset: CameraPreset
+    var params: RealismParameters
+    var frame: FrameMode
+    var trimBars: Bool
+    var anchor: Double
+    var cropX: Double
+    var cropScale: Double
+}
+
 @MainActor
 final class BatchViewModel: ObservableObject {
 
@@ -33,6 +48,8 @@ final class BatchViewModel: ObservableObject {
     @Published var isCancelling: Bool = false
     @Published var progress: Double = 0
     @Published var message: String?
+    @Published private(set) var canUndo = false
+    @Published private(set) var canRedo = false
 
     // 与编辑器同一套参数，批量页也能逐项微调。
     // 每个 didSet 都会让已经处理过的结果作废 —— 见 invalidateResults。
@@ -63,6 +80,11 @@ final class BatchViewModel: ObservableObject {
     private var memoryToken: NSObjectProtocol?
     private var cancelRequested = false
     private var staleNoticeShown = false
+
+    /// 撤回 / 恢复。换预设、换随机、增删照片都记一步。
+    private var history = ReversibleHistory<BatchUndoState>(limit: 10)
+    /// 正在回填快照：此时各属性的 didSet 不应该再触发「参数已改」那一套。
+    private var isRestoring = false
 
     /// 成片预览缓存。看过的那张再切回来是瞬时的；
     /// 改参数、换画幅、重掷之后自动失效。
@@ -107,31 +129,42 @@ final class BatchViewModel: ObservableObject {
     func load(_ payloads: [(data: Data, thumb: UIImage)]) {
         items = payloads.prefix(Self.maxItems).map { BatchItem(data: $0.data, thumb: $0.thumb) }
         dropPreviews()
+        history.clear()
+        syncHistory()
         progress = 0
         message = nil
         staleNoticeShown = false
     }
 
-    /// 从相册追加几张，不用退出去重选整批。
-    func append(_ payloads: [(data: Data, thumb: UIImage)]) {
-        guard !isRunning, !payloads.isEmpty else { return }
+    /// 从相册追加几张，不用退出去重选整批。返回新加入那几张的 id，
+    /// 全屏查看器靠它把画面切到刚加的第一张上。
+    @discardableResult
+    func append(_ payloads: [(data: Data, thumb: UIImage)]) -> [UUID] {
+        guard !isRunning, !payloads.isEmpty else { return [] }
 
         let room = Self.maxItems - items.count
         guard room > 0 else {
             show("队列最多 \(Self.maxItems) 张")
-            return
+            return []
         }
+
+        recordUndo()
         let slice = Array(payloads.prefix(room))
-        items.append(contentsOf: slice.map { BatchItem(data: $0.data, thumb: $0.thumb) })
-        dropPreviews()
+        let added = slice.map { BatchItem(data: $0.data, thumb: $0.thumb) }
+        items.append(contentsOf: added)
+
+        // 参数没变，老照片的预览依然有效，不必整片丢掉重渲；
+        // 新加的那几张本来就没有缓存，第一次打开时现算。
         progress = 0
         staleNoticeShown = false
         show(slice.count < payloads.count ? "已添加 \(slice.count) 张，超出上限的已忽略" : "已添加 \(slice.count) 张")
+        return added.map(\.id)
     }
 
     /// 换预设时同步刷新整套参数，和编辑器的行为保持一致。
     func select(_ newPreset: CameraPreset) {
         guard newPreset != preset else { return }
+        recordUndo()
         preset = newPreset
         params = newPreset.baseParameters.jittered(seed: UInt64.random(in: 1...UInt64.max))
     }
@@ -139,6 +172,7 @@ final class BatchViewModel: ObservableObject {
     /// 处理中不允许改动队列，避免索引错位。
     func remove(_ id: UUID) {
         guard !isRunning else { return }
+        recordUndo()
         items.removeAll { $0.id == id }
         evictPreview(id)
         progress = 0
@@ -148,6 +182,8 @@ final class BatchViewModel: ObservableObject {
     func reset() {
         items = []
         dropPreviews()
+        history.clear()
+        syncHistory()
         progress = 0
         isRunning = false
         isCancelling = false
@@ -159,6 +195,7 @@ final class BatchViewModel: ObservableObject {
     /// 只重掷这一张。已处理的会退回未处理 —— 预览变了，之前存的那张就不再对得上。
     func reroll(_ id: UUID) {
         guard !isRunning, let index = items.firstIndex(where: { $0.id == id }) else { return }
+        recordUndo()
         items[index].seed = UInt64.random(in: 1...UInt64.max)
         items[index].state = .pending
         evictPreview(id)
@@ -171,6 +208,7 @@ final class BatchViewModel: ObservableObject {
 
     func rerollAll() {
         guard !isRunning else { return }
+        recordUndo()
         for index in items.indices {
             items[index].seed = UInt64.random(in: 1...UInt64.max)
             items[index].state = .pending
@@ -180,18 +218,91 @@ final class BatchViewModel: ObservableObject {
         show("全部换了一种随机")
     }
 
+    // MARK: - 撤回 / 恢复
+    //
+    // 批量页的「上一次改动」既可能是换随机，也可能是换预设、删掉一张、
+    // 或者刚追加了几张 —— 所以记的是整份快照，而不是单个参数。
+
+    @discardableResult
+    func undo() -> Bool {
+        guard !isRunning, let state = history.undo(current: currentState()) else { return false }
+        restore(state)
+        show("已撤回上一次改动")
+        Haptics.tap()
+        return true
+    }
+
+    @discardableResult
+    func redo() -> Bool {
+        guard !isRunning, let state = history.redo(current: currentState()) else { return false }
+        restore(state)
+        show("已恢复")
+        Haptics.tap()
+        return true
+    }
+
+    private func recordUndo() {
+        guard !isRunning else { return }
+        history.record(currentState())
+        syncHistory()
+    }
+
+    private func currentState() -> BatchUndoState {
+        BatchUndoState(items: items,
+                       preset: preset,
+                       params: params,
+                       frame: frame,
+                       trimBars: trimBars,
+                       anchor: anchor,
+                       cropX: cropX,
+                       cropScale: cropScale)
+    }
+
+    private func restore(_ state: BatchUndoState) {
+        isRestoring = true
+        items = state.items
+        preset = state.preset
+        frame = state.frame
+        trimBars = state.trimBars
+        anchor = state.anchor
+        cropX = state.cropX
+        cropScale = state.cropScale
+        params = state.params
+        isRestoring = false
+
+        // 画面回到了旧参数，之前打的勾不再成立；但提示语是「已撤回」，
+        // 不该再叠一句「参数已改，需要重新处理」。
+        dropPreviews()
+        markStale(announce: false)
+        progress = 0
+        persistNow()
+        syncHistory()
+    }
+
+    private func syncHistory() {
+        canUndo = history.canUndo
+        canRedo = history.canRedo
+    }
+
     // MARK: - 结果失效
 
     /// 参数一变，之前存进相册的那批就不再对应当前画面：
     /// 预览要重算，已经打勾的条目也要退回待处理。
     /// 否则界面会一直显示「12/12 已完成」，而实际存进去的是另一套参数。
     private func invalidateResults() {
+        // 撤回 / 恢复时属性会连续赋值，这时候由 restore 自己统一收尾。
+        guard !isRestoring else { return }
+        // 手动改参数之后，再按「恢复」会把这一点改动一起吃掉，先把 redo 丢掉。
+        if history.canRedo {
+            history.clearRedo()
+            syncHistory()
+        }
         dropPreviews()
         markStale()
         persistSoon()
     }
 
-    private func markStale() {
+    private func markStale(announce: Bool = true) {
         guard !isRunning else { return }
         var changed = false
         for index in items.indices where items[index].state != .pending {
@@ -200,7 +311,7 @@ final class BatchViewModel: ObservableObject {
         }
         guard changed || progress > 0 else { return }
         progress = 0
-        if !staleNoticeShown {
+        if announce, !staleNoticeShown {
             staleNoticeShown = true
             show("参数已改，需要重新处理")
         }
@@ -432,6 +543,12 @@ final class BatchViewModel: ObservableObject {
         isRunning = false
         isCancelling = false
         cancelRequested = false
+
+        // 跑完一轮之后，「处理前」的快照已经对不上了：这时候再撤回，
+        // 会把刚打上的勾一起清掉，看起来像出错。直接清空历史更符合直觉 ——
+        // 已经写进相册的照片本来也撤不回来。
+        history.clear()
+        syncHistory()
 
         if cancelled {
             show(saved > 0 ? "已取消 · 已保存 \(saved) 张" : "已取消，没有保存")

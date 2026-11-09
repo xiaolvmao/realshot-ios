@@ -12,12 +12,17 @@ final class EditorViewModel: ObservableObject {
     @Published private(set) var isBusy = false
     @Published private(set) var toast: String?
     @Published private(set) var canUndo = false
+    @Published private(set) var canRedo = false
     @Published var shareFile: ShareFile?
 
     // MARK: 参数
     @Published var preset: CameraPreset = .phone
     @Published var params: RealismParameters = CameraPreset.phone.baseParameters {
-        didSet { scheduleRender(); persistSoon() }
+        didSet {
+            dropRedoIfEdited()
+            scheduleRender()
+            persistSoon()
+        }
     }
     @Published var frame: FrameMode = .ratio4x3 {
         didSet { scheduleRender(); persistSoon() }
@@ -64,9 +69,11 @@ final class EditorViewModel: ObservableObject {
     /// 最新一次渲染请求的编号，排队中的旧任务发现编号过期就直接放弃。
     private let generation = GenerationBox()
 
-    /// 最近几次随机的参数，用来撤销。
-    private var history: [RealismParameters] = []
-    private let historyLimit = 5
+    /// 最近几次随机 / 换预设的参数，用来撤回 / 恢复。
+    /// 预设也要一起记：只退参数会让顶部标题停在新的那个预设上，和画面不一致。
+    private var history = ReversibleHistory<EditorSnapshot>(limit: 8)
+    /// 正在回填历史快照，此时 params 的 didSet 不能当成“用户手动改的”。
+    private var isRestoring = false
 
     init() {
         if let saved = SettingsStore.loadEditor() {
@@ -98,8 +105,8 @@ final class EditorViewModel: ObservableObject {
         before = nil
         after = nil
         compare = 0.5
-        history.removeAll()
-        canUndo = false
+        history.clear()
+        syncHistory()
 
         // 每次导入都换一个种子，同一张图重复导入也会得到不同的颗粒分布
         var p = preset.baseParameters
@@ -139,17 +146,48 @@ final class EditorViewModel: ObservableObject {
 
     /// 回到上一次随机（或上一次切换预设）的那组参数。
     func undo() {
-        guard let last = history.popLast() else { return }
-        params = last
-        canUndo = !history.isEmpty
-        show("已撤销上一次随机")
+        guard let previous = history.undo(current: snapshot()) else { return }
+        apply(previous)
+        show("已撤回上一次改动")
         Haptics.tap()
     }
 
+    /// 把刚撤回的那一步再走回来。
+    func redo() {
+        guard let next = history.redo(current: snapshot()) else { return }
+        apply(next)
+        show("已恢复")
+        Haptics.tap()
+    }
+
+    private func snapshot() -> EditorSnapshot {
+        EditorSnapshot(preset: preset, params: params)
+    }
+
+    private func apply(_ snapshot: EditorSnapshot) {
+        isRestoring = true
+        preset = snapshot.preset
+        params = snapshot.params
+        isRestoring = false
+        syncHistory()
+    }
+
     private func pushHistory() {
-        history.append(params)
-        if history.count > historyLimit { history.removeFirst() }
-        canUndo = true
+        history.record(snapshot())
+        syncHistory()
+    }
+
+    /// 手动拖滑杆也会写 params：这时再按「恢复」会把刚拖的那点改动吃掉，
+    /// 所以顺手把恢复分支丢掉。
+    private func dropRedoIfEdited() {
+        guard !isRestoring, history.canRedo else { return }
+        history.clearRedo()
+        syncHistory()
+    }
+
+    private func syncHistory() {
+        canUndo = history.canUndo
+        canRedo = history.canRedo
     }
 
     // MARK: - 渲染
@@ -320,6 +358,13 @@ final class EditorViewModel: ObservableObject {
 struct ShareFile: Identifiable {
     let id = UUID()
     let url: URL
+}
+
+/// 撤回 / 恢复记的一份快照。预设和参数必须一起退，
+/// 否则会出现「标题写着 CCD、画面其实是手机主摄」的错位。
+struct EditorSnapshot {
+    var preset: CameraPreset
+    var params: RealismParameters
 }
 
 /// 给后台渲染队列用的请求编号。渲染在后台线程、编号在主线程推进，

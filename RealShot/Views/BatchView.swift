@@ -52,7 +52,7 @@ struct BatchView: View {
                     .foregroundStyle(Theme.faint)
             }
 
-            HStack {
+            HStack(spacing: 8) {
                 Button {
                     model.reset()
                     Haptics.tap()
@@ -67,6 +67,14 @@ struct BatchView: View {
                 .disabled(model.isRunning)
                 .opacity(model.isRunning ? 0.4 : 1)
 
+                // 撤回 / 恢复：换预设、换随机、增删照片都能退回去
+                historyButton("arrow.uturn.backward", enabled: model.canUndo, label: "撤回") {
+                    model.undo()
+                }
+                historyButton("arrow.uturn.forward", enabled: model.canRedo, label: "恢复") {
+                    model.redo()
+                }
+
                 Spacer()
 
                 HStack(spacing: 8) {
@@ -75,20 +83,6 @@ struct BatchView: View {
                         .foregroundStyle(Theme.accent)
                         .monospacedDigit()
                         .frame(width: 34)
-
-                    // 不用退出去重选整批，直接往队列里加
-                    PhotosPicker(selection: $appendItems,
-                                 maxSelectionCount: 20,
-                                 matching: .images,
-                                 photoLibrary: .shared()) {
-                        Image(systemName: isAppending ? "ellipsis" : "plus")
-                            .font(.system(size: 13, weight: .semibold))
-                            .foregroundStyle(Theme.subtext)
-                            .frame(width: 34, height: 34)
-                            .background(Theme.surfaceRaised, in: Circle())
-                    }
-                    .disabled(model.isRunning || isAppending)
-                    .opacity(model.isRunning ? 0.4 : 1)
 
                     Button {
                         showHelp = true
@@ -108,6 +102,23 @@ struct BatchView: View {
         .padding(.vertical, 8)
     }
 
+    private func historyButton(_ symbol: String,
+                               enabled: Bool,
+                               label: String,
+                               action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            Image(systemName: symbol)
+                .font(.system(size: 12, weight: .semibold))
+                .foregroundStyle(enabled ? Theme.text : Theme.faint)
+                .frame(width: 30, height: 30)
+                .background(Theme.surfaceRaised, in: Circle())
+        }
+        .buttonStyle(.plain)
+        .disabled(!enabled)
+        .opacity(enabled ? 1 : 0.35)
+        .accessibilityLabel(label)
+    }
+
     private var hint: some View {
         Text("点开可拖动对比原图 · 长按删除")
             .font(.system(size: 10.5))
@@ -125,12 +136,44 @@ struct BatchView: View {
                 ForEach(model.items) { item in
                     cell(item)
                 }
+                if model.items.count < BatchViewModel.maxItems {
+                    addCell
+                }
             }
             .padding(.horizontal, 16)
             .padding(.top, 4)
             .padding(.bottom, 14)
         }
         .frame(maxHeight: .infinity)
+    }
+
+    /// 加号跟在最后一张后面：新照片本来就是追加到队尾的，
+    /// 放在头上会让人以为是从前面插进去。
+    private var addCell: some View {
+        PhotosPicker(selection: $appendItems,
+                     maxSelectionCount: 20,
+                     matching: .images,
+                     photoLibrary: .shared()) {
+            VStack(spacing: 6) {
+                Image(systemName: isAppending ? "ellipsis" : "plus")
+                    .font(.system(size: 18, weight: .medium))
+                Text(isAppending ? "读取中" : "添加")
+                    .font(.system(size: 10.5))
+            }
+            .foregroundStyle(model.isRunning ? Theme.faint : Theme.subtext)
+            .frame(height: 104)
+            .frame(maxWidth: .infinity)
+            .background(
+                RoundedRectangle(cornerRadius: 10, style: .continuous)
+                    .fill(Theme.surfaceRaised.opacity(0.5))
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: 10, style: .continuous)
+                    .strokeBorder(Theme.stroke, style: StrokeStyle(lineWidth: 1, dash: [4, 4]))
+            )
+        }
+        .disabled(model.isRunning || isAppending)
+        .opacity(model.isRunning ? 0.4 : 1)
     }
 
     private func cell(_ item: BatchItem) -> some View {
@@ -340,8 +383,7 @@ struct BatchView: View {
 
     /// 从相册补几张进来。重复的图不会被去重 —— 用户可能就是想再处理一遍。
     private func append(_ selection: [PhotosPickerItem]) {
-        let items = Array(selection.prefix(20))
-        guard !items.isEmpty else {
+        guard !selection.isEmpty else {
             appendItems = []
             return
         }
@@ -353,26 +395,17 @@ struct BatchView: View {
                 appendItems = []
             }
 
-            var payloads: [(data: Data, thumb: UIImage)] = []
-            var skipped = 0
-            for item in items {
-                guard let data = try? await item.loadTransferable(type: Data.self),
-                      let thumb = ImageLoader.image(from: data, maxPixel: ImageLoader.thumbnailPixel) else {
-                    skipped += 1
-                    continue
-                }
-                payloads.append((data: data, thumb: thumb))
-            }
+            let loaded = await PhotoPickerLoader.load(selection, limit: 20)
 
-            guard !payloads.isEmpty else {
+            guard !loaded.payloads.isEmpty else {
                 model.show("这些图片读不出来")
                 Haptics.warning()
                 return
             }
 
-            model.append(payloads)
-            if skipped > 0 {
-                model.show("有 \(skipped) 张读不出来，已跳过")
+            model.append(loaded.payloads.map { (data: $0.data, thumb: $0.thumb) })
+            if loaded.skipped > 0 {
+                model.show("有 \(loaded.skipped) 张读不出来，已跳过")
             }
             Haptics.success()
         }

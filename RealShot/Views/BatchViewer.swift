@@ -1,4 +1,5 @@
 import SwiftUI
+import PhotosUI
 import UIKit
 
 /// 批量队列里的单张查看器。
@@ -17,6 +18,8 @@ struct BatchViewer: View {
     @State private var isLoading = true
     @State private var confirmDelete = false
     @State private var shareFile: ShareFile?
+    @State private var appendItems: [PhotosPickerItem] = []
+    @State private var isAppending = false
 
     init(model: BatchViewModel, startID: UUID) {
         self.model = model
@@ -24,7 +27,7 @@ struct BatchViewer: View {
     }
 
     private var current: BatchItem? {
-        model.items.first { $0.id == currentID }
+        model.items.first { $0.id == currentID } ?? model.items.first
     }
 
     private var position: Int {
@@ -52,6 +55,10 @@ struct BatchViewer: View {
         }
         .onChange(of: model.previewGeneration) { _, _ in
             Task { await reload() }
+        }
+        .onChange(of: appendItems) { _, newValue in
+            guard !newValue.isEmpty else { return }
+            append(newValue)
         }
         .sheet(item: $shareFile) { file in
             ShareSheet(items: [file.url])
@@ -201,6 +208,11 @@ struct BatchViewer: View {
                         .buttonStyle(.plain)
                         .id(item.id)
                     }
+
+                    // 缩略图条末尾的加号：不用退出去，边看边往里加
+                    if model.items.count < BatchViewModel.maxItems {
+                        addThumb
+                    }
                 }
                 .padding(.horizontal, 16)
                 .padding(.vertical, 8)
@@ -211,6 +223,26 @@ struct BatchViewer: View {
             }
         }
         .frame(height: 66)
+    }
+
+    private var addThumb: some View {
+        PhotosPicker(selection: $appendItems,
+                     maxSelectionCount: 20,
+                     matching: .images,
+                     photoLibrary: .shared()) {
+            Image(systemName: isAppending ? "ellipsis" : "plus")
+                .font(.system(size: 16, weight: .medium))
+                .foregroundStyle(.white.opacity(0.7))
+                .frame(width: 50, height: 50)
+                .background(.white.opacity(0.08), in: RoundedRectangle(cornerRadius: 8, style: .continuous))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 8, style: .continuous)
+                        .strokeBorder(Color.white.opacity(0.22), style: StrokeStyle(lineWidth: 1, dash: [4, 4]))
+                )
+        }
+        .disabled(model.isRunning || isAppending)
+        .opacity(model.isRunning ? 0.35 : 1)
+        .accessibilityLabel("添加照片")
     }
 
     // MARK: 操作
@@ -228,6 +260,15 @@ struct BatchViewer: View {
                     Haptics.tap()
                 }
 
+                // 撤回 / 恢复就放在两个随机按钮旁边：换随机是探索，退回去是保底
+                pill("arrow.uturn.backward", "撤回", enabled: model.canUndo) {
+                    model.undo()
+                }
+
+                pill("arrow.uturn.forward", "恢复", enabled: model.canRedo) {
+                    model.redo()
+                }
+
                 pill("square.split.2x1", compare > 0.5 ? "看原图" : "看成片") {
                     compare = compare > 0.5 ? 0.0 : 1.0
                     Haptics.select()
@@ -243,20 +284,23 @@ struct BatchViewer: View {
         .padding(.bottom, 16)
     }
 
-    private func pill(_ symbol: String, _ title: String, action: @escaping () -> Void) -> some View {
+    private func pill(_ symbol: String,
+                      _ title: String,
+                      enabled: Bool = true,
+                      action: @escaping () -> Void) -> some View {
         Button(action: action) {
             HStack(spacing: 5) {
                 Image(systemName: symbol)
                 Text(title)
             }
             .font(.system(size: 11.5, weight: .medium))
-            .foregroundStyle(.white.opacity(0.9))
+            .foregroundStyle(.white.opacity(enabled ? 0.9 : 0.35))
             .padding(.horizontal, 12)
             .frame(height: 30)
-            .background(.white.opacity(0.12), in: Capsule())
+            .background(.white.opacity(enabled ? 0.12 : 0.05), in: Capsule())
         }
         .buttonStyle(.plain)
-        .disabled(model.isRunning)
+        .disabled(model.isRunning || !enabled)
         .opacity(model.isRunning ? 0.4 : 1)
     }
 
@@ -285,6 +329,17 @@ struct BatchViewer: View {
     // MARK: 动作
 
     private func reload() async {
+        // 撤回 / 恢复可能把整队换回之前的样子，当前这张也许已经不在队里了。
+        // 先挪到队首，避免停在一个空白页上。
+        if !model.items.contains(where: { $0.id == currentID }) {
+            guard let first = model.items.first else {
+                dismiss()
+                return
+            }
+            currentID = first.id
+            return
+        }
+
         guard let item = current else { return }
 
         // 看过的图直接上屏，不闪一下加载圈
@@ -314,6 +369,41 @@ struct BatchViewer: View {
         } else {
             let next = Swift.min(index, model.items.count - 1)
             currentID = model.items[next].id
+        }
+    }
+
+    /// 在查看器里直接往队列追加照片。
+    /// 加完自动跳到新加的第一张：它用的是「当前这套参数 + 自己的种子」，
+    /// 当面看到画面出来，比口头保证更容易确认参数真的生效了。
+    private func append(_ selection: [PhotosPickerItem]) {
+        guard !selection.isEmpty else {
+            appendItems = []
+            return
+        }
+
+        isAppending = true
+        Task { @MainActor in
+            defer {
+                isAppending = false
+                appendItems = []
+            }
+
+            let loaded = await PhotoPickerLoader.load(selection, limit: 20)
+
+            guard !loaded.payloads.isEmpty else {
+                model.show("这些图片读不出来")
+                Haptics.warning()
+                return
+            }
+
+            let added = model.append(loaded.payloads.map { (data: $0.data, thumb: $0.thumb) })
+            if loaded.skipped > 0 {
+                model.show("有 \(loaded.skipped) 张读不出来，已跳过")
+            }
+            if let first = added.first {
+                currentID = first
+            }
+            Haptics.success()
         }
     }
 
