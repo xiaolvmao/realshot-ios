@@ -207,6 +207,36 @@ def watch(owner, name, timeout_min):
     return run
 
 
+class _NoRedirect(urllib.request.HTTPRedirectHandler):
+    """拦住 302，好让调用方自己决定要不要带鉴权头去取重定向地址。"""
+
+    def redirect_request(self, req, fp, code, msg, headers, newurl):
+        return None
+
+
+def download(url, dest):
+    """artifact 的下载地址会 302 到 Azure 签名链接，
+    那里不接受 Authorization 头，所以只在第一跳带鉴权。"""
+    req = urllib.request.Request(url)
+    req.add_header("Authorization", "Bearer " + token())
+    req.add_header("Accept", "application/vnd.github+json")
+    req.add_header("User-Agent", "realshot-publisher")
+    opener = urllib.request.build_opener(urllib.request.ProxyHandler({}), _NoRedirect)
+    try:
+        with opener.open(req, timeout=60) as resp:
+            data = resp.read()
+    except urllib.error.HTTPError as e:
+        location = e.headers.get("Location")
+        if not location:
+            sys.exit("artifact 下载失败: HTTP {}".format(e.code))
+        plain = urllib.request.build_opener(urllib.request.ProxyHandler({}))
+        req2 = urllib.request.Request(location, headers={"User-Agent": "realshot-publisher"})
+        with plain.open(req2, timeout=180) as resp:
+            data = resp.read()
+    with open(dest, "wb") as fh:
+        fh.write(data)
+
+
 def fetch(owner, name, out_dir):
     run = latest_run(owner, name)
     if not run:
@@ -222,10 +252,8 @@ def fetch(owner, name, out_dir):
     os.makedirs(out_dir, exist_ok=True)
     for art in items:
         print("· 下载 {} ({:.1f} KB)".format(art["name"], art["size_in_bytes"] / 1024))
-        _, blob = request("GET", art["archive_download_url"], raw=True)
         zip_path = os.path.join(out_dir, art["name"] + ".zip")
-        with open(zip_path, "wb") as fh:
-            fh.write(blob)
+        download(art["archive_download_url"], zip_path)
         print("  已保存 {}".format(zip_path))
 
         import zipfile

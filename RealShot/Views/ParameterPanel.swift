@@ -219,27 +219,28 @@ struct ParameterPanel: View {
 // MARK: - 预设条
 
 struct PresetStrip: View {
-    @ObservedObject var model: EditorViewModel
+    let selected: CameraPreset
+    let onSelect: (CameraPreset) -> Void
 
     var body: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 8) {
                 ForEach(CameraPreset.allCases) { preset in
-                    let selected = preset == model.preset
+                    let isOn = preset == selected
                     Button {
-                        model.select(preset)
+                        onSelect(preset)
                     } label: {
                         VStack(spacing: 3) {
                             Image(systemName: preset.symbol)
                                 .font(.system(size: 14, weight: .medium))
                             Text(preset.title)
-                                .font(.system(size: 10.5, weight: selected ? .semibold : .regular))
+                                .font(.system(size: 10.5, weight: isOn ? .semibold : .regular))
                         }
-                        .foregroundStyle(selected ? Color.black : Theme.subtext)
+                        .foregroundStyle(isOn ? Color.black : Theme.subtext)
                         .frame(width: 66, height: 46)
                         .background(
                             RoundedRectangle(cornerRadius: 12, style: .continuous)
-                                .fill(selected ? Theme.accent : Theme.surfaceRaised)
+                                .fill(isOn ? Theme.accent : Theme.surfaceRaised)
                         )
                     }
                     .buttonStyle(.plain)

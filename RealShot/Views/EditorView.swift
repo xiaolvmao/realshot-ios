@@ -3,6 +3,7 @@ import UIKit
 
 struct EditorView: View {
     @ObservedObject var model: EditorViewModel
+    @State private var showHelp = false
 
     var body: some View {
         VStack(spacing: 0) {
@@ -167,11 +168,28 @@ struct EditorView: View {
                 .buttonStyle(.plain)
 
                 Spacer()
+
+                Button {
+                    showHelp = true
+                    Haptics.tap()
+                } label: {
+                    Image(systemName: "questionmark")
+                        .font(.system(size: 12, weight: .bold))
+                        .foregroundStyle(Theme.subtext)
+                        .frame(width: 30, height: 30)
+                        .background(Theme.surfaceRaised, in: Circle())
+                }
+                .buttonStyle(.plain)
+                .sheet(isPresented: $showHelp) {
+                    HelpView()
+                }
             }
             .padding(.horizontal, 16)
 
-            PresetStrip(model: model)
-                .padding(.bottom, 6)
+            PresetStrip(selected: model.preset) { preset in
+                model.select(preset)
+            }
+            .padding(.bottom, 6)
 
             ParameterPanel(model: model)
         }

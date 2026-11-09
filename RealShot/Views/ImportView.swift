@@ -5,25 +5,59 @@ import UIKit
 
 struct ImportView: View {
     @ObservedObject var model: EditorViewModel
+    @ObservedObject var batch: BatchViewModel
 
     @State private var pickedItem: PhotosPickerItem?
+    @State private var pickedItems: [PhotosPickerItem] = []
     @State private var isLoading = false
+    @State private var showHelp = false
 
     var body: some View {
         VStack(spacing: 0) {
-            Spacer(minLength: 24)
-            hero
-            Spacer(minLength: 28)
-            actions
             Spacer(minLength: 20)
+            hero
+            Spacer(minLength: 26)
+            actions
+            Spacer(minLength: 16)
             footnote
         }
         .padding(.horizontal, 26)
         .padding(.bottom, 18)
+        .overlay(alignment: .topTrailing) { helpButton }
+        .sheet(isPresented: $showHelp) {
+            HelpView()
+        }
         .onChange(of: pickedItem) { _, newValue in
             guard let newValue else { return }
             load(newValue)
         }
+        .onChange(of: pickedItems) { _, newValue in
+            guard !newValue.isEmpty else { return }
+            loadBatch(newValue)
+        }
+    }
+
+    // MARK: 右上角说明
+
+    private var helpButton: some View {
+        Button {
+            showHelp = true
+            Haptics.tap()
+        } label: {
+            HStack(spacing: 5) {
+                Image(systemName: "questionmark.circle")
+                Text("使用说明")
+            }
+            .font(.system(size: 12, weight: .medium))
+            .foregroundStyle(Theme.subtext)
+            .padding(.horizontal, 12)
+            .frame(height: 30)
+            .background(Theme.surface, in: Capsule())
+            .overlay(Capsule().stroke(Theme.stroke, lineWidth: 1))
+        }
+        .buttonStyle(.plain)
+        .padding(.trailing, 18)
+        .padding(.top, 6)
     }
 
     // MARK: 视觉
@@ -79,7 +113,7 @@ struct ImportView: View {
     // MARK: 操作
 
     private var actions: some View {
-        VStack(spacing: 12) {
+        VStack(spacing: 11) {
             PhotosPicker(selection: $pickedItem, matching: .images, photoLibrary: .shared()) {
                 HStack(spacing: 8) {
                     Image(systemName: "photo.on.rectangle.angled")
@@ -93,15 +127,21 @@ struct ImportView: View {
             }
             .simultaneousGesture(TapGesture().onEnded { Haptics.tap() })
 
-            Button {
-                paste()
-            } label: {
+            PhotosPicker(selection: $pickedItems,
+                         maxSelectionCount: 20,
+                         matching: .images,
+                         photoLibrary: .shared()) {
                 HStack(spacing: 8) {
-                    Image(systemName: "doc.on.clipboard")
-                    Text("从剪贴板粘贴")
+                    Image(systemName: "square.stack.3d.down.right")
+                    Text("批量处理（可多选）")
+                    Spacer(minLength: 0)
+                    Text("最多 20 张")
+                        .font(.system(size: 11))
+                        .foregroundStyle(Theme.faint)
                 }
                 .font(.system(size: 15, weight: .medium))
                 .foregroundStyle(Theme.text)
+                .padding(.horizontal, 16)
                 .frame(maxWidth: .infinity)
                 .frame(height: 50)
                 .background(Theme.surface, in: RoundedRectangle(cornerRadius: 16, style: .continuous))
@@ -110,11 +150,30 @@ struct ImportView: View {
                         .stroke(Theme.stroke, lineWidth: 1)
                 )
             }
+            .simultaneousGesture(TapGesture().onEnded { Haptics.tap() })
+
+            Button {
+                paste()
+            } label: {
+                HStack(spacing: 8) {
+                    Image(systemName: "doc.on.clipboard")
+                    Text("从剪贴板粘贴")
+                }
+                .font(.system(size: 14, weight: .medium))
+                .foregroundStyle(Theme.subtext)
+                .frame(maxWidth: .infinity)
+                .frame(height: 44)
+                .background(Theme.surface.opacity(0.55), in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+            }
 
             if isLoading {
-                ProgressView()
-                    .tint(Theme.accent)
-                    .padding(.top, 4)
+                HStack(spacing: 7) {
+                    ProgressView().tint(Theme.accent).scaleEffect(0.8)
+                    Text("正在读取…")
+                        .font(.system(size: 11.5))
+                        .foregroundStyle(Theme.subtext)
+                }
+                .padding(.top, 4)
             }
         }
     }
@@ -142,6 +201,30 @@ struct ImportView: View {
             }
             model.load(image)
             pickedItem = nil
+        }
+    }
+
+    /// 批量：只留原始数据 + 一张小缩略图，不把 20 张全尺寸图都解进内存。
+    private func loadBatch(_ selection: [PhotosPickerItem]) {
+        isLoading = true
+        Task { @MainActor in
+            defer {
+                isLoading = false
+                pickedItems = []
+            }
+            var payloads: [(data: Data, thumb: UIImage)] = []
+            for item in selection.prefix(20) {
+                guard let data = try? await item.loadTransferable(type: Data.self),
+                      let thumb = ImageLoader.image(from: data, maxPixel: 640) else { continue }
+                payloads.append((data: data, thumb: thumb))
+            }
+            guard !payloads.isEmpty else {
+                model.show("这些图片读不出来")
+                Haptics.warning()
+                return
+            }
+            batch.load(payloads)
+            Haptics.success()
         }
     }
 
