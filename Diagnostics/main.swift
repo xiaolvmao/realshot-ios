@@ -423,3 +423,54 @@ if seededRenders.count >= 2 {
 }
 
 print("  小结：\(rerollOK) / \(rerollChecked) 组不同种子产生了可见差异")
+
+// MARK: - 曝光 EV（色彩 tab 的「曝光」滑杆）是否真的起作用
+//
+// 代码里 abs(exposure) <= 0.005 会整段跳过 CIExposureAdjust，
+// 所以取 0 时这个节点根本不执行 —— 界面上看着像“空”的原因就在这里。
+// 这里按档位扫一遍，量出平均亮度的实际变化。
+
+func meanLuma(_ cg: CGImage) -> Double? {
+    guard let b = bitmap(cg) else { return nil }
+    let n = cg.width * cg.height
+    var sum = 0.0
+    for i in 0..<n {
+        let o = i * 4
+        sum += 0.2126 * Double(b[o]) + 0.7152 * Double(b[o + 1]) + 0.0722 * Double(b[o + 2])
+    }
+    return sum / Double(n) / 255.0
+}
+
+print("\n=== 曝光 EV（色彩 → 曝光）===")
+
+// 先做一次 jitter，再把 exposure 钉死，避免随机量混进来
+var evBase = CameraPreset.phone.baseParameters.jittered(seed: 20261109)
+evBase.exposure = 0
+
+var evTable: [(ev: Double, mean: Double)] = []
+for ev in [-0.4, -0.2, 0.0, 0.2, 0.4] {
+    var p = evBase
+    p.exposure = ev
+    let request = RenderRequest(params: p, frame: .ratio4x3,
+                                trimBars: true, anchor: 0.5, longEdge: 0)
+    guard let cg = engine.makeFinal(source, request: request),
+          let mean = meanLuma(cg) else {
+        print(String(format: "  %+.1fEV → 渲染失败", ev))
+        continue
+    }
+    evTable.append((ev, mean))
+    writePNG(CIImage(cgImage: cg), to: "\(outDir)/ev-\(ev).png")
+}
+
+if let zero = evTable.first(where: { abs($0.ev) < 0.001 })?.mean {
+    for row in evTable {
+        print(String(format: "  %+.1fEV → 平均亮度 %.4f  (%+.1f%%)",
+                     row.ev, row.mean, (row.mean / zero - 1) * 100))
+    }
+    // 线性空间里 +1EV 应该正好亮一倍，这里换成等价的倍数看一眼
+    for row in evTable where abs(row.ev) > 0.001 {
+        let ratio = pow(2.0, row.ev)
+        print(String(format: "  %+.1fEV 理论增益 ×%.2f，线性光等效 ×%.2f",
+                     row.ev, ratio, row.mean / zero))
+    }
+}
