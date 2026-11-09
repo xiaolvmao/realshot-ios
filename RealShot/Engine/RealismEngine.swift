@@ -90,9 +90,9 @@ final class RealismEngine: @unchecked Sendable {
         }
 
         step("0-source", image)
-        var img = prepare(image, request: request, maxDimension: sampleDimension)
-        step("1-prepared", img)
-        img = geometry(img, params: request.params)
+        let prepared = prepare(image, request: request, maxDimension: sampleDimension)
+        step("1-prepared", prepared)
+        var img = geometry(prepared, params: request.params)
         step("2-geometry", img)
         img = color(img, params: request.params)
         step("3-color", img)
@@ -103,10 +103,16 @@ final class RealismEngine: @unchecked Sendable {
         img = scene(img, params: request.params)
         step("6-scene", img)
 
-        if let cg = render(img, params: request.params) {
-            step("7-final+jpeg", CIImage(cgImage: cg))
+        // 编码链单独测：光栅化一步、JPEG 往返一步
+        let piped = pipelineImage(prepared, params: request.params)
+        step("7-pipeline", piped)
+        if let cg = makeCGImage(piped, fallbackExtent: prepared.extent) {
+            step("8-cgimage", CIImage(cgImage: cg))
+            let jpg = JpegDegrader.degrade(cg, quality: request.params.jpegQuality,
+                                           passes: request.params.jpegPasses)
+            step("9-jpeg", CIImage(cgImage: jpg))
         } else {
-            out.append(StageMetric(name: "7-final+jpeg NIL", meanR: -1, meanG: -1, meanB: -1,
+            out.append(StageMetric(name: "8-cgimage NIL", meanR: -1, meanG: -1, meanB: -1,
                                    meanA: -1, minLuma: -1, maxLuma: -1))
         }
         return out
@@ -241,6 +247,14 @@ final class RealismEngine: @unchecked Sendable {
     // MARK: - 主链路
 
     private func render(_ input: CIImage, params p: RealismParameters) -> CGImage? {
+        let img = pipelineImage(input, params: p)
+        guard let cg = makeCGImage(img, fallbackExtent: input.extent) else { return nil }
+        // 最后一步：真实的有损压缩
+        return JpegDegrader.degrade(cg, quality: p.jpegQuality, passes: p.jpegPasses)
+    }
+
+    /// 几何 → 色彩 → 光学 → 传感器 → 场景，不含编码。
+    func pipelineImage(_ input: CIImage, params p: RealismParameters) -> CIImage {
         var img = input
         img = geometry(img, params: p)
         img = color(img, params: p)
@@ -253,29 +267,24 @@ final class RealismEngine: @unchecked Sendable {
         if p.grain > 0.005 || p.chromaNoise > 0.005 {
             let before = meanLuma(preSensor)
             let after = meanLuma(sensorOut)
-            if before > 0.02, after < before * 0.45 {
-                img = preSensor
-            } else {
-                img = sensorOut
-            }
+            img = (before > 0.02 && after < before * 0.45) ? preSensor : sensorOut
         } else {
             img = sensorOut
         }
 
-        img = scene(img, params: p)
+        return scene(img, params: p)
+    }
 
-        var rect = img.extent
+    /// 光栅化。抽出来是为了能单独测「CGImage 这一步」有没有掉亮度。
+    func makeCGImage(_ image: CIImage, fallbackExtent: CGRect) -> CGImage? {
+        var rect = image.extent
         if !rect.isInfinite && !rect.isNull {
             rect = rect.integral
         } else {
-            rect = input.extent.integral
+            rect = fallbackExtent.integral
         }
-        guard rect.width > 4, rect.height > 4,
-              let cg = context.createCGImage(img, from: rect, format: .RGBA8, colorSpace: srgb) else {
-            return nil
-        }
-        // 最后一步：真实的有损压缩
-        return JpegDegrader.degrade(cg, quality: p.jpegQuality, passes: p.jpegPasses)
+        guard rect.width > 4, rect.height > 4 else { return nil }
+        return context.createCGImage(image, from: rect, format: .RGBA8, colorSpace: srgb)
     }
 
     // MARK: - 几何
@@ -472,12 +481,12 @@ final class RealismEngine: @unchecked Sendable {
 
         // 亮度颗粒
         if let grain = grainLayer(offsetX: ox, offsetY: oy, extent: extent, params: p) {
-            img = addLayer(grain, over: img, amplitude: p.grain * 0.10)
+            img = addLayer(grain, over: img)
         }
 
         // 彩色噪点：先糊成大色斑，再叠回去，才像高感的暗部色噪
         if let chroma = chromaLayer(offsetX: ox + 217, offsetY: oy + 149, extent: extent, params: p) {
-            img = addLayer(chroma, over: img, amplitude: p.chromaNoise * 0.14)
+            img = addLayer(chroma, over: img)
         }
 
         return img
@@ -500,14 +509,10 @@ final class RealismEngine: @unchecked Sendable {
         ])
     }
 
-    /// 加性叠加：底图先减 amplitude/2，再把均值为 0 的图层加回去。
+    /// 加性叠加：图层本身均值为 0，直接相加即可，
     /// 净效果 = 原图 + amplitude·(n − 0.5)，不会整体偏亮或偏暗。
-    private func addLayer(_ layer: CIImage, over image: CIImage, amplitude: Double) -> CIImage {
-        let a = CGFloat(min(max(amplitude, 0), 1)) / 2
-        let shifted = apply("CIColorMatrix", image, [
-            "inputBiasVector": CIVector(x: -a, y: -a, z: -a, w: 0)
-        ])
-        return apply("CIAdditionCompositing", layer, [kCIInputBackgroundImageKey: shifted])
+    private func addLayer(_ layer: CIImage, over image: CIImage) -> CIImage {
+        apply("CIAdditionCompositing", layer, [kCIInputBackgroundImageKey: image])
             .cropped(to: image.extent)
     }
 

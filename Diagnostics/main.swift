@@ -220,7 +220,31 @@ for stage in RealismEngine.PipelineStage.allCases {
 
 print("\n中间图已写入 \(outDir)")
 
-// MARK: - 定点排查
+// MARK: - JPEG 往返
+//
+// 单独验一次：一张 50% 灰编码成 JPEG 再解码，应该还是 0.5。
+// 如果掉到 0.25 或 0.17，说明问题不在滤镜，而在编码/色彩空间。
+
+func grayImage(_ v: CGFloat, width: Int, height: Int) -> CGImage? {
+    guard let ctx = CGContext(data: nil, width: width, height: height,
+                              bitsPerComponent: 8, bytesPerRow: width * 4, space: srgb,
+                              bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue) else { return nil }
+    ctx.setFillColor(CGColor(colorSpace: srgb, components: [v, v, v, 1])!)
+    ctx.fill(CGRect(x: 0, y: 0, width: width, height: height))
+    return ctx.makeImage()
+}
+
+print("\n=== JPEG 往返 ===")
+for v in [0.25, 0.5, 0.75] {
+    guard let gray = grayImage(CGFloat(v), width: 256, height: 256) else { continue }
+    show(engine.debugMeasure("gray-in \(v)", CIImage(cgImage: gray)))
+    if let enc = JpegDegrader.encode(gray, quality: 0.85),
+       let dec = JpegDegrader.decode(enc) {
+        show(engine.debugMeasure("gray-after-jpeg \(v)", CIImage(cgImage: dec)))
+        print("     colorspace=\(String(describing: dec.colorSpace?.name)) "
+              + "bits=\(dec.bitsPerComponent) alpha=\(dec.alphaInfo.rawValue)")
+    }
+}
 //
 // 上面已经定位到 sensor 这一级。这里把「真实链路输入 + 各种参数组合」逐一测一遍，
 // 确认是颗粒、色噪，还是 grainSize 触发的模糊路径。
