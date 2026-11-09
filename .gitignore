@@ -1,0 +1,16 @@
+# Xcode / 构建产物
+build/
+dist/
+DerivedData/
+*.xcarchive
+*.ipa
+*.dSYM.zip
+
+# 用户级设置
+xcuserdata/
+*.xcuserstate
+*.xcscmblueprint
+
+# 系统
+.DS_Store
+Thumbs.db

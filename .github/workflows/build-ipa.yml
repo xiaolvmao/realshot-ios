@@ -1,0 +1,63 @@
+name: Build IPA
+
+# 没有 Mac 也能出包：push 之后到 Actions 页面下载 artifact。
+# 产出的是无签名 IPA，用 Sideloadly / AltStore 用自己的 Apple ID 重签安装。
+
+on:
+  push:
+    branches: [main, master]
+  workflow_dispatch:
+
+jobs:
+  ipa:
+    runs-on: macos-15
+    timeout-minutes: 30
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: 检查工具链
+        run: |
+          xcodebuild -version
+          xcode-select -p
+
+      - name: 定位工程目录
+        run: |
+          if [ -f "RealShot.xcodeproj/project.pbxproj" ]; then
+            echo "PROJECT_DIR=$PWD" >> "$GITHUB_ENV"
+          elif [ -f "RealShot/RealShot.xcodeproj/project.pbxproj" ]; then
+            echo "PROJECT_DIR=$PWD/RealShot" >> "$GITHUB_ENV"
+          elif [ -f "照片ios/RealShot/RealShot.xcodeproj/project.pbxproj" ]; then
+            echo "PROJECT_DIR=$PWD/照片ios/RealShot" >> "$GITHUB_ENV"
+          else
+            echo "找不到 RealShot.xcodeproj"; exit 1
+          fi
+          echo "工程目录: $PROJECT_DIR"
+
+      - name: 校验工程可被 Xcode 读取
+        run: |
+          cd "$PROJECT_DIR"
+          if xcodebuild -list -project RealShot.xcodeproj; then
+            echo "工程文件解析正常"
+          else
+            echo "::warning::提交的 .xcodeproj 无法解析，改用 XcodeGen 从 project.yml 重新生成"
+            brew install xcodegen
+            xcodegen generate
+            xcodebuild -list -project RealShot.xcodeproj
+          fi
+
+      - name: 打包
+        run: |
+          chmod +x "$PROJECT_DIR/scripts/build_ipa.sh"
+          "$PROJECT_DIR/scripts/build_ipa.sh"
+
+      - name: 检查产物
+        run: ls -lh "$PROJECT_DIR/dist"
+
+      - name: 上传 IPA
+        uses: actions/upload-artifact@v4
+        with:
+          name: RealShot-unsigned-ipa
+          path: "**/dist/*.ipa"
+          if-no-files-found: error
+          retention-days: 30
