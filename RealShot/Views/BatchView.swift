@@ -71,7 +71,7 @@ struct BatchView: View {
     }
 
     private var hint: some View {
-        Text("点开可比对原图 · 长按删除")
+        Text("点开可拖动对比原图 · 长按删除")
             .font(.system(size: 10.5))
             .foregroundStyle(Theme.faint)
             .frame(maxWidth: .infinity, alignment: .leading)

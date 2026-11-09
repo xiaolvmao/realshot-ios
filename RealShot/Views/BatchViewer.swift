@@ -2,14 +2,16 @@ import SwiftUI
 import UIKit
 
 /// 批量队列里的单张查看器。
-/// 交互向编辑器看齐：左右滑动或点药丸切「原图 / 成片」，底部缩略图换张，
+/// 交互向编辑器看齐：拖动分割线比对「原图 / 成片」，底部缩略图换张，
 /// 顺手能重掷随机、分享、看说明、删除。
 struct BatchViewer: View {
     @ObservedObject var model: BatchViewModel
     @Environment(\.dismiss) private var dismiss
 
     @State private var currentID: UUID
-    @State private var showOriginal = false
+    /// 分割线位置，0 = 全原图，1 = 全成片。和编辑器用的是同一个交互。
+    @State private var compare: Double = 1.0
+    @State private var showDragHint = true
     @State private var before: UIImage?
     @State private var after: UIImage?
     @State private var isLoading = true
@@ -37,13 +39,17 @@ struct BatchViewer: View {
             VStack(spacing: 0) {
                 topBar
                 imageArea
-                modeSwitch
                 thumbStrip
                 actionBar
             }
         }
         .statusBarHidden()
         .task(id: currentID) { await reload() }
+        .task {
+            // 拖过一次或等几秒就收起来，别一直挡着画面
+            try? await Task.sleep(nanoseconds: 4_500_000_000)
+            showDragHint = false
+        }
         .onChange(of: model.previewGeneration) { _, _ in
             Task { await reload() }
         }
@@ -109,10 +115,8 @@ struct BatchViewer: View {
 
     private var imageArea: some View {
         ZStack {
-            if let image = showOriginal ? before : after {
-                Image(uiImage: image)
-                    .resizable()
-                    .aspectRatio(contentMode: .fit)
+            if let before = before, let after = after {
+                CompareSlider(before: before, after: after, position: $compare)
                     .padding(.horizontal, 4)
             } else if isLoading {
                 ProgressView()
@@ -144,48 +148,30 @@ struct BatchViewer: View {
                 }
                 .allowsHitTesting(false)
             }
+
+            if before != nil, after != nil, showDragHint {
+                VStack {
+                    Spacer()
+                    HStack(spacing: 5) {
+                        Image(systemName: "hand.draw")
+                            .font(.system(size: 10))
+                        Text("拖动中间圆点对比")
+                            .font(.system(size: 10.5, weight: .medium))
+                    }
+                    .foregroundStyle(.white.opacity(0.78))
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 5)
+                    .background(.black.opacity(0.45), in: Capsule())
+                    .padding(.bottom, 12)
+                }
+                .allowsHitTesting(false)
+                .transition(.opacity)
+            }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .contentShape(Rectangle())
-        .gesture(swipeBetweenVersions)
-        .animation(.easeInOut(duration: 0.18), value: showOriginal)
-    }
-
-    /// 右滑看原图、左滑看成片。
-    private var swipeBetweenVersions: some Gesture {
-        DragGesture(minimumDistance: 24)
-            .onEnded { value in
-                let dx = value.translation.width
-                guard abs(dx) > 44, abs(dx) > abs(value.translation.height) else { return }
-                let target = dx > 0
-                guard target != showOriginal else { return }
-                showOriginal = target
-                Haptics.select()
-            }
-    }
-
-    private var modeSwitch: some View {
-        HStack(spacing: 6) {
-            modePill("原图", active: showOriginal) { showOriginal = true }
-            modePill("成片", active: !showOriginal) { showOriginal = false }
-        }
-        .padding(.top, 6)
-    }
-
-    private func modePill(_ title: String, active: Bool, action: @escaping () -> Void) -> some View {
-        Button {
-            guard !active else { return }
-            action()
-            Haptics.select()
-        } label: {
-            Text(title)
-                .font(.system(size: 11.5, weight: active ? .semibold : .regular))
-                .foregroundStyle(active ? Color.black : .white.opacity(0.6))
-                .padding(.horizontal, 14)
-                .frame(height: 26)
-                .background(active ? Theme.accent : Color.white.opacity(0.1), in: Capsule())
-        }
-        .buttonStyle(.plain)
+        .animation(.easeInOut(duration: 0.25), value: showDragHint)
+        .animation(.easeInOut(duration: 0.18), value: isLoading)
+        .onChange(of: compare) { _, _ in showDragHint = false }
     }
 
     // MARK: 缩略图条
@@ -242,8 +228,8 @@ struct BatchViewer: View {
                     Haptics.tap()
                 }
 
-                pill("square.split.2x1", showOriginal ? "看成片" : "看原图") {
-                    showOriginal.toggle()
+                pill("square.split.2x1", compare > 0.5 ? "看原图" : "看成片") {
+                    compare = compare > 0.5 ? 0.0 : 1.0
                     Haptics.select()
                 }
 
