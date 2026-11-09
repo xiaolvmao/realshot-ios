@@ -268,7 +268,6 @@ struct BatchViewer: View {
                 pill("arrow.uturn.forward", "恢复", enabled: model.canRedo) {
                     model.redo()
                 }
-
                 pill("square.split.2x1", compare > 0.5 ? "看原图" : "看成片") {
                     compare = compare > 0.5 ? 0.0 : 1.0
                     Haptics.select()

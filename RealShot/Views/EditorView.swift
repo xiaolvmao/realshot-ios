@@ -33,7 +33,7 @@ struct EditorView: View {
                     .foregroundStyle(Theme.faint)
             }
 
-            HStack(spacing: 8) {
+            HStack(spacing: 6) {
                 Button {
                     model.closeEditor()
                     Haptics.tap()
@@ -46,7 +46,7 @@ struct EditorView: View {
                 }
                 .buttonStyle(.plain)
 
-                Spacer()
+                Spacer(minLength: 4)
 
                 historyButton("arrow.uturn.backward", enabled: model.canUndo, label: "撤回") {
                     model.undo()
@@ -61,7 +61,7 @@ struct EditorView: View {
                     Text("保存")
                         .font(.system(size: 13.5, weight: .semibold))
                         .foregroundStyle(Color.black)
-                        .padding(.horizontal, 16)
+                        .padding(.horizontal, 14)
                         .frame(height: 34)
                         .background(Theme.accent, in: Capsule())
                 }

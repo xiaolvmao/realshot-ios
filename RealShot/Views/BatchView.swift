@@ -68,10 +68,10 @@ struct BatchView: View {
                 .opacity(model.isRunning ? 0.4 : 1)
 
                 // 撤回 / 恢复：换预设、换随机、增删照片都能退回去
-                historyButton("arrow.uturn.backward", enabled: model.canUndo, label: "撤回") {
+                historyButton("arrow.uturn.backward", enabled: model.canUndo && !model.isRunning, label: "撤回") {
                     model.undo()
                 }
-                historyButton("arrow.uturn.forward", enabled: model.canRedo, label: "恢复") {
+                historyButton("arrow.uturn.forward", enabled: model.canRedo && !model.isRunning, label: "恢复") {
                     model.redo()
                 }
 
