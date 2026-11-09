@@ -54,7 +54,7 @@ struct HelpView: View {
         VStack(alignment: .leading, spacing: 14) {
             heading("三步上手")
 
-            step(1, "选图", "从相册挑一张，或从剪贴板粘贴。点「批量处理」可以一次选多张。")
+            step(1, "选图", "从相册选，或从剪贴板粘贴。相册面板本身支持多选：只选一张就直接进编辑，选两张以上自动进入批量。")
             step(2, "挑预设再微调", "六个预设对应六种器材。先选最接近的一个，再动滑杆。")
             step(3, "保存", "点右上角「保存」写入相册。想先看效果，拖动中间的竖线对比原图。")
         }
@@ -108,7 +108,7 @@ struct HelpView: View {
         VStack(alignment: .leading, spacing: 10) {
             heading("批量处理")
 
-            Text("一次最多选 20 张。选好后先挑预设和画幅，再点「开始处理并保存」，它会逐张渲染并直接写进相册，缩略图上打勾的就是完成的。")
+            Text("在相册面板里选两张以上，就会自动进到这里，一次最多 20 张。选好后先挑预设和画幅，再点「开始处理并保存」，它会逐张渲染并直接写进相册，缩略图上打勾的就是完成的。")
                 .font(.system(size: 13))
                 .foregroundStyle(Theme.subtext)
                 .lineSpacing(3)

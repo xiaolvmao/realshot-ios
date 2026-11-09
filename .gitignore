@@ -14,3 +14,7 @@ xcuserdata/
 # 系统
 .DS_Store
 Thumbs.db
+
+# 排障产物（只在 CI 里生成并作为 artifact 取回，不进仓库）
+diag/
+ci.log

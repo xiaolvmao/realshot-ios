@@ -7,10 +7,16 @@ struct ImportView: View {
     @ObservedObject var model: EditorViewModel
     @ObservedObject var batch: BatchViewModel
 
-    @State private var pickedItem: PhotosPickerItem?
+    /// 相册选择统一走多选：选 1 张直接进编辑器，多张进批量。
+    /// 系统多选面板本身就是原生的多选 UI（拖选、连续点选都支持）。
     @State private var pickedItems: [PhotosPickerItem] = []
     @State private var isLoading = false
+    @State private var readDone = 0
+    @State private var readTotal = 0
     @State private var showHelp = false
+
+    /// 与相册面板的上限保持一致，也是批量队列的上限。
+    private static let maxSelection = 20
 
     var body: some View {
         VStack(spacing: 0) {
@@ -27,13 +33,9 @@ struct ImportView: View {
         .sheet(isPresented: $showHelp) {
             HelpView()
         }
-        .onChange(of: pickedItem) { _, newValue in
-            guard let newValue else { return }
-            load(newValue)
-        }
         .onChange(of: pickedItems) { _, newValue in
             guard !newValue.isEmpty else { return }
-            loadBatch(newValue)
+            load(newValue)
         }
     }
 
@@ -114,41 +116,25 @@ struct ImportView: View {
 
     private var actions: some View {
         VStack(spacing: 11) {
-            PhotosPicker(selection: $pickedItem, matching: .images, photoLibrary: .shared()) {
-                HStack(spacing: 8) {
-                    Image(systemName: "photo.on.rectangle.angled")
-                    Text("从相册选择")
-                }
-                .font(.system(size: 16, weight: .semibold))
-                .foregroundStyle(Color.black)
-                .frame(maxWidth: .infinity)
-                .frame(height: 54)
-                .background(Theme.accent, in: RoundedRectangle(cornerRadius: 16, style: .continuous))
-            }
-            .simultaneousGesture(TapGesture().onEnded { Haptics.tap() })
-
             PhotosPicker(selection: $pickedItems,
-                         maxSelectionCount: 20,
+                         maxSelectionCount: Self.maxSelection,
                          matching: .images,
                          photoLibrary: .shared()) {
-                HStack(spacing: 8) {
-                    Image(systemName: "square.stack.3d.down.right")
-                    Text("批量处理（可多选）")
-                    Spacer(minLength: 0)
-                    Text("最多 20 张")
-                        .font(.system(size: 11))
-                        .foregroundStyle(Theme.faint)
+                VStack(spacing: 3) {
+                    HStack(spacing: 8) {
+                        Image(systemName: "photo.on.rectangle.angled")
+                        Text("从相册选择")
+                    }
+                    .font(.system(size: 16, weight: .semibold))
+
+                    Text("可多选 · 1 张直接编辑，多张批量处理")
+                        .font(.system(size: 11, weight: .medium))
+                        .opacity(0.62)
                 }
-                .font(.system(size: 15, weight: .medium))
-                .foregroundStyle(Theme.text)
-                .padding(.horizontal, 16)
+                .foregroundStyle(Color.black)
                 .frame(maxWidth: .infinity)
-                .frame(height: 50)
-                .background(Theme.surface, in: RoundedRectangle(cornerRadius: 16, style: .continuous))
-                .overlay(
-                    RoundedRectangle(cornerRadius: 16, style: .continuous)
-                        .stroke(Theme.stroke, lineWidth: 1)
-                )
+                .frame(height: 64)
+                .background(Theme.accent, in: RoundedRectangle(cornerRadius: 16, style: .continuous))
             }
             .simultaneousGesture(TapGesture().onEnded { Haptics.tap() })
 
@@ -169,7 +155,7 @@ struct ImportView: View {
             if isLoading {
                 HStack(spacing: 7) {
                     ProgressView().tint(Theme.accent).scaleEffect(0.8)
-                    Text("正在读取…")
+                    Text(readTotal > 1 ? "正在读取 \(max(readDone, 1)) / \(readTotal)…" : "正在读取…")
                         .font(.system(size: 11.5))
                         .foregroundStyle(Theme.subtext)
                 }
@@ -190,38 +176,59 @@ struct ImportView: View {
 
     // MARK: 动作
 
-    private func load(_ item: PhotosPickerItem) {
-        isLoading = true
-        Task { @MainActor in
-            defer { isLoading = false }
-            guard let data = try? await item.loadTransferable(type: Data.self),
-                  let image = ImageLoader.image(from: data) else {
-                model.show("这张图片读不出来")
-                return
-            }
-            model.load(image)
-            pickedItem = nil
+    /// 统一的入口：一张进编辑器，多张进批量队列。
+    private func load(_ selection: [PhotosPickerItem]) {
+        let items = Array(selection.prefix(Self.maxSelection))
+        guard !items.isEmpty else {
+            pickedItems = []
+            return
         }
-    }
 
-    /// 批量：只留原始数据 + 一张小缩略图，不把 20 张全尺寸图都解进内存。
-    private func loadBatch(_ selection: [PhotosPickerItem]) {
         isLoading = true
+        readTotal = items.count
+        readDone = 0
+
         Task { @MainActor in
             defer {
                 isLoading = false
+                readDone = 0
+                readTotal = 0
                 pickedItems = []
             }
+
+            // 单张：直接进编辑器，不必绕一步批量队列。
+            if items.count == 1 {
+                guard let data = try? await items[0].loadTransferable(type: Data.self),
+                      let image = ImageLoader.image(from: data) else {
+                    model.show("这张图片读不出来")
+                    Haptics.warning()
+                    return
+                }
+                model.load(image)
+                Haptics.success()
+                return
+            }
+
+            // 多张：只留原始数据 + 一张小缩略图，不把 20 张全尺寸图都解进内存。
             var payloads: [(data: Data, thumb: UIImage)] = []
-            for item in selection.prefix(20) {
+            var skipped = 0
+            for item in items {
+                defer { readDone += 1 }
                 guard let data = try? await item.loadTransferable(type: Data.self),
-                      let thumb = ImageLoader.image(from: data, maxPixel: 640) else { continue }
+                      let thumb = ImageLoader.image(from: data, maxPixel: 640) else {
+                    skipped += 1
+                    continue
+                }
                 payloads.append((data: data, thumb: thumb))
             }
+
             guard !payloads.isEmpty else {
                 model.show("这些图片读不出来")
                 Haptics.warning()
                 return
+            }
+            if skipped > 0 {
+                model.show("有 \(skipped) 张读不出来，已跳过")
             }
             batch.load(payloads)
             Haptics.success()
