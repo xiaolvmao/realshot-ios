@@ -320,3 +320,106 @@ for (kind, layer) in engine.noiseLayerImages(opticsOut, params: phoneParams) {
     bm2.name = kind + " over optics"
     show(bm2)
 }
+
+// MARK: - 随机种子（批量页「单张随机 / 全部随机」是否生效）
+//
+// 两个重掷按钮本质上只做一件事：把该张的 seed 换成一个随机数。
+// 能不能“生效”取决于两件事，各测一次：
+//   1. 不同 seed → 参数不同 → 渲染结果不同（RMS 应明显 > 0）
+//   2. 同一 seed 重复渲染 → 结果完全一致（RMS 应为 0，预览才代表最终保存的那张）
+// 这里直接用真机上的调用路径 engine.makeFinal，不另写一条渲染链。
+
+func bitmap(_ cg: CGImage) -> [UInt8]? {
+    let w = cg.width, h = cg.height
+    guard w > 1, h > 1 else { return nil }
+    var buf = [UInt8](repeating: 0, count: w * h * 4)
+    let ok: Bool = buf.withUnsafeMutableBytes { raw in
+        guard let base = raw.baseAddress,
+              let ctx = CGContext(data: base, width: w, height: h,
+                                  bitsPerComponent: 8, bytesPerRow: w * 4,
+                                  space: srgb,
+                                  bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue) else { return false }
+        ctx.draw(cg, in: CGRect(x: 0, y: 0, width: w, height: h))
+        return true
+    }
+    return ok ? buf : nil
+}
+
+/// 两张同尺寸成片的像素差：RMS（0…1）、单通道最大差、有变化的像素占比。
+func pixelStats(_ a: CGImage, _ b: CGImage) -> (rms: Double, maxDelta: Int, changed: Double)? {
+    guard a.width == b.width, a.height == b.height,
+          let A = bitmap(a), let B = bitmap(b) else { return nil }
+    let n = a.width * a.height
+    var sum = 0.0
+    var maxDelta = 0
+    var changed = 0
+    for i in 0..<n {
+        let o = i * 4
+        var local = 0
+        for c in 0..<3 {
+            let d = abs(Int(A[o + c]) - Int(B[o + c]))
+            sum += Double(d * d)
+            if d > local { local = d }
+        }
+        if local > 0 { changed += 1 }
+        if local > maxDelta { maxDelta = local }
+    }
+    return (rms: (sum / Double(n * 3)).squareRoot() / 255.0,
+            maxDelta: maxDelta,
+            changed: Double(changed) / Double(n))
+}
+
+print("\n=== 随机种子（批量页「单张随机 / 全部随机」）===")
+
+let jitterBase = CameraPreset.phone.baseParameters
+print("  基准参数 grain=\(String(format: "%.2f", jitterBase.grain)) "
+      + "size=\(String(format: "%.2f", jitterBase.grainSize)) "
+      + "chroma=\(String(format: "%.2f", jitterBase.chromaNoise)) "
+      + "vig=\(String(format: "%.2f", jitterBase.vignette)) "
+      + "exposure=\(String(format: "%+.2f", jitterBase.exposure))")
+
+func seededRequest(_ seed: UInt64) -> RenderRequest {
+    RenderRequest(params: jitterBase.jittered(seed: seed),
+                  frame: .ratio4x3, trimBars: true, anchor: 0.5, longEdge: 0)
+}
+
+var seededRenders: [(seed: UInt64, image: CGImage)] = []
+for seed in [UInt64(2026), UInt64(2027), UInt64(2028)] {
+    let p = jitterBase.jittered(seed: seed)
+    print(String(format: "  seed %llu  grain=%.3f size=%.2f chroma=%.3f vig=%.3f "
+                 + "bloom=%.3f exposure=%+.3f warmth=%.3f rot=%+.2f",
+                 seed, p.grain, p.grainSize, p.chromaNoise, p.vignette,
+                 p.bloom, p.exposure, p.warmth, p.rotation))
+
+    if let cg = engine.makeFinal(source, request: seededRequest(seed)) {
+        seededRenders.append((seed, cg))
+        writePNG(CIImage(cgImage: cg), to: "\(outDir)/seed-\(seed).png")
+    } else {
+        print("  ⚠️ seed \(seed) 渲染失败")
+    }
+}
+
+var rerollOK = 0
+var rerollChecked = 0
+if seededRenders.count >= 2 {
+    let first = seededRenders[0]
+    for other in seededRenders.dropFirst() {
+        guard let st = pixelStats(first.image, other.image) else { continue }
+        rerollChecked += 1
+        let changed = st.rms > 0.004 && st.changed > 0.15
+        if changed { rerollOK += 1 }
+        print(String(format: "  seed %llu vs %llu → RMS %.2f%%  maxΔ %3d  变化像素 %.1f%%  %@",
+                     first.seed, other.seed, st.rms * 100, st.maxDelta, st.changed * 100,
+                     changed ? "✓ 画面确实变了" : "✗ 几乎一模一样"))
+    }
+
+    // 同种子重渲染：必须逐像素一致，否则「预览 = 保存」这个承诺就不成立
+    if let again = engine.makeFinal(source, request: seededRequest(seed: first.seed)),
+       let st = pixelStats(first.image, again) {
+        print(String(format: "  同种子重复渲染 → RMS %.2f%%  maxΔ %d  %@",
+                     st.rms * 100, st.maxDelta,
+                     st.maxDelta == 0 ? "✓ 完全一致（可复现）" : "✗ 不一致（预览与最终保存会不同）"))
+    }
+}
+
+print("  小结：\(rerollOK) / \(rerollChecked) 组不同种子产生了可见差异")

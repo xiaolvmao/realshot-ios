@@ -9,14 +9,13 @@ struct BatchViewer: View {
     @Environment(\.dismiss) private var dismiss
 
     @State private var currentID: UUID
-    /// 分割线位置，0 = 全原图，1 = 全成片。和编辑器用的是同一个交互。
-    @State private var compare: Double = 1.0
+    /// 分割线位置，0 = 全原图，1 = 全成片。默认停在正中间，左右各一半。
+    @State private var compare: Double = 0.5
     @State private var showDragHint = true
     @State private var before: UIImage?
     @State private var after: UIImage?
     @State private var isLoading = true
     @State private var confirmDelete = false
-    @State private var showHelp = false
     @State private var shareFile: ShareFile?
 
     init(model: BatchViewModel, startID: UUID) {
@@ -236,19 +235,6 @@ struct BatchViewer: View {
                 pill("square.and.arrow.up", "分享") {
                     Task { await share() }
                 }
-
-                Button {
-                    showHelp = true
-                    Haptics.tap()
-                } label: {
-                    Image(systemName: "questionmark")
-                        .font(.system(size: 12, weight: .bold))
-                        .foregroundStyle(.white.opacity(0.7))
-                        .frame(width: 30, height: 30)
-                        .background(.white.opacity(0.12), in: Circle())
-                }
-                .buttonStyle(.plain)
-                .sheet(isPresented: $showHelp) { HelpView() }
             }
             .padding(.horizontal, 16)
         }

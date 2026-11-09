@@ -98,6 +98,9 @@ final class BatchViewModel: ObservableObject {
         items[index].seed = UInt64.random(in: 1...UInt64.max)
         items[index].state = .pending
         evictPreview(id)
+        // 只清缓存不够：查看器靠 previewGeneration 触发重渲染，
+        // 不自增这一下，画面上还是旧的那张。
+        previewGeneration += 1
         progress = 0
         show("这一张换了一种随机")
     }
