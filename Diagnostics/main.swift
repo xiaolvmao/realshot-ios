@@ -537,3 +537,53 @@ for preset in CameraPreset.allCases {
     }
 }
 print("  \(checkedSeeds) 组随机扰动 → 越界 \(badSeeds) 组 \(badSeeds == 0 ? "✓" : "✗")")
+
+// MARK: - 画幅裁切（水平位置 / 向内缩放）
+//
+// 这两个滑杆是这次新加的，必须验证它们真的改变了输出，
+// 而不是「界面上有、实际没接进管线」。
+
+print("\n=== 画幅裁切（水平位置 / 向内缩放）===")
+
+// 4:3 画幅下，1600×900 的源图会被裁掉左右，正好用来测水平位置
+let wideSource = makeTestImage(width: 1600, height: 900)
+let cropBase = CameraPreset.phone.baseParameters.jittered(seed: 20261109)
+
+func cropped(_ x: Double, _ scale: Double) -> CGImage? {
+    let request = RenderRequest(params: cropBase,
+                                frame: .ratio4x3,
+                                trimBars: false,
+                                anchor: 0.5,
+                                cropX: x,
+                                cropScale: scale,
+                                longEdge: 0)
+    return engine.makeFinal(wideSource, request: request)
+}
+
+let centerCrop = cropped(0.5, 1.0)
+let leftCrop = cropped(0.0, 1.0)
+let rightCrop = cropped(1.0, 1.0)
+let zoomCrop = cropped(0.5, 2.0)
+
+if let centerCrop {
+    print("  水平居中 · 缩放 1.0 → \(centerCrop.width) × \(centerCrop.height)")
+}
+if let zoomCrop {
+    print("  水平居中 · 缩放 2.0 → \(zoomCrop.width) × \(zoomCrop.height)")
+}
+
+if let leftCrop, let rightCrop, let st = pixelStats(leftCrop, rightCrop) {
+    print(String(format: "  左对齐 vs 右对齐 → RMS %.2f%%  变化像素 %.1f%%  %@",
+                 st.rms * 100, st.changed * 100,
+                 (st.rms > 0.004 && st.changed > 0.15) ? "✓ 位置确实变了" : "✗ 没动"))
+}
+
+if let centerCrop, let zoomCrop {
+    let ratio = Double(zoomCrop.width) / Double(centerCrop.width)
+    print(String(format: "  缩放 2.0 后的宽度比 %.3f  %@", ratio,
+                 abs(ratio - 0.5) < 0.04 ? "✓ 约为一半" : "✗ 不符合预期"))
+}
+
+// 把两种对齐的样张留下来，肉眼也能确认裁的是不同的一边
+if let leftCrop { writePNG(CIImage(cgImage: leftCrop), to: "\(outDir)/crop-left.png") }
+if let rightCrop { writePNG(CIImage(cgImage: rightCrop), to: "\(outDir)/crop-right.png") }
