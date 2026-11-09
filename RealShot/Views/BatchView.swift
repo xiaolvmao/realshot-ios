@@ -67,14 +67,6 @@ struct BatchView: View {
                 .disabled(model.isRunning)
                 .opacity(model.isRunning ? 0.4 : 1)
 
-                // 撤回 / 恢复：换预设、换随机、增删照片都能退回去
-                historyButton("arrow.uturn.backward", enabled: model.canUndo && !model.isRunning, label: "撤回") {
-                    model.undo()
-                }
-                historyButton("arrow.uturn.forward", enabled: model.canRedo && !model.isRunning, label: "恢复") {
-                    model.redo()
-                }
-
                 Spacer()
 
                 HStack(spacing: 8) {
@@ -100,23 +92,6 @@ struct BatchView: View {
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 8)
-    }
-
-    private func historyButton(_ symbol: String,
-                               enabled: Bool,
-                               label: String,
-                               action: @escaping () -> Void) -> some View {
-        Button(action: action) {
-            Image(systemName: symbol)
-                .font(.system(size: 12, weight: .semibold))
-                .foregroundStyle(enabled ? Theme.text : Theme.faint)
-                .frame(width: 30, height: 30)
-                .background(Theme.surfaceRaised, in: Circle())
-        }
-        .buttonStyle(.plain)
-        .disabled(!enabled)
-        .opacity(enabled ? 1 : 0.35)
-        .accessibilityLabel(label)
     }
 
     private var hint: some View {

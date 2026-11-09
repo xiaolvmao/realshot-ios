@@ -260,14 +260,6 @@ struct BatchViewer: View {
                     Haptics.tap()
                 }
 
-                // 撤回 / 恢复就放在两个随机按钮旁边：换随机是探索，退回去是保底
-                pill("arrow.uturn.backward", "撤回", enabled: model.canUndo) {
-                    model.undo()
-                }
-
-                pill("arrow.uturn.forward", "恢复", enabled: model.canRedo) {
-                    model.redo()
-                }
                 pill("square.split.2x1", compare > 0.5 ? "看原图" : "看成片") {
                     compare = compare > 0.5 ? 0.0 : 1.0
                     Haptics.select()
@@ -285,7 +277,6 @@ struct BatchViewer: View {
 
     private func pill(_ symbol: String,
                       _ title: String,
-                      enabled: Bool = true,
                       action: @escaping () -> Void) -> some View {
         Button(action: action) {
             HStack(spacing: 5) {
@@ -293,13 +284,13 @@ struct BatchViewer: View {
                 Text(title)
             }
             .font(.system(size: 11.5, weight: .medium))
-            .foregroundStyle(.white.opacity(enabled ? 0.9 : 0.35))
+            .foregroundStyle(.white.opacity(0.9))
             .padding(.horizontal, 12)
             .frame(height: 30)
-            .background(.white.opacity(enabled ? 0.12 : 0.05), in: Capsule())
+            .background(.white.opacity(0.12), in: Capsule())
         }
         .buttonStyle(.plain)
-        .disabled(model.isRunning || !enabled)
+        .disabled(model.isRunning)
         .opacity(model.isRunning ? 0.4 : 1)
     }
 
@@ -328,7 +319,7 @@ struct BatchViewer: View {
     // MARK: 动作
 
     private func reload() async {
-        // 撤回 / 恢复可能把整队换回之前的样子，当前这张也许已经不在队里了。
+        // 队里可能刚删过 / 加过照片，当前这张也许已经不在其中了。
         // 先挪到队首，避免停在一个空白页上。
         if !model.items.contains(where: { $0.id == currentID }) {
             guard let first = model.items.first else {

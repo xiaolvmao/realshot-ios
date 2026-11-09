@@ -55,7 +55,6 @@ jobs:
             RealShot/Models/RealismParameters.swift \
             RealShot/Models/FrameMode.swift \
             RealShot/Models/CameraPreset.swift \
-            RealShot/Support/History.swift \
             RealShot/Engine/FrameAdapter.swift \
             RealShot/Engine/JpegDegrader.swift \
             RealShot/Engine/RealismEngine.swift
