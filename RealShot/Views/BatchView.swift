@@ -150,17 +150,21 @@ struct BatchView: View {
     /// 加号跟在最后一张后面：新照片本来就是追加到队尾的，
     /// 放在头上会让人以为是从前面插进去。
     private var addCell: some View {
-        PhotosPicker(selection: $appendItems,
-                     maxSelectionCount: 20,
-                     matching: .images,
-                     photoLibrary: .shared()) {
+        // 先取成局部 Bool，避免在 PhotosPicker 的 label 闭包里碰 main actor 上的 model
+        let running = model.isRunning
+        let appending = isAppending
+
+        return PhotosPicker(selection: $appendItems,
+                            maxSelectionCount: 20,
+                            matching: .images,
+                            photoLibrary: .shared()) {
             VStack(spacing: 6) {
-                Image(systemName: isAppending ? "ellipsis" : "plus")
+                Image(systemName: appending ? "ellipsis" : "plus")
                     .font(.system(size: 18, weight: .medium))
-                Text(isAppending ? "读取中" : "添加")
+                Text(appending ? "读取中" : "添加")
                     .font(.system(size: 10.5))
             }
-            .foregroundStyle(model.isRunning ? Theme.faint : Theme.subtext)
+            .foregroundStyle(running ? Theme.faint : Theme.subtext)
             .frame(height: 104)
             .frame(maxWidth: .infinity)
             .background(
@@ -172,8 +176,8 @@ struct BatchView: View {
                     .strokeBorder(Theme.stroke, style: StrokeStyle(lineWidth: 1, dash: [4, 4]))
             )
         }
-        .disabled(model.isRunning || isAppending)
-        .opacity(model.isRunning ? 0.4 : 1)
+        .disabled(running || appending)
+        .opacity(running ? 0.4 : 1)
     }
 
     private func cell(_ item: BatchItem) -> some View {
