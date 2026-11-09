@@ -63,6 +63,11 @@ func makeTestImage(width: Int, height: Int) -> CIImage {
     return CIImage(cgImage: cg)
 }
 
+// 注意：这里写出的 PNG 只用来“看大致画面”，不能用来判断真实亮度。
+// 中间阶段的 CIImage 处在扩展线性工作空间，writePNGRepresentation(colorSpace: srgb)
+// 不会做线性→sRGB 编码，于是 4-optics ~ 7-pipeline 的图看起来偏暗（实测 YAVG 0.125，
+// 而同一份像素经 makeCGImage 编码后是 0.369）。判断真实亮度请看 *-8-cgimage.png
+// 与 *-9-jpeg.png，那才是用户拿到的成片。
 func writePNG(_ image: CIImage, to path: String) {
     let e = image.extent
     guard !e.isInfinite, !e.isNull, !e.isEmpty else { return }
