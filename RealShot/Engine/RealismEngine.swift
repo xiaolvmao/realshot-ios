@@ -382,7 +382,7 @@ final class RealismEngine: @unchecked Sendable {
             img = apply("CIVignetteEffect", img, [
                 "inputCenter": CIVector(x: extent.midX, y: extent.midY),
                 "inputRadius": min(extent.width, extent.height) * 0.70,
-                "inputIntensity": min(p.vignette * 1.5, 1.0),
+                "inputIntensity": min(p.vignette * 0.9, 0.85),
                 "inputFalloff": 0.45
             ]).cropped(to: extent)
         }
@@ -481,18 +481,32 @@ final class RealismEngine: @unchecked Sendable {
 
         // 亮度颗粒
         if let grain = grainLayer(offsetX: ox, offsetY: oy, extent: extent, params: p) {
-            img = addLayer(grain, over: img, amplitude: p.grain * 0.10)
+            img = addLayer(grain, over: img)
         }
 
         // 彩色噪点：先糊成大色斑，再叠回去，才像高感的暗部色噪
         if let chroma = chromaLayer(offsetX: ox + 217, offsetY: oy + 149, extent: extent, params: p) {
-            img = addLayer(chroma, over: img, amplitude: p.chromaNoise * 0.14)
+            img = addLayer(chroma, over: img)
         }
 
+        // 叠加会带进一点整体偏移（Core Image 的工作空间是线性的，加性噪声的
+        // 均值换算到显示空间不是常数）。测一次，把偏移补回去：噪点只该贡献纹理，
+        // 不该改变整幅图的明暗。
+        let before = meanLuma(input)
+        let after = meanLuma(img)
+        if before > 0.02, after > 0.01 {
+            let delta = before - after
+            if abs(delta) > 0.006 {
+                let d = CGFloat(delta)
+                img = apply("CIColorMatrix", img, [
+                    "inputBiasVector": CIVector(x: d, y: d, z: d, w: 0)
+                ])
+            }
+        }
         return img
     }
 
-    /// 噪点图层：取值 [0, amplitude]、alpha 恒为 1，由 addLayer 配平。
+    /// 噪点图层：取值 [0, amplitude]、alpha 恒为 1。
     ///
     /// 注意：这里刻意不用 soft light / overlay 这类混合模式。
     /// Core Image 的 blend 滤镜在本工程的配置下会把整幅图算成 0
@@ -509,17 +523,11 @@ final class RealismEngine: @unchecked Sendable {
         ])
     }
 
-    /// 加性叠加：图层是 [0, amplitude]，底图先压暗 amplitude/2，再相加。
-    /// 净效果 = 原图 + amplitude·(n − 0.5)，均值和黑位都不变。
-    ///
-    /// 注意不能让图层带负值：CIAdditionCompositing 的输入会被截断到 [0,1]，
-    /// 负半轴被砍掉之后就只剩“提亮”，整张图会灰掉。
-    private func addLayer(_ layer: CIImage, over image: CIImage, amplitude: Double) -> CIImage {
-        let a = CGFloat(min(max(amplitude, 0), 1)) / 2
-        let shifted = apply("CIColorMatrix", image, [
-            "inputBiasVector": CIVector(x: -a, y: -a, z: -a, w: 0)
-        ])
-        return apply("CIAdditionCompositing", layer, [kCIInputBackgroundImageKey: shifted])
+    /// 加性叠加。图层非负、alpha 为 1，直接相加。
+    /// 叠加带来的整体偏移由 sensor 末尾测均值补回，这里不做预压暗 ——
+    /// 预压暗在 CI 的线性工作空间里会放大成不成比例的变暗。
+    private func addLayer(_ layer: CIImage, over image: CIImage) -> CIImage {
+        apply("CIAdditionCompositing", layer, [kCIInputBackgroundImageKey: image])
             .cropped(to: image.extent)
     }
 
