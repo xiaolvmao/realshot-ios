@@ -472,33 +472,61 @@ final class RealismEngine: @unchecked Sendable {
 
         // 亮度颗粒
         if let grain = grainLayer(offsetX: ox, offsetY: oy, extent: extent, params: p) {
-            img = apply("CISoftLightBlendMode", grain, [kCIInputBackgroundImageKey: img]).cropped(to: extent)
+            img = addLayer(grain, over: img, amplitude: p.grain * 0.10)
         }
 
         // 彩色噪点：先糊成大色斑，再叠回去，才像高感的暗部色噪
-        if let tuned = chromaLayer(offsetX: ox + 217, offsetY: oy + 149, extent: extent, params: p) {
-            img = apply("CIOverlayBlendMode", tuned, [kCIInputBackgroundImageKey: img]).cropped(to: extent)
+        if let chroma = chromaLayer(offsetX: ox + 217, offsetY: oy + 149, extent: extent, params: p) {
+            img = addLayer(chroma, over: img, amplitude: p.chromaNoise * 0.14)
         }
 
         return img
     }
 
-    /// 亮度颗粒层。中灰为 1，偏离中灰的幅度决定颗粒强度。
+    /// 噪点图层：均值为 0、幅度为 ±amplitude/2、alpha 恒为 1。
+    ///
+    /// 注意：这里刻意不用 soft light / overlay 这类混合模式。
+    /// Core Image 的 blend 滤镜在本工程的配置下会把整幅图算成 0
+    /// （实测：中灰 0.5 叠上去成片全黑），加性叠加是唯一可控的做法。
+    private func noiseLayer(_ shape: CIImage, amplitude: Double, monochrome: Bool) -> CIImage {
+        let a = CGFloat(min(max(amplitude, 0), 1))
+        let source = monochrome ? grayscale(shape) : shape
+        return apply("CIColorMatrix", source, [
+            "inputRVector": CIVector(x: a, y: 0, z: 0, w: 0),
+            "inputGVector": CIVector(x: 0, y: a, z: 0, w: 0),
+            "inputBVector": CIVector(x: 0, y: 0, z: a, w: 0),
+            "inputAVector": CIVector(x: 0, y: 0, z: 0, w: 0),
+            "inputBiasVector": CIVector(x: -a / 2, y: -a / 2, z: -a / 2, w: 1)
+        ])
+    }
+
+    /// 加性叠加：底图先减 amplitude/2，再把均值为 0 的图层加回去。
+    /// 净效果 = 原图 + amplitude·(n − 0.5)，不会整体偏亮或偏暗。
+    private func addLayer(_ layer: CIImage, over image: CIImage, amplitude: Double) -> CIImage {
+        let a = CGFloat(min(max(amplitude, 0), 1)) / 2
+        let shifted = apply("CIColorMatrix", image, [
+            "inputBiasVector": CIVector(x: -a, y: -a, z: -a, w: 0)
+        ])
+        return apply("CIAdditionCompositing", layer, [kCIInputBackgroundImageKey: shifted])
+            .cropped(to: image.extent)
+    }
+
+    /// 亮度颗粒层。均值 0，幅度 ±(grain·0.10)/2。
     private func grainLayer(offsetX: CGFloat, offsetY: CGFloat,
                             extent: CGRect, params p: RealismParameters) -> CIImage? {
         guard p.grain > 0.005,
               let noise = opaqueNoise(offsetX: offsetX, offsetY: offsetY, extent: extent) else { return nil }
-        var grain = centered(grayscale(noise), amplitude: p.grain * 0.13)
+        var shape = grayscale(noise)
         if p.grainSize > 1.05 {
             let unit = max(extent.width, extent.height) / 1200.0
             let radius = CGFloat((p.grainSize - 1.0) * 1.15) * unit
-            grain = apply("CIGaussianBlur", grain.clampedToExtent(), [kCIInputRadiusKey: radius])
+            shape = apply("CIGaussianBlur", shape.clampedToExtent(), [kCIInputRadiusKey: radius])
                 .cropped(to: extent)
         }
-        return grain
+        return noiseLayer(shape, amplitude: p.grain * 0.10, monochrome: true)
     }
 
-    /// 彩色噪点层：低频色斑，中灰为 1。
+    /// 彩色噪点层：低频色斑，RGB 三通道各自独立。
     private func chromaLayer(offsetX: CGFloat, offsetY: CGFloat,
                              extent: CGRect, params p: RealismParameters) -> CIImage? {
         guard p.chromaNoise > 0.005,
@@ -507,7 +535,7 @@ final class RealismEngine: @unchecked Sendable {
         let blobs = apply("CIGaussianBlur", noise.clampedToExtent(), [
             kCIInputRadiusKey: max(1.6 * unit, 0.6)
         ]).cropped(to: extent)
-        return centered(grayscale(blobs), amplitude: p.chromaNoise * 0.55)
+        return noiseLayer(blobs, amplitude: p.chromaNoise * 0.14, monochrome: false)
     }
 
     /// 诊断用：拿到真实的噪点图层。
@@ -583,20 +611,6 @@ final class RealismEngine: @unchecked Sendable {
         ])
     }
 
-    /// 把 0...1 的噪声压到 0.5 附近，只保留 ± amplitude/2 的波动，
-    /// 这样叠加时才是“颗粒”而不是“雪花屏”。alpha 恒为 1。
-    private func centered(_ image: CIImage, amplitude: Double) -> CIImage {
-        let a = CGFloat(min(max(amplitude, 0), 1))
-        let b = 0.5 - a * 0.5
-        return apply("CIColorMatrix", image, [
-            "inputRVector": CIVector(x: a, y: 0, z: 0, w: 0),
-            "inputGVector": CIVector(x: 0, y: a, z: 0, w: 0),
-            "inputBVector": CIVector(x: 0, y: 0, z: a, w: 0),
-            "inputAVector": CIVector(x: 0, y: 0, z: 0, w: 0),
-            "inputBiasVector": CIVector(x: b, y: b, z: b, w: 1)
-        ])
-    }
-
     /// 整图平均亮度。用于兜底检查：渲染结果不能突然塌成黑图。
     private func meanLuma(_ image: CIImage) -> Double {
         let e = image.extent
@@ -646,7 +660,8 @@ final class RealismEngine: @unchecked Sendable {
         guard let grid = generator.outputImage else { return image }
 
         let rotated = grid.transformed(by: CGAffineTransform(rotationAngle: 0.09)).cropped(to: extent)
-        return apply("CISoftLightBlendMode", rotated, [kCIInputBackgroundImageKey: image]).cropped(to: extent)
+        // 加性叠加（屏幕反光就是往画面里加光），不用 blend 滤镜
+        return apply("CIAdditionCompositing", rotated, [kCIInputBackgroundImageKey: image]).cropped(to: extent)
     }
 
     private func lightLeak(_ image: CIImage, strength: Double, extent: CGRect, seed: UInt64) -> CIImage {
@@ -674,7 +689,8 @@ final class RealismEngine: @unchecked Sendable {
         gradient.setValue(CIColor(red: 0, green: 0, blue: 0, alpha: 0), forKey: "inputColor1")
 
         guard let leak = gradient.outputImage?.cropped(to: extent) else { return image }
-        return apply("CIScreenBlendMode", leak, [kCIInputBackgroundImageKey: image]).cropped(to: extent)
+        // 漏光是“往画面里加光”，用加性叠加；屏幕混合在这套配置下会算出全黑
+        return apply("CIAdditionCompositing", leak, [kCIInputBackgroundImageKey: image]).cropped(to: extent)
     }
 
     // MARK: - 小工具

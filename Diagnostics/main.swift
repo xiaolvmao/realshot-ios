@@ -240,7 +240,7 @@ var m0 = engine.isolate(opticsOut, stage: .sensor, params: phoneParams)
 m0.name = "sensor(原参数)"
 show(m0)
 
-print("  -- 噪点图层本身（应该是 0.5 附近、alpha 1）--")
+print("  -- 噪点图层本身（加性图层：均值应接近 0，alpha 1）--")
 for m in engine.debugNoiseLayers(opticsOut, params: phoneParams) { show(m) }
 
 print("  -- 变量控制 --")
