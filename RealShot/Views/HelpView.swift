@@ -113,7 +113,13 @@ struct HelpView: View {
                 .foregroundStyle(Theme.subtext)
                 .lineSpacing(3)
 
-            tip("批量用的是同一个预设，但每张的随机扰动独立，所以不会看起来像同一个滤镜刷了二十遍。中途失败的那张会标红，不影响其它张。")
+            VStack(alignment: .leading, spacing: 11) {
+                bullet("调参", "底部「参数」里能改质感、光学、色彩、画幅四类，和编辑器是同一套滑杆。改完所有张都用这套值。", Theme.accent)
+                bullet("看大图", "点任意缩略图全屏查看，底部显示这一张的处理状态和像素尺寸。", Theme.accent)
+                bullet("删除", "长按缩略图，在菜单里选「删除」。只移出这次队列，相册里的原图不受影响。", Color.orange)
+            }
+
+            tip("批量用的是你调好的那套参数，但每张的随机扰动独立，所以不会看起来像同一个滤镜刷了二十遍。中途失败的那张会标红，不影响其它张。")
         }
     }
 

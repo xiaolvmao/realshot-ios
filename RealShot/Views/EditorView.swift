@@ -191,7 +191,12 @@ struct EditorView: View {
             }
             .padding(.bottom, 6)
 
-            ParameterPanel(model: model)
+            ParameterPanel(params: $model.params,
+                           frame: $model.frame,
+                           trimBars: $model.trimBars,
+                           anchor: $model.anchor,
+                           longEdge: $model.longEdge,
+                           writeExif: $model.writeExif)
         }
         .padding(.top, 10)
     }
