@@ -167,7 +167,7 @@ struct ParameterPanel: View {
             ParameterSlider(title: "黑位抬升", value: $params.blackLift) { percent($0) }
             ParameterSlider(title: "高光压缩", value: $params.highlightRolloff) { percent($0) }
             ParameterSlider(title: "曝光", value: $params.exposure, range: -0.4...0.4) {
-                abs($0) < 0.005 ? "不调整" : String(format: "%+.2fEV", $0)
+                String(format: "%+.2fEV", $0)
             }
         }
     }

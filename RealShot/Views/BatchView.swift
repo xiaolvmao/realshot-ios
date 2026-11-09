@@ -8,6 +8,7 @@ struct BatchView: View {
 
     @State private var viewerSeed: ViewerSeed?
     @State private var showParams = false
+    @State private var showHelp = false
 
     var body: some View {
         VStack(spacing: 0) {
@@ -20,6 +21,7 @@ struct BatchView: View {
         .overlay(alignment: .top) { toast }
         .animation(.easeInOut(duration: 0.2), value: model.message)
         .sheet(isPresented: $showParams) { parameterSheet }
+        .sheet(isPresented: $showHelp) { HelpView() }
         .fullScreenCover(item: $viewerSeed) { seed in
             BatchViewer(model: model, startID: seed.id)
         }
@@ -32,23 +34,8 @@ struct BatchView: View {
     // MARK: 顶栏
 
     private var header: some View {
-        HStack(alignment: .center) {
-            Button {
-                model.reset()
-                Haptics.tap()
-            } label: {
-                Image(systemName: "xmark")
-                    .font(.system(size: 13, weight: .bold))
-                    .foregroundStyle(Theme.text)
-                    .frame(width: 34, height: 34)
-                    .background(Theme.surfaceRaised, in: Circle())
-            }
-            .buttonStyle(.plain)
-            .disabled(model.isRunning)
-            .opacity(model.isRunning ? 0.4 : 1)
-
-            Spacer()
-
+        // 标题放在 ZStack 里绝对居中，两侧各自排布，加了右上角的按钮也不会把标题挤偏
+        ZStack {
             VStack(spacing: 1) {
                 Text("批量处理")
                     .font(.system(size: 13, weight: .semibold))
@@ -58,13 +45,43 @@ struct BatchView: View {
                     .foregroundStyle(Theme.faint)
             }
 
-            Spacer()
+            HStack {
+                Button {
+                    model.reset()
+                    Haptics.tap()
+                } label: {
+                    Image(systemName: "xmark")
+                        .font(.system(size: 13, weight: .bold))
+                        .foregroundStyle(Theme.text)
+                        .frame(width: 34, height: 34)
+                        .background(Theme.surfaceRaised, in: Circle())
+                }
+                .buttonStyle(.plain)
+                .disabled(model.isRunning)
+                .opacity(model.isRunning ? 0.4 : 1)
 
-            Text(model.doneCount > 0 ? "\(model.doneCount)/\(model.items.count)" : "")
-                .font(.system(size: 12, weight: .semibold, design: .rounded))
-                .foregroundStyle(Theme.accent)
-                .monospacedDigit()
-                .frame(width: 34)
+                Spacer()
+
+                HStack(spacing: 8) {
+                    Text(model.doneCount > 0 ? "\(model.doneCount)/\(model.items.count)" : "")
+                        .font(.system(size: 12, weight: .semibold, design: .rounded))
+                        .foregroundStyle(Theme.accent)
+                        .monospacedDigit()
+                        .frame(width: 34)
+
+                    Button {
+                        showHelp = true
+                        Haptics.tap()
+                    } label: {
+                        Image(systemName: "questionmark")
+                            .font(.system(size: 12, weight: .bold))
+                            .foregroundStyle(Theme.subtext)
+                            .frame(width: 34, height: 34)
+                            .background(Theme.surfaceRaised, in: Circle())
+                    }
+                    .buttonStyle(.plain)
+                }
+            }
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 8)
