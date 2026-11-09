@@ -1,6 +1,8 @@
 import CoreImage
 import CoreGraphics
+#if canImport(UIKit)
 import UIKit
+#endif
 
 struct RenderRequest {
     var params: RealismParameters
@@ -40,6 +42,7 @@ final class RealismEngine: @unchecked Sendable {
 
     // MARK: - 对外接口
 
+#if canImport(UIKit)
     /// 预览：同时返回「加效果前」和「加效果后」，两者构图完全一致，
     /// 这样对比滑块才不会错位。
     func makeComparison(_ image: CIImage,
@@ -52,11 +55,123 @@ final class RealismEngine: @unchecked Sendable {
               let afterCG = render(prepared, params: request.params) else { return nil }
         return (before: UIImage(cgImage: beforeCG), after: UIImage(cgImage: afterCG))
     }
+#endif
 
     /// 导出：全尺寸渲染，返回 CGImage，交给 ExifWriter 打包。
     func makeFinal(_ image: CIImage, request: RenderRequest) -> CGImage? {
         let prepared = prepare(image, request: request, maxDimension: request.longEdge)
         return render(prepared, params: request.params)
+    }
+
+    // MARK: - 管线自检
+
+    /// 一次渲染中某一级的统计量。用于在 CI 上定位「成片发黑」这类问题：
+    /// 逐级打印均值，掉下来的那一步就是元凶。
+    struct StageMetric {
+        var name: String
+        var meanR: Double
+        var meanG: Double
+        var meanB: Double
+        var meanA: Double
+        var minLuma: Double
+        var maxLuma: Double
+    }
+
+    /// 逐级跑一遍管线并测亮度/alpha。不参与 App 运行时逻辑，只在诊断工具里用。
+    func trace(_ image: CIImage,
+               request: RenderRequest,
+               sampleDimension: CGFloat = 640,
+               onStage: ((String, CIImage) -> Void)? = nil) -> [StageMetric] {
+        var out: [StageMetric] = []
+
+        func step(_ name: String, _ img: CIImage) {
+            onStage?(name, img)
+            out.append(measure(name, img))
+        }
+
+        step("0-source", image)
+        var img = prepare(image, request: request, maxDimension: sampleDimension)
+        step("1-prepared", img)
+        img = geometry(img, params: request.params)
+        step("2-geometry", img)
+        img = color(img, params: request.params)
+        step("3-color", img)
+        img = optics(img, params: request.params)
+        step("4-optics", img)
+        img = sensor(img, params: request.params)
+        step("5-sensor", img)
+        img = scene(img, params: request.params)
+        step("6-scene", img)
+
+        if let cg = render(img, params: request.params) {
+            step("7-final+jpeg", CIImage(cgImage: cg))
+        } else {
+            out.append(StageMetric(name: "7-final+jpeg NIL", meanR: -1, meanG: -1, meanB: -1,
+                                   meanA: -1, minLuma: -1, maxLuma: -1))
+        }
+        return out
+    }
+
+    /// 管线里的单级，用于「只跑这一步」的隔离测试。
+    enum PipelineStage: String, CaseIterable {
+        case geometry, color, optics, sensor, scene
+    }
+
+    /// 只对准备好的图跑预处理（裁剪 / 重采样 / 破坏像素）。
+    func preparedImage(_ image: CIImage, request: RenderRequest, sampleDimension: CGFloat = 640) -> CIImage {
+        prepare(image, request: request, maxDimension: sampleDimension)
+    }
+
+    /// 单独跑某一级，用来确认是哪一步把画面弄黑的。
+    func isolate(_ prepared: CIImage, stage: PipelineStage, params p: RealismParameters) -> StageMetric {
+        let out: CIImage
+        switch stage {
+        case .geometry: out = geometry(prepared, params: p)
+        case .color: out = color(prepared, params: p)
+        case .optics: out = optics(prepared, params: p)
+        case .sensor: out = sensor(prepared, params: p)
+        case .scene: out = scene(prepared, params: p)
+        }
+        return measure("only-" + stage.rawValue, out)
+    }
+
+    private func measure(_ name: String, _ image: CIImage) -> StageMetric {
+        let e = image.extent
+        let rect = (e.isInfinite || e.isNull || e.isEmpty)
+            ? CGRect(x: 0, y: 0, width: 640, height: 480)
+            : e.integral
+
+        let w = Int(rect.width.rounded())
+        let h = Int(rect.height.rounded())
+        guard w > 0, h > 0, w * h <= 4_000_000 else {
+            return StageMetric(name: name + " (extent \(Int(rect.width))x\(Int(rect.height)) skip)",
+                               meanR: -1, meanG: -1, meanB: -1, meanA: -1, minLuma: -1, maxLuma: -1)
+        }
+
+        var bitmap = [UInt8](repeating: 0, count: w * h * 4)
+        bitmap.withUnsafeMutableBytes { raw in
+            guard let base = raw.baseAddress else { return }
+            context.render(image, toBitmap: base, rowBytes: w * 4,
+                           bounds: rect, format: .RGBA8, colorSpace: srgb)
+        }
+
+        var sr = 0.0, sg = 0.0, sb = 0.0, sa = 0.0
+        var minL = 1.0, maxL = 0.0
+        let n = Double(w * h)
+        var i = 0
+        while i < bitmap.count {
+            let r = Double(bitmap[i]) / 255.0
+            let g = Double(bitmap[i + 1]) / 255.0
+            let b = Double(bitmap[i + 2]) / 255.0
+            let a = Double(bitmap[i + 3]) / 255.0
+            sr += r; sg += g; sb += b; sa += a
+            let l = 0.2126 * r + 0.7152 * g + 0.0722 * b
+            if l < minL { minL = l }
+            if l > maxL { maxL = l }
+            i += 4
+        }
+        return StageMetric(name: name, meanR: sr / n, meanG: sg / n, meanB: sb / n,
+                           meanA: sa / n, minLuma: minL, maxLuma: maxL)
     }
 
     // MARK: - 预处理

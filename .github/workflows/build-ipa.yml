@@ -46,6 +46,29 @@ jobs:
             xcodebuild -list -project RealShot.xcodeproj
           fi
 
+      - name: 管线自检（定位成片发黑）
+        continue-on-error: true
+        run: |
+          cd "$PROJECT_DIR"
+          swiftc -O -o /tmp/diag \
+            Diagnostics/main.swift \
+            RealShot/Models/RealismParameters.swift \
+            RealShot/Models/FrameMode.swift \
+            RealShot/Models/CameraPreset.swift \
+            RealShot/Engine/FrameAdapter.swift \
+            RealShot/Engine/JpegDegrader.swift \
+            RealShot/Engine/RealismEngine.swift
+          /tmp/diag diag-out
+
+      - name: 上传自检中间图
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pipeline-diagnostics
+          path: "**/diag-out/*.png"
+          if-no-files-found: ignore
+          retention-days: 7
+
       - name: 打包
         run: |
           chmod +x "$PROJECT_DIR/scripts/build_ipa.sh"
