@@ -1,0 +1,919 @@
+﻿2026-11-09T05:37:07.6649300Z Current runner version: '2.338.2'
+2026-11-09T05:37:07.6663710Z ##[group]Runner Image Provisioner
+2026-11-09T05:37:07.6664440Z Hosted Compute Agent
+2026-11-09T05:37:07.6666090Z Version: 20261103.629
+2026-11-09T05:37:07.6666610Z Commit: 15dbd9ccb5dbf34fae002b6ed1a2670f52df37bc
+2026-11-09T05:37:07.6667130Z Build Date: 2026-11-03T17:26:59Z
+2026-11-09T05:37:07.6667580Z Worker ID: {37939bba-abb2-42af-a552-d7c934300c7d}
+2026-11-09T05:37:07.6668040Z Region: westus
+2026-11-09T05:37:07.6668400Z Cloud: MacCloud
+2026-11-09T05:37:07.6668750Z ##[endgroup]
+2026-11-09T05:37:07.6669990Z ##[group]Operating System
+2026-11-09T05:37:07.6670410Z macOS
+2026-11-09T05:37:07.6670750Z 15.8.2
+2026-11-09T05:37:07.6671080Z 24H232
+2026-11-09T05:37:07.6671420Z ##[endgroup]
+2026-11-09T05:37:07.6671780Z ##[group]Runner Image
+2026-11-09T05:37:07.6672160Z Image: macos-15-arm64
+2026-11-09T05:37:07.6672540Z Version: 20261104.0514.1
+2026-11-09T05:37:07.6673380Z Included Software: https://github.com/actions/runner-images/blob/macos-15-arm64/20261104.0514/images/macos/macos-15-arm64-Readme.md
+2026-11-09T05:37:07.6674420Z Image Release: https://github.com/actions/runner-images/releases/tag/macos-15-arm64%2F20261104.0514
+2026-11-09T05:37:07.6675070Z ##[endgroup]
+2026-11-09T05:37:07.6675870Z ##[group]GITHUB_TOKEN Permissions
+2026-11-09T05:37:07.6677150Z Contents: read
+2026-11-09T05:37:07.6677510Z Metadata: read
+2026-11-09T05:37:07.6677870Z Packages: read
+2026-11-09T05:37:07.6678220Z ##[endgroup]
+2026-11-09T05:37:07.6679680Z Secret source: Actions
+2026-11-09T05:37:07.6680240Z Cache mode: write
+2026-11-09T05:37:07.6680680Z Prepare workflow directory
+2026-11-09T05:37:07.6904470Z Prepare all required actions
+2026-11-09T05:37:07.6938270Z Getting action download info
+2026-11-09T05:37:08.1044570Z Download action repository 'actions/checkout@v4' (SHA:11d5960a326750d5838078e36cf38b85af677262)
+2026-11-09T05:37:08.4903040Z Download action repository 'actions/upload-artifact@v4' (SHA:ea165f8d65b6e75b540449e92b4886f43607fa02)
+2026-11-09T05:37:08.7638410Z Complete job name: ipa
+2026-11-09T05:37:08.8169550Z ##[group]Run actions/checkout@v4
+2026-11-09T05:37:08.8170130Z with:
+2026-11-09T05:37:08.8170450Z   repository: xiaolvmao/realshot-ios
+2026-11-09T05:37:08.8173110Z   token: ***
+2026-11-09T05:37:08.8173420Z   ssh-strict: true
+2026-11-09T05:37:08.8173740Z   ssh-user: git
+2026-11-09T05:37:08.8174060Z   persist-credentials: true
+2026-11-09T05:37:08.8174410Z   clean: true
+2026-11-09T05:37:08.8174730Z   sparse-checkout-cone-mode: true
+2026-11-09T05:37:08.8175110Z   fetch-depth: 1
+2026-11-09T05:37:08.8175420Z   fetch-tags: false
+2026-11-09T05:37:08.8175750Z   show-progress: true
+2026-11-09T05:37:08.8176070Z   lfs: false
+2026-11-09T05:37:08.8176380Z   submodules: false
+2026-11-09T05:37:08.8176700Z   set-safe-directory: true
+2026-11-09T05:37:08.8177070Z   allow-unsafe-pr-checkout: false
+2026-11-09T05:37:08.8177640Z ##[endgroup]
+2026-11-09T05:37:09.1967010Z Syncing repository: xiaolvmao/realshot-ios
+2026-11-09T05:37:09.1968440Z ##[group]Getting Git version info
+2026-11-09T05:37:09.1969100Z Working directory is '/Users/runner/work/realshot-ios/realshot-ios'
+2026-11-09T05:37:09.1970030Z [command]/opt/homebrew/bin/git version
+2026-11-09T05:37:09.2250430Z git version 2.56.0
+2026-11-09T05:37:09.2270900Z ##[endgroup]
+2026-11-09T05:37:09.2279510Z Copying '/Users/runner/.gitconfig' to '/Users/runner/work/_temp/c47fe7fa-4d15-4309-a73f-552aabf88c88/.gitconfig'
+2026-11-09T05:37:09.2286360Z Temporarily overriding HOME='/Users/runner/work/_temp/c47fe7fa-4d15-4309-a73f-552aabf88c88' before making global git config changes
+2026-11-09T05:37:09.2287370Z Adding repository directory to the temporary git global config as a safe directory
+2026-11-09T05:37:09.2289750Z [command]/opt/homebrew/bin/git config --global --add safe.directory /Users/runner/work/realshot-ios/realshot-ios
+2026-11-09T05:37:09.2405120Z Deleting the contents of '/Users/runner/work/realshot-ios/realshot-ios'
+2026-11-09T05:37:09.2407370Z ##[group]Initializing the repository
+2026-11-09T05:37:09.2411080Z [command]/opt/homebrew/bin/git init /Users/runner/work/realshot-ios/realshot-ios
+2026-11-09T05:37:09.2656920Z hint: Using 'master' as the name for the initial branch. This default branch name
+2026-11-09T05:37:09.2757820Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+2026-11-09T05:37:09.2782370Z hint: to use in all of your new repositories, which will suppress this warning,
+2026-11-09T05:37:09.2784810Z hint: call:
+2026-11-09T05:37:09.2824290Z hint:
+2026-11-09T05:37:09.2833290Z hint: 	git config --global init.defaultBranch <name>
+2026-11-09T05:37:09.2834080Z hint:
+2026-11-09T05:37:09.2834870Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+2026-11-09T05:37:09.2836840Z hint: 'development'. The just-created branch can be renamed via this command:
+2026-11-09T05:37:09.2837700Z hint:
+2026-11-09T05:37:09.2838360Z hint: 	git branch -m <name>
+2026-11-09T05:37:09.2840910Z hint:
+2026-11-09T05:37:09.2841760Z hint: Disable this message with "git config set advice.defaultBranchName false"
+2026-11-09T05:37:09.2844150Z Initialized empty Git repository in /Users/runner/work/realshot-ios/realshot-ios/.git/
+2026-11-09T05:37:09.2847230Z [command]/opt/homebrew/bin/git remote add origin https://github.com/xiaolvmao/realshot-ios
+2026-11-09T05:37:09.2849160Z ##[endgroup]
+2026-11-09T05:37:09.2850020Z ##[group]Disabling automatic garbage collection
+2026-11-09T05:37:09.2850690Z [command]/opt/homebrew/bin/git config --local gc.auto 0
+2026-11-09T05:37:09.2906380Z ##[endgroup]
+2026-11-09T05:37:09.2906970Z ##[group]Setting up auth
+2026-11-09T05:37:09.2911690Z [command]/opt/homebrew/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-11-09T05:37:09.2977410Z [command]/opt/homebrew/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-11-09T05:37:09.3954690Z [command]/opt/homebrew/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-11-09T05:37:09.4016020Z [command]/opt/homebrew/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-11-09T05:37:09.4745200Z [command]/opt/homebrew/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-11-09T05:37:09.4806660Z [command]/opt/homebrew/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-11-09T05:37:09.5499490Z [command]/opt/homebrew/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+2026-11-09T05:37:09.5560790Z ##[endgroup]
+2026-11-09T05:37:09.5561540Z ##[group]Fetching the repository
+2026-11-09T05:37:09.5566750Z [command]/opt/homebrew/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +499ab1ee665f5e6327e5eeec1d8525b8a37725ca:refs/remotes/origin/main
+2026-11-09T05:37:10.0585410Z From https://github.com/xiaolvmao/realshot-ios
+2026-11-09T05:37:10.0586120Z  * [new ref]         499ab1ee665f5e6327e5eeec1d8525b8a37725ca -> origin/main
+2026-11-09T05:37:10.0587570Z ##[endgroup]
+2026-11-09T05:37:10.0588130Z ##[group]Determining the checkout info
+2026-11-09T05:37:10.0588820Z ##[endgroup]
+2026-11-09T05:37:10.0592100Z [command]/opt/homebrew/bin/git sparse-checkout disable
+2026-11-09T05:37:10.0660380Z [command]/opt/homebrew/bin/git config --local --unset-all extensions.worktreeConfig
+2026-11-09T05:37:10.0724920Z ##[group]Checking out the ref
+2026-11-09T05:37:10.0725670Z [command]/opt/homebrew/bin/git checkout --progress --force -B main refs/remotes/origin/main
+2026-11-09T05:37:10.0897570Z Switched to a new branch 'main'
+2026-11-09T05:37:10.0899680Z branch 'main' set up to track 'origin/main'.
+2026-11-09T05:37:10.0903300Z ##[endgroup]
+2026-11-09T05:37:10.0979240Z [command]/opt/homebrew/bin/git log -1 --format=%H
+2026-11-09T05:37:10.1038200Z 499ab1ee665f5e6327e5eeec1d8525b8a37725ca
+2026-11-09T05:37:10.1202930Z ##[group]Run xcodebuild -version
+2026-11-09T05:37:10.1203690Z [36;1mxcodebuild -version[0m
+2026-11-09T05:37:10.1204100Z [36;1mxcode-select -p[0m
+2026-11-09T05:37:10.1246910Z shell: /bin/bash -e {0}
+2026-11-09T05:37:10.1247410Z ##[endgroup]
+2026-11-09T05:37:10.3596960Z Xcode 16.4
+2026-11-09T05:37:10.3607040Z Build version 16F6
+2026-11-09T05:37:10.3655820Z /Applications/Xcode_16.4.app/Contents/Developer
+2026-11-09T05:37:10.3721560Z ##[group]Run if [ -f "RealShot.xcodeproj/project.pbxproj" ]; then
+2026-11-09T05:37:10.3722300Z [36;1mif [ -f "RealShot.xcodeproj/project.pbxproj" ]; then[0m
+2026-11-09T05:37:10.3722910Z [36;1m  echo "PROJECT_DIR=$PWD" >> "$GITHUB_ENV"[0m
+2026-11-09T05:37:10.3723530Z [36;1melif [ -f "RealShot/RealShot.xcodeproj/project.pbxproj" ]; then[0m
+2026-11-09T05:37:10.3724340Z [36;1m  echo "PROJECT_DIR=$PWD/RealShot" >> "$GITHUB_ENV"[0m
+2026-11-09T05:37:10.3725050Z [36;1melif [ -f "照片ios/RealShot/RealShot.xcodeproj/project.pbxproj" ]; then[0m
+2026-11-09T05:37:10.3725700Z [36;1m  echo "PROJECT_DIR=$PWD/照片ios/RealShot" >> "$GITHUB_ENV"[0m
+2026-11-09T05:37:10.3726230Z [36;1melse[0m
+2026-11-09T05:37:10.3726600Z [36;1m  echo "找不到 RealShot.xcodeproj"; exit 1[0m
+2026-11-09T05:37:10.3727020Z [36;1mfi[0m
+2026-11-09T05:37:10.3727360Z [36;1mecho "工程目录: $PROJECT_DIR"[0m
+2026-11-09T05:37:10.3759390Z shell: /bin/bash -e {0}
+2026-11-09T05:37:10.3759870Z ##[endgroup]
+2026-11-09T05:37:10.4126670Z 工程目录: 
+2026-11-09T05:37:10.4168470Z ##[group]Run cd "$PROJECT_DIR"
+2026-11-09T05:37:10.4169000Z [36;1mcd "$PROJECT_DIR"[0m
+2026-11-09T05:37:10.4169470Z [36;1mif xcodebuild -list -project RealShot.xcodeproj; then[0m
+2026-11-09T05:37:10.4169960Z [36;1m  echo "工程文件解析正常"[0m
+2026-11-09T05:37:10.4170330Z [36;1melse[0m
+2026-11-09T05:37:10.4170800Z [36;1m  echo "::warning::提交的 .xcodeproj 无法解析，改用 XcodeGen 从 project.yml 重新生成"[0m
+2026-11-09T05:37:10.4171330Z [36;1m  brew install xcodegen[0m
+2026-11-09T05:37:10.4171730Z [36;1m  xcodegen generate[0m
+2026-11-09T05:37:10.4172160Z [36;1m  xcodebuild -list -project RealShot.xcodeproj[0m
+2026-11-09T05:37:10.4172670Z [36;1mfi[0m
+2026-11-09T05:37:10.4203790Z shell: /bin/bash -e {0}
+2026-11-09T05:37:10.4204180Z env:
+2026-11-09T05:37:10.4204570Z   PROJECT_DIR: /Users/runner/work/realshot-ios/realshot-ios
+2026-11-09T05:37:10.4205050Z ##[endgroup]
+2026-11-09T05:37:11.8035040Z Command line invocation:
+2026-11-09T05:37:11.8036860Z     /Applications/Xcode_16.4.app/Contents/Developer/usr/bin/xcodebuild -list -project RealShot.xcodeproj
+2026-11-09T05:37:11.8037640Z 
+2026-11-09T05:37:14.0387080Z Information about project "RealShot":
+2026-11-09T05:37:14.0388620Z     Targets:
+2026-11-09T05:37:14.0390780Z         RealShot
+2026-11-09T05:37:14.0391220Z 
+2026-11-09T05:37:14.0391420Z     Build Configurations:
+2026-11-09T05:37:14.0391810Z         Debug
+2026-11-09T05:37:14.0392190Z         Release
+2026-11-09T05:37:14.0392490Z 
+2026-11-09T05:37:14.0393180Z     If no build configuration is specified and -scheme is not passed then "Release" is used.
+2026-11-09T05:37:14.0393960Z 
+2026-11-09T05:37:14.0394110Z     Schemes:
+2026-11-09T05:37:14.0394460Z         RealShot
+2026-11-09T05:37:14.0394770Z 
+2026-11-09T05:37:14.0434010Z 工程文件解析正常
+2026-11-09T05:37:14.0902260Z ##[group]Run cd "$PROJECT_DIR"
+2026-11-09T05:37:14.0902690Z [36;1mcd "$PROJECT_DIR"[0m
+2026-11-09T05:37:14.0903000Z [36;1mswiftc -O -o /tmp/diag \[0m
+2026-11-09T05:37:14.0903290Z [36;1m  Diagnostics/main.swift \[0m
+2026-11-09T05:37:14.0903660Z [36;1m  RealShot/Models/RealismParameters.swift \[0m
+2026-11-09T05:37:14.0904050Z [36;1m  RealShot/Models/FrameMode.swift \[0m
+2026-11-09T05:37:14.0904360Z [36;1m  RealShot/Models/CameraPreset.swift \[0m
+2026-11-09T05:37:14.0904650Z [36;1m  RealShot/Engine/FrameAdapter.swift \[0m
+2026-11-09T05:37:14.0905000Z [36;1m  RealShot/Engine/JpegDegrader.swift \[0m
+2026-11-09T05:37:14.0905440Z [36;1m  RealShot/Engine/RealismEngine.swift[0m
+2026-11-09T05:37:14.0905710Z [36;1m/tmp/diag diag-out[0m
+2026-11-09T05:37:14.0972330Z shell: /bin/bash -e {0}
+2026-11-09T05:37:14.0972660Z env:
+2026-11-09T05:37:14.0973200Z   PROJECT_DIR: /Users/runner/work/realshot-ios/realshot-ios
+2026-11-09T05:37:14.0973520Z ##[endgroup]
+2026-11-09T05:37:41.2810530Z sRGB working space: kCGColorSpaceSRGB
+2026-11-09T05:37:41.2813560Z source extent: (0.0, 0.0, 1200.0, 900.0)
+2026-11-09T05:37:41.2823310Z 
+2026-11-09T05:37:41.2826590Z === phone / 手机主摄 ===
+2026-11-09T05:37:41.2827920Z   grain=0.39 soft=0.44 ca=0.17 vig=0.36 bloom=0.38 persp=0.38 leak=0.00 screen=0.00 jpegP=1 q=0.83
+2026-11-09T05:37:41.2830960Z   0-source                rgb=(0.473 0.459 0.442) a=1.000  luma 0.032…1.000
+2026-11-09T05:37:41.2846070Z   1-prepared              rgb=(0.464 0.448 0.431) a=0.997  luma 0.000…1.000
+2026-11-09T05:37:41.2846780Z   2-geometry              rgb=(0.464 0.448 0.431) a=0.997  luma 0.000…1.000
+2026-11-09T05:37:41.2847250Z   3-color                 rgb=(0.338 0.321 0.299) a=0.997  luma 0.009…0.882
+2026-11-09T05:37:41.2847730Z   4-optics                rgb=(0.335 0.318 0.296) a=1.000  luma 0.009…0.855
+2026-11-09T05:37:41.2848490Z   5-sensor                rgb=(0.003 0.001 0.001) a=1.000  luma 0.000…0.402
+2026-11-09T05:37:41.2848940Z   6-scene                 rgb=(0.003 0.001 0.001) a=1.000  luma 0.000…0.402
+2026-11-09T05:37:41.2849550Z   7-final+jpeg            rgb=(0.000 0.000 0.000) a=1.000  luma 0.000…0.000
+2026-11-09T05:37:41.2850370Z   ⚠️ 成片均值亮度只有 0.000，基本等于全黑
+2026-11-09T05:37:41.2850500Z 
+2026-11-09T05:37:41.2850770Z === telephoto / 长焦人像 ===
+2026-11-09T05:37:41.2851310Z   grain=0.31 soft=0.60 ca=0.27 vig=0.50 bloom=0.52 persp=0.23 leak=0.00 screen=0.00 jpegP=1 q=0.85
+2026-11-09T05:37:41.2851890Z   0-source                rgb=(0.473 0.459 0.442) a=1.000  luma 0.032…1.000
+2026-11-09T05:37:41.2852500Z   1-prepared              rgb=(0.464 0.448 0.431) a=0.997  luma 0.000…1.000
+2026-11-09T05:37:41.2853370Z   2-geometry              rgb=(0.464 0.448 0.431) a=0.997  luma 0.000…1.000
+2026-11-09T05:37:41.2854150Z   3-color                 rgb=(0.307 0.288 0.260) a=0.997  luma 0.004…0.890
+2026-11-09T05:37:41.2854750Z   4-optics                rgb=(0.304 0.285 0.258) a=1.000  luma 0.004…0.818
+2026-11-09T05:37:41.2855530Z   5-sensor                rgb=(0.002 0.000 0.000) a=1.000  luma 0.000…0.360
+2026-11-09T05:37:41.2856160Z   6-scene                 rgb=(0.002 0.000 0.000) a=1.000  luma 0.000…0.360
+2026-11-09T05:37:41.2856990Z   7-final+jpeg            rgb=(0.000 0.000 0.000) a=1.000  luma 0.000…0.000
+2026-11-09T05:37:41.2857610Z   ⚠️ 成片均值亮度只有 0.000，基本等于全黑
+2026-11-09T05:37:41.2858670Z 
+2026-11-09T05:37:41.2860030Z === ccd / CCD 数码 ===
+2026-11-09T05:37:41.2861280Z   grain=0.25 soft=0.52 ca=0.33 vig=0.40 bloom=0.58 persp=0.38 leak=0.00 screen=0.00 jpegP=2 q=0.69
+2026-11-09T05:37:41.2865180Z   0-source                rgb=(0.473 0.459 0.442) a=1.000  luma 0.032…1.000
+2026-11-09T05:37:41.2866850Z   1-prepared              rgb=(0.464 0.448 0.431) a=0.997  luma 0.000…1.000
+2026-11-09T05:37:41.2868280Z   2-geometry              rgb=(0.464 0.448 0.431) a=0.997  luma 0.000…1.000
+2026-11-09T05:37:41.2869830Z   3-color                 rgb=(0.325 0.311 0.286) a=0.997  luma 0.000…0.904
+2026-11-09T05:37:41.2871150Z   4-optics                rgb=(0.322 0.307 0.283) a=1.000  luma 0.000…0.869
+2026-11-09T05:37:41.2872730Z   5-sensor                rgb=(0.004 0.001 0.001) a=1.000  luma 0.000…0.394
+2026-11-09T05:37:41.2873270Z   6-scene                 rgb=(0.004 0.001 0.001) a=1.000  luma 0.000…0.394
+2026-11-09T05:37:41.2873780Z   7-final+jpeg            rgb=(0.000 0.000 0.000) a=1.000  luma 0.000…0.000
+2026-11-09T05:37:41.2874140Z   ⚠️ 成片均值亮度只有 0.000，基本等于全黑
+2026-11-09T05:37:41.2874340Z 
+2026-11-09T05:37:41.2874540Z === film / 35mm 胶片 ===
+2026-11-09T05:37:41.2874970Z   grain=0.59 soft=0.54 ca=0.23 vig=0.48 bloom=0.46 persp=0.38 leak=0.22 screen=0.00 jpegP=1 q=0.86
+2026-11-09T05:37:41.2875480Z   0-source                rgb=(0.473 0.459 0.442) a=1.000  luma 0.032…1.000
+2026-11-09T05:37:41.2875990Z   1-prepared              rgb=(0.464 0.448 0.431) a=0.997  luma 0.000…1.000
+2026-11-09T05:37:41.2876540Z   2-geometry              rgb=(0.464 0.448 0.431) a=0.997  luma 0.000…1.000
+2026-11-09T05:37:41.2885090Z   3-color                 rgb=(0.312 0.295 0.271) a=0.997  luma 0.016…0.857
+2026-11-09T05:37:41.2892240Z   4-optics                rgb=(0.309 0.293 0.268) a=1.000  luma 0.017…0.803
+2026-11-09T05:37:41.2892700Z   5-sensor                rgb=(0.001 0.000 0.000) a=1.000  luma 0.000…0.283
+2026-11-09T05:37:41.2897340Z   6-scene                 rgb=(0.001 0.000 0.000) a=1.000  luma 0.000…0.295
+2026-11-09T05:37:41.2897920Z   7-final+jpeg            rgb=(0.000 0.000 0.000) a=1.000  luma 0.000…0.000
+2026-11-09T05:37:41.2898500Z   ⚠️ 成片均值亮度只有 0.000，基本等于全黑
+2026-11-09T05:37:41.2898700Z 
+2026-11-09T05:37:41.2898810Z === disposable / 一次性相机 ===
+2026-11-09T05:37:41.2899310Z   grain=0.73 soft=0.74 ca=0.43 vig=0.61 bloom=0.56 persp=0.38 leak=0.60 screen=0.00 jpegP=1 q=0.71
+2026-11-09T05:37:41.2899860Z   0-source                rgb=(0.473 0.459 0.442) a=1.000  luma 0.032…1.000
+2026-11-09T05:37:41.2900420Z   1-prepared              rgb=(0.464 0.448 0.431) a=0.997  luma 0.000…1.000
+2026-11-09T05:37:41.2900990Z   2-geometry              rgb=(0.464 0.448 0.431) a=0.997  luma 0.000…1.000
+2026-11-09T05:37:41.2901510Z   3-color                 rgb=(0.289 0.270 0.242) a=0.997  luma 0.008…0.854
+2026-11-09T05:37:41.2902040Z   4-optics                rgb=(0.287 0.267 0.239) a=1.000  luma 0.009…0.759
+2026-11-09T05:37:41.2902500Z   5-sensor                rgb=(0.000 0.000 0.000) a=1.000  luma 0.000…0.182
+2026-11-09T05:37:41.2903020Z   6-scene                 rgb=(0.000 0.000 0.000) a=1.000  luma 0.000…0.219
+2026-11-09T05:37:41.2903470Z   7-final+jpeg            rgb=(0.000 0.000 0.000) a=1.000  luma 0.000…0.000
+2026-11-09T05:37:41.2903920Z   ⚠️ 成片均值亮度只有 0.000，基本等于全黑
+2026-11-09T05:37:41.2904110Z 
+2026-11-09T05:37:41.2904360Z === screenShot / 翻拍屏幕 ===
+2026-11-09T05:37:41.2904750Z   grain=0.33 soft=0.57 ca=0.29 vig=0.31 bloom=0.58 persp=0.53 leak=0.14 screen=0.50 jpegP=1 q=0.79
+2026-11-09T05:37:41.2905390Z   0-source                rgb=(0.473 0.459 0.442) a=1.000  luma 0.032…1.000
+2026-11-09T05:37:41.2905840Z   1-prepared              rgb=(0.464 0.448 0.431) a=0.997  luma 0.000…1.000
+2026-11-09T05:37:41.2906400Z   2-geometry              rgb=(0.464 0.448 0.431) a=0.997  luma 0.000…1.000
+2026-11-09T05:37:41.2906840Z   3-color                 rgb=(0.349 0.334 0.315) a=0.997  luma 0.004…0.889
+2026-11-09T05:37:41.2907360Z   4-optics                rgb=(0.346 0.331 0.312) a=1.000  luma 0.004…0.862
+2026-11-09T05:37:41.2907810Z   5-sensor                rgb=(0.004 0.002 0.002) a=1.000  luma 0.000…0.432
+2026-11-09T05:37:41.2908400Z   6-scene                 rgb=(0.003 0.001 0.001) a=1.000  luma 0.000…0.392
+2026-11-09T05:37:41.2909000Z   7-final+jpeg            rgb=(0.000 0.000 0.000) a=1.000  luma 0.000…0.000
+2026-11-09T05:37:41.2909380Z   ⚠️ 成片均值亮度只有 0.000，基本等于全黑
+2026-11-09T05:37:41.2909560Z 
+2026-11-09T05:37:41.2910050Z 总结：6 / 6 个预设的成片接近全黑
+2026-11-09T05:37:41.2910230Z 
+2026-11-09T05:37:41.2911030Z === 单级隔离（源图均值亮度见 0-source）===
+2026-11-09T05:37:41.2911540Z   only-color                rgb=(0.464 0.448 0.431) a=0.997  luma 0.000…1.000
+2026-11-09T05:37:41.2911870Z 
+2026-11-09T05:37:41.2912010Z -- geometry --
+2026-11-09T05:37:41.2912680Z   baseline 全关               rgb=(0.464 0.448 0.431) a=0.997  luma 0.000…1.000
+2026-11-09T05:37:41.2913270Z   perspective + rotation    rgb=(0.464 0.448 0.431) a=0.997  luma 0.000…1.000
+2026-11-09T05:37:41.2913770Z   bloom                     rgb=(0.464 0.448 0.431) a=0.997  luma 0.000…1.000
+2026-11-09T05:37:41.2914290Z   vignette                  rgb=(0.464 0.448 0.431) a=0.997  luma 0.000…1.000
+2026-11-09T05:37:41.2914770Z   tone curve                rgb=(0.464 0.448 0.431) a=0.997  luma 0.000…1.000
+2026-11-09T05:37:41.2915320Z   chroma aberration         rgb=(0.464 0.448 0.431) a=0.997  luma 0.000…1.000
+2026-11-09T05:37:41.2915850Z   gaussian softness         rgb=(0.464 0.448 0.431) a=0.997  luma 0.000…1.000
+2026-11-09T05:37:41.2916480Z   motion blur               rgb=(0.464 0.448 0.431) a=0.997  luma 0.000…1.000
+2026-11-09T05:37:41.2917080Z   sharpen                   rgb=(0.464 0.448 0.431) a=0.997  luma 0.000…1.000
+2026-11-09T05:37:41.2917980Z   grain only                rgb=(0.464 0.448 0.431) a=0.997  luma 0.000…1.000
+2026-11-09T05:37:41.2918610Z   chroma noise only         rgb=(0.464 0.448 0.431) a=0.997  luma 0.000…1.000
+2026-11-09T05:37:41.2919200Z   grain + chroma noise      rgb=(0.464 0.448 0.431) a=0.997  luma 0.000…1.000
+2026-11-09T05:37:41.2919800Z   light leak                rgb=(0.464 0.448 0.431) a=0.997  luma 0.000…1.000
+2026-11-09T05:37:41.2920340Z   screen texture            rgb=(0.464 0.448 0.431) a=0.997  luma 0.000…1.000
+2026-11-09T05:37:41.2920660Z 
+2026-11-09T05:37:41.2920790Z -- color --
+2026-11-09T05:37:41.2921180Z   baseline 全关               rgb=(0.464 0.448 0.431) a=0.997  luma 0.000…1.000
+2026-11-09T05:37:41.2921690Z   perspective + rotation    rgb=(0.464 0.448 0.431) a=0.997  luma 0.000…1.000
+2026-11-09T05:37:41.2922240Z   bloom                     rgb=(0.467 0.451 0.434) a=0.997  luma 0.032…1.000
+2026-11-09T05:37:41.2922720Z   vignette                  rgb=(0.357 0.341 0.321) a=0.997  luma 0.000…1.000
+2026-11-09T05:37:41.2923300Z   tone curve                rgb=(0.452 0.439 0.423) a=0.997  luma 0.000…0.950
+2026-11-09T05:37:41.2923790Z   chroma aberration         rgb=(0.464 0.448 0.431) a=0.997  luma 0.000…1.000
+2026-11-09T05:37:41.2924410Z   gaussian softness         rgb=(0.464 0.448 0.431) a=0.997  luma 0.000…1.000
+2026-11-09T05:37:41.2924880Z   motion blur               rgb=(0.464 0.448 0.431) a=0.997  luma 0.000…1.000
+2026-11-09T05:37:41.2925430Z   sharpen                   rgb=(0.464 0.448 0.431) a=0.997  luma 0.000…1.000
+2026-11-09T05:37:41.2926000Z   grain only                rgb=(0.464 0.448 0.431) a=0.997  luma 0.000…1.000
+2026-11-09T05:37:41.2926540Z   chroma noise only         rgb=(0.464 0.448 0.431) a=0.997  luma 0.000…1.000
+2026-11-09T05:37:41.2927180Z   grain + chroma noise      rgb=(0.464 0.448 0.431) a=0.997  luma 0.000…1.000
+2026-11-09T05:37:41.2927670Z   light leak                rgb=(0.464 0.448 0.431) a=0.997  luma 0.000…1.000
+2026-11-09T05:37:41.2928240Z   screen texture            rgb=(0.464 0.448 0.431) a=0.997  luma 0.000…1.000
+2026-11-09T05:37:41.2928530Z 
+2026-11-09T05:37:41.2928600Z -- optics --
+2026-11-09T05:37:41.2929030Z   baseline 全关               rgb=(0.464 0.448 0.431) a=0.997  luma 0.000…1.000
+2026-11-09T05:37:41.2929630Z   perspective + rotation    rgb=(0.464 0.448 0.431) a=0.997  luma 0.000…1.000
+2026-11-09T05:37:41.2930200Z   bloom                     rgb=(0.464 0.448 0.431) a=0.997  luma 0.000…1.000
+2026-11-09T05:37:41.2930680Z   vignette                  rgb=(0.464 0.448 0.431) a=0.997  luma 0.000…1.000
+2026-11-09T05:37:41.2931310Z   tone curve                rgb=(0.464 0.448 0.431) a=0.997  luma 0.000…1.000
+2026-11-09T05:37:41.2931790Z   chroma aberration         rgb=(0.464 0.448 0.431) a=0.999  luma 0.001…1.000
+2026-11-09T05:37:41.2932330Z   gaussian softness         rgb=(0.464 0.448 0.431) a=0.997  luma 0.000…1.000
+2026-11-09T05:37:41.2932800Z   motion blur               rgb=(0.461 0.445 0.429) a=0.991  luma 0.000…0.996
+2026-11-09T05:37:41.2933320Z   sharpen                   rgb=(0.464 0.448 0.431) a=0.997  luma 0.000…1.000
+2026-11-09T05:37:41.2934080Z   grain only                rgb=(0.464 0.448 0.431) a=0.997  luma 0.000…1.000
+2026-11-09T05:37:41.2934580Z   chroma noise only         rgb=(0.464 0.448 0.431) a=0.997  luma 0.000…1.000
+2026-11-09T05:37:41.2935140Z   grain + chroma noise      rgb=(0.464 0.448 0.431) a=0.997  luma 0.000…1.000
+2026-11-09T05:37:41.2935700Z   light leak                rgb=(0.464 0.448 0.431) a=0.997  luma 0.000…1.000
+2026-11-09T05:37:41.2936330Z   screen texture            rgb=(0.464 0.448 0.431) a=0.997  luma 0.000…1.000
+2026-11-09T05:37:41.2936650Z 
+2026-11-09T05:37:41.2936700Z -- sensor --
+2026-11-09T05:37:41.2937120Z   baseline 全关               rgb=(0.464 0.448 0.431) a=0.997  luma 0.000…1.000
+2026-11-09T05:37:41.2937610Z   perspective + rotation    rgb=(0.464 0.448 0.431) a=0.997  luma 0.000…1.000
+2026-11-09T05:37:41.2938160Z   bloom                     rgb=(0.464 0.448 0.431) a=0.997  luma 0.000…1.000
+2026-11-09T05:37:41.2938910Z   vignette                  rgb=(0.464 0.448 0.431) a=0.997  luma 0.000…1.000
+2026-11-09T05:37:41.2939420Z   tone curve                rgb=(0.464 0.448 0.431) a=0.997  luma 0.000…1.000
+2026-11-09T05:37:41.2940090Z   chroma aberration         rgb=(0.464 0.448 0.431) a=0.997  luma 0.000…1.000
+2026-11-09T05:37:41.2940590Z   gaussian softness         rgb=(0.464 0.448 0.431) a=0.997  luma 0.000…1.000
+2026-11-09T05:37:41.2941180Z   motion blur               rgb=(0.464 0.448 0.431) a=0.997  luma 0.000…1.000
+2026-11-09T05:37:41.2941650Z   sharpen                   rgb=(0.464 0.448 0.431) a=0.997  luma 0.000…1.000
+2026-11-09T05:37:41.2942180Z   grain only                rgb=(0.468 0.453 0.436) a=0.998  luma 0.000…1.000
+2026-11-09T05:37:41.2942720Z   chroma noise only         rgb=(0.479 0.467 0.449) a=0.998  luma 0.000…1.000
+2026-11-09T05:37:41.2943220Z   grain + chroma noise      rgb=(0.484 0.471 0.454) a=0.999  luma 0.000…1.000
+2026-11-09T05:37:41.2943820Z   light leak                rgb=(0.464 0.448 0.431) a=0.997  luma 0.000…1.000
+2026-11-09T05:37:41.2944330Z   screen texture            rgb=(0.464 0.448 0.431) a=0.997  luma 0.000…1.000
+2026-11-09T05:37:41.2944620Z 
+2026-11-09T05:37:41.2944760Z -- scene --
+2026-11-09T05:37:41.2945170Z   baseline 全关               rgb=(0.464 0.448 0.431) a=0.997  luma 0.000…1.000
+2026-11-09T05:37:41.2945740Z   perspective + rotation    rgb=(0.464 0.448 0.431) a=0.997  luma 0.000…1.000
+2026-11-09T05:37:41.2946350Z   bloom                     rgb=(0.464 0.448 0.431) a=0.997  luma 0.000…1.000
+2026-11-09T05:37:41.2946890Z   vignette                  rgb=(0.464 0.448 0.431) a=0.997  luma 0.000…1.000
+2026-11-09T05:37:41.2947410Z   tone curve                rgb=(0.464 0.448 0.431) a=0.997  luma 0.000…1.000
+2026-11-09T05:37:41.2947900Z   chroma aberration         rgb=(0.464 0.448 0.431) a=0.997  luma 0.000…1.000
+2026-11-09T05:37:41.2948480Z   gaussian softness         rgb=(0.464 0.448 0.431) a=0.997  luma 0.000…1.000
+2026-11-09T05:37:41.2948970Z   motion blur               rgb=(0.464 0.448 0.431) a=0.997  luma 0.000…1.000
+2026-11-09T05:37:41.2949520Z   sharpen                   rgb=(0.464 0.448 0.431) a=0.997  luma 0.000…1.000
+2026-11-09T05:37:41.2950000Z   grain only                rgb=(0.464 0.448 0.431) a=0.997  luma 0.000…1.000
+2026-11-09T05:37:41.2950740Z   chroma noise only         rgb=(0.464 0.448 0.431) a=0.997  luma 0.000…1.000
+2026-11-09T05:37:41.2951490Z   grain + chroma noise      rgb=(0.464 0.448 0.431) a=0.997  luma 0.000…1.000
+2026-11-09T05:37:41.2952030Z   light leak                rgb=(0.474 0.453 0.436) a=0.997  luma 0.000…1.000
+2026-11-09T05:37:41.2952670Z   screen texture            rgb=(0.475 0.460 0.444) a=0.997  luma 0.000…1.000
+2026-11-09T05:37:41.2952910Z 
+2026-11-09T05:37:41.2953090Z 中间图已写入 diag-out
+2026-11-09T05:37:41.3113140Z ##[group]Run actions/upload-artifact@v4
+2026-11-09T05:37:41.3113730Z with:
+2026-11-09T05:37:41.3114070Z   name: pipeline-diagnostics
+2026-11-09T05:37:41.3114590Z   path: **/diag-out/*.png
+2026-11-09T05:37:41.3114910Z   if-no-files-found: ignore
+2026-11-09T05:37:41.3115180Z   retention-days: 7
+2026-11-09T05:37:41.3115350Z   compression-level: 6
+2026-11-09T05:37:41.3115520Z   overwrite: false
+2026-11-09T05:37:41.3115700Z   include-hidden-files: false
+2026-11-09T05:37:41.3115880Z env:
+2026-11-09T05:37:41.3116150Z   PROJECT_DIR: /Users/runner/work/realshot-ios/realshot-ios
+2026-11-09T05:37:41.3116530Z ##[endgroup]
+2026-11-09T05:37:41.7399440Z (node:6578) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-11-09T05:37:41.7509190Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-11-09T05:37:41.7909450Z With the provided path, there will be 48 files uploaded
+2026-11-09T05:37:41.7909950Z Artifact name is valid!
+2026-11-09T05:37:41.7910140Z Root directory input is valid!
+2026-11-09T05:37:42.1812560Z Beginning upload of artifact content to blob storage
+2026-11-09T05:37:42.3908280Z (node:6578) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+2026-11-09T05:37:43.3242100Z Uploaded bytes 6973047
+2026-11-09T05:37:43.3955240Z Finished uploading artifact content to blob storage!
+2026-11-09T05:37:43.3966640Z SHA256 digest of uploaded artifact zip is 68bd097541b8243b55e7ef0b908dd3bebed922213f5410f001cf0b6f4e0cf7fa
+2026-11-09T05:37:43.3970440Z Finalizing artifact upload
+2026-11-09T05:37:43.8270820Z Artifact pipeline-diagnostics.zip successfully finalized. Artifact ID 13652063309
+2026-11-09T05:37:43.8272050Z Artifact pipeline-diagnostics has been successfully uploaded! Final size is 6973047 bytes. Artifact ID is 13652063309
+2026-11-09T05:37:43.8278250Z Artifact download URL: https://github.com/xiaolvmao/realshot-ios/actions/runs/42568337435/artifacts/13652063309
+2026-11-09T05:37:43.8421380Z ##[group]Run chmod +x "$PROJECT_DIR/scripts/build_ipa.sh"
+2026-11-09T05:37:43.8421830Z [36;1mchmod +x "$PROJECT_DIR/scripts/build_ipa.sh"[0m
+2026-11-09T05:37:43.8422130Z [36;1m"$PROJECT_DIR/scripts/build_ipa.sh"[0m
+2026-11-09T05:37:43.9941050Z shell: /bin/bash -e {0}
+2026-11-09T05:37:43.9941270Z env:
+2026-11-09T05:37:43.9941520Z   PROJECT_DIR: /Users/runner/work/realshot-ios/realshot-ios
+2026-11-09T05:37:43.9941800Z ##[endgroup]
+2026-11-09T05:37:44.4660340Z *** Terminating app due to uncaught exception 'NSFileHandleOperationException', reason: '*** -[_NSStdIOFileHandle writeData:]: Broken pipe'
+2026-11-09T05:37:44.4665010Z *** First throw call stack:
+2026-11-09T05:37:44.4666090Z (
+2026-11-09T05:37:44.4672130Z 	0   CoreFoundation                      0x00000001839743b0 __exceptionPreprocess + 176
+2026-11-09T05:37:44.4672990Z ▸ Xcode: Xcode 16.4
+2026-11-09T05:37:44.4673750Z 	1   libobjc.A.dylib                     0x0000000183436b90 objc_exception_throw + 88
+2026-11-09T05:37:44.4674450Z ▸ 模式: unsigned
+2026-11-09T05:37:44.4677740Z 	2   Foundation                          0x00000001856ed7b4 -[NSConcreteFileHandle readDataUpToLength:error:] + 0
+2026-11-09T05:37:44.4683680Z 	3   Foundation                          0x0000000184ec4428 -[NSConcreteFileHandle writeData:] + 300
+2026-11-09T05:37:44.4686670Z 	4   xcodebuild                          0x000000010260db24 -[XcodebuildPreIDEHandler handleVersionWithArguments:] + 612
+2026-11-09T05:37:44.4689060Z 	5   xcodebuild                          0x000000010260d5d8 -[XcodebuildPreIDEHandler runWithArguments:] + 116
+2026-11-09T05:37:44.4692070Z 	6   xcodebuild                          0x000000010260d198 main + 512
+2026-11-09T05:37:44.4714910Z 	7   dyld                                0x0000000183476b98 start + 6076
+2026-11-09T05:37:44.4716320Z )
+2026-11-09T05:37:44.4717890Z libc++abi: terminating due to uncaught exception of type NSException
+2026-11-09T05:37:46.6605220Z Command line invocation:
+2026-11-09T05:37:46.6628330Z     /Applications/Xcode_16.4.app/Contents/Developer/usr/bin/xcodebuild -project RealShot.xcodeproj -scheme RealShot -configuration Release -sdk iphoneos -derivedDataPath build/DerivedData -archivePath build/RealShot.xcarchive CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY= EXPANDED_CODE_SIGN_IDENTITY= archive
+2026-11-09T05:37:46.6660510Z 
+2026-11-09T05:37:46.6729700Z Build settings from command line:
+2026-11-09T05:37:46.6759860Z     CODE_SIGN_IDENTITY = 
+2026-11-09T05:37:46.6762190Z     CODE_SIGNING_ALLOWED = NO
+2026-11-09T05:37:46.6775340Z     CODE_SIGNING_REQUIRED = NO
+2026-11-09T05:37:46.6802400Z     EXPANDED_CODE_SIGN_IDENTITY = 
+2026-11-09T05:37:46.6802680Z     SDKROOT = iphoneos18.5
+2026-11-09T05:37:46.6803460Z 
+2026-11-09T05:37:47.3539470Z --- xcodebuild: WARNING: Using the first of multiple matching destinations:
+2026-11-09T05:37:47.3540700Z { platform:iOS, id:dvtdevice-DVTiPhonePlaceholder-iphoneos:placeholder, name:Any iOS Device }
+2026-11-09T05:37:47.3554870Z { platform:macOS, arch:arm64, variant:Designed for [iPad,iPhone], id:b9389f317b978f40c6555031d772db68e251d46c, name:My Mac }
+2026-11-09T05:37:47.3555920Z { platform:iOS Simulator, id:dvtdevice-DVTiOSDeviceSimulatorPlaceholder-iphonesimulator:placeholder, name:Any iOS Simulator Device }
+2026-11-09T05:37:47.3560820Z { platform:visionOS Simulator, arch:arm64, variant:Designed for [iPad,iPhone], id:D0F14F8F-92E2-4F22-A865-D3C15827F37B, OS:2.3, name:Apple Vision Pro }
+2026-11-09T05:37:47.3561640Z { platform:visionOS Simulator, arch:arm64, variant:Designed for [iPad,iPhone], id:4C6D3708-4F33-4B94-8133-1FE8939E1175, OS:2.4, name:Apple Vision Pro }
+2026-11-09T05:37:47.3568320Z { platform:visionOS Simulator, arch:arm64, variant:Designed for [iPad,iPhone], id:402E966D-7AB6-4E10-B300-697686E3727A, OS:2.5, name:Apple Vision Pro }
+2026-11-09T05:37:47.3570020Z { platform:visionOS Simulator, arch:arm64, variant:Designed for [iPad,iPhone], id:A3A5FF05-9D8C-4AB3-AEE3-FD2FF49EF0FD, OS:26.1, name:Apple Vision Pro }
+2026-11-09T05:37:47.3571840Z { platform:visionOS Simulator, arch:arm64, variant:Designed for [iPad,iPhone], id:644B81BA-B8E0-472D-A49B-84FF1C95498B, OS:26.2, name:Apple Vision Pro }
+2026-11-09T05:37:47.3572660Z { platform:iOS Simulator, arch:arm64, id:7329C2BF-DE37-4FEE-868A-478B416CB957, OS:18.5, name:iPad (10th generation) }
+2026-11-09T05:37:47.3573330Z { platform:iOS Simulator, arch:x86_64, id:7329C2BF-DE37-4FEE-868A-478B416CB957, OS:18.5, name:iPad (10th generation) }
+2026-11-09T05:37:47.3574600Z { platform:iOS Simulator, arch:arm64, id:881E8995-0461-4E8E-B017-F42A75B9D1CE, OS:18.6, name:iPad (10th generation) }
+2026-11-09T05:37:47.3576530Z { platform:iOS Simulator, arch:x86_64, id:881E8995-0461-4E8E-B017-F42A75B9D1CE, OS:18.6, name:iPad (10th generation) }
+2026-11-09T05:37:47.3578360Z { platform:iOS Simulator, arch:arm64, id:EB040E2D-06C7-4ED6-8DAF-3806BA80E34D, OS:26.0.1, name:iPad (10th generation) }
+2026-11-09T05:37:47.3580120Z { platform:iOS Simulator, arch:x86_64, id:EB040E2D-06C7-4ED6-8DAF-3806BA80E34D, OS:26.0.1, name:iPad (10th generation) }
+2026-11-09T05:37:47.3582370Z { platform:iOS Simulator, arch:arm64, id:53209C6D-F710-47D6-A1FE-BCFDF2AF0F23, OS:26.1, name:iPad (10th generation) }
+2026-11-09T05:37:47.3584280Z { platform:iOS Simulator, arch:x86_64, id:53209C6D-F710-47D6-A1FE-BCFDF2AF0F23, OS:26.1, name:iPad (10th generation) }
+2026-11-09T05:37:47.3586340Z { platform:iOS Simulator, arch:arm64, id:06716521-45A3-4B83-9675-8E50641017F6, OS:26.2, name:iPad (10th generation) }
+2026-11-09T05:37:47.3588060Z { platform:iOS Simulator, arch:x86_64, id:06716521-45A3-4B83-9675-8E50641017F6, OS:26.2, name:iPad (10th generation) }
+2026-11-09T05:37:47.3589680Z { platform:iOS Simulator, arch:arm64, id:560CD563-3A24-434E-9AA6-6D016EF02D15, OS:18.5, name:iPad (A16) }
+2026-11-09T05:37:47.3591290Z { platform:iOS Simulator, arch:x86_64, id:560CD563-3A24-434E-9AA6-6D016EF02D15, OS:18.5, name:iPad (A16) }
+2026-11-09T05:37:47.3592840Z { platform:iOS Simulator, arch:arm64, id:9BB0D925-7787-4106-B71A-AD484A9288D4, OS:18.6, name:iPad (A16) }
+2026-11-09T05:37:47.3594360Z { platform:iOS Simulator, arch:x86_64, id:9BB0D925-7787-4106-B71A-AD484A9288D4, OS:18.6, name:iPad (A16) }
+2026-11-09T05:37:47.3595870Z { platform:iOS Simulator, arch:arm64, id:648126EC-3BAA-4497-8DEC-2C26C0FC062C, OS:26.0.1, name:iPad (A16) }
+2026-11-09T05:37:47.3597850Z { platform:iOS Simulator, arch:x86_64, id:648126EC-3BAA-4497-8DEC-2C26C0FC062C, OS:26.0.1, name:iPad (A16) }
+2026-11-09T05:37:47.3599310Z { platform:iOS Simulator, arch:arm64, id:89969594-357A-405D-9A9B-1B6F799D50F1, OS:26.1, name:iPad (A16) }
+2026-11-09T05:37:47.3600860Z { platform:iOS Simulator, arch:x86_64, id:89969594-357A-405D-9A9B-1B6F799D50F1, OS:26.1, name:iPad (A16) }
+2026-11-09T05:37:47.3602640Z { platform:iOS Simulator, arch:arm64, id:99B14484-E343-4170-AA2E-F738DF7FB3F2, OS:26.2, name:iPad (A16) }
+2026-11-09T05:37:47.3604110Z { platform:iOS Simulator, arch:x86_64, id:99B14484-E343-4170-AA2E-F738DF7FB3F2, OS:26.2, name:iPad (A16) }
+2026-11-09T05:37:47.3605900Z { platform:iOS Simulator, arch:arm64, id:8AC197DA-8AFB-4008-B892-BE4C21D57251, OS:18.5, name:iPad Air 11-inch (M2) }
+2026-11-09T05:37:47.3610860Z { platform:iOS Simulator, arch:x86_64, id:8AC197DA-8AFB-4008-B892-BE4C21D57251, OS:18.5, name:iPad Air 11-inch (M2) }
+2026-11-09T05:37:47.3612270Z { platform:iOS Simulator, arch:arm64, id:AC158E0E-E1A0-4A5A-8F2E-2D315823858F, OS:18.6, name:iPad Air 11-inch (M2) }
+2026-11-09T05:37:47.3613000Z { platform:iOS Simulator, arch:x86_64, id:AC158E0E-E1A0-4A5A-8F2E-2D315823858F, OS:18.6, name:iPad Air 11-inch (M2) }
+2026-11-09T05:37:47.3613650Z { platform:iOS Simulator, arch:arm64, id:7EEA2B4C-E33A-489F-8CE9-54A95A012A7B, OS:26.0.1, name:iPad Air 11-inch (M2) }
+2026-11-09T05:37:47.3614280Z { platform:iOS Simulator, arch:x86_64, id:7EEA2B4C-E33A-489F-8CE9-54A95A012A7B, OS:26.0.1, name:iPad Air 11-inch (M2) }
+2026-11-09T05:37:47.3614890Z { platform:iOS Simulator, arch:arm64, id:B6B452C5-2B28-4772-A72D-3CF8F80C40F8, OS:26.1, name:iPad Air 11-inch (M2) }
+2026-11-09T05:37:47.3615760Z { platform:iOS Simulator, arch:x86_64, id:B6B452C5-2B28-4772-A72D-3CF8F80C40F8, OS:26.1, name:iPad Air 11-inch (M2) }
+2026-11-09T05:37:47.3616400Z { platform:iOS Simulator, arch:arm64, id:600769A2-106D-47FC-BC82-226EB3CB9A19, OS:26.2, name:iPad Air 11-inch (M2) }
+2026-11-09T05:37:47.3617080Z { platform:iOS Simulator, arch:x86_64, id:600769A2-106D-47FC-BC82-226EB3CB9A19, OS:26.2, name:iPad Air 11-inch (M2) }
+2026-11-09T05:37:47.3617730Z { platform:iOS Simulator, arch:arm64, id:65AAFA9D-5BED-41AA-B95E-A76F19286A8B, OS:18.5, name:iPad Air 11-inch (M3) }
+2026-11-09T05:37:47.3618420Z { platform:iOS Simulator, arch:x86_64, id:65AAFA9D-5BED-41AA-B95E-A76F19286A8B, OS:18.5, name:iPad Air 11-inch (M3) }
+2026-11-09T05:37:47.3619080Z { platform:iOS Simulator, arch:arm64, id:4EC2E2B3-E3CF-4711-9A17-801DD5C3CA76, OS:18.6, name:iPad Air 11-inch (M3) }
+2026-11-09T05:37:47.3619720Z { platform:iOS Simulator, arch:x86_64, id:4EC2E2B3-E3CF-4711-9A17-801DD5C3CA76, OS:18.6, name:iPad Air 11-inch (M3) }
+2026-11-09T05:37:47.3620380Z { platform:iOS Simulator, arch:arm64, id:A84145FE-B5F8-4F9A-83B8-8C10CD9179A8, OS:26.0.1, name:iPad Air 11-inch (M3) }
+2026-11-09T05:37:47.3623170Z { platform:iOS Simulator, arch:x86_64, id:A84145FE-B5F8-4F9A-83B8-8C10CD9179A8, OS:26.0.1, name:iPad Air 11-inch (M3) }
+2026-11-09T05:37:47.3624550Z { platform:iOS Simulator, arch:arm64, id:3ACD0CEF-A8E0-4A94-8854-1D15E72A2B2F, OS:26.1, name:iPad Air 11-inch (M3) }
+2026-11-09T05:37:47.3625380Z { platform:iOS Simulator, arch:x86_64, id:3ACD0CEF-A8E0-4A94-8854-1D15E72A2B2F, OS:26.1, name:iPad Air 11-inch (M3) }
+2026-11-09T05:37:47.3626140Z { platform:iOS Simulator, arch:arm64, id:46B2C201-34BD-490F-B6CA-09A9D44428F6, OS:26.2, name:iPad Air 11-inch (M3) }
+2026-11-09T05:37:47.3626950Z { platform:iOS Simulator, arch:x86_64, id:46B2C201-34BD-490F-B6CA-09A9D44428F6, OS:26.2, name:iPad Air 11-inch (M3) }
+2026-11-09T05:37:47.3627700Z { platform:iOS Simulator, arch:arm64, id:FE2DECE8-63B8-4A77-B8E5-1C4D1940D796, OS:18.5, name:iPad Air 13-inch (M2) }
+2026-11-09T05:37:47.3628360Z { platform:iOS Simulator, arch:x86_64, id:FE2DECE8-63B8-4A77-B8E5-1C4D1940D796, OS:18.5, name:iPad Air 13-inch (M2) }
+2026-11-09T05:37:47.3629010Z { platform:iOS Simulator, arch:arm64, id:A5E07AD7-C10C-4A8D-AFCC-4AABB5FDDDAD, OS:18.6, name:iPad Air 13-inch (M2) }
+2026-11-09T05:37:47.3629770Z { platform:iOS Simulator, arch:x86_64, id:A5E07AD7-C10C-4A8D-AFCC-4AABB5FDDDAD, OS:18.6, name:iPad Air 13-inch (M2) }
+2026-11-09T05:37:47.3630420Z { platform:iOS Simulator, arch:arm64, id:77346208-A853-44D8-A5FD-B500FCCAF077, OS:26.0.1, name:iPad Air 13-inch (M2) }
+2026-11-09T05:37:47.3631090Z { platform:iOS Simulator, arch:x86_64, id:77346208-A853-44D8-A5FD-B500FCCAF077, OS:26.0.1, name:iPad Air 13-inch (M2) }
+2026-11-09T05:37:47.3631730Z { platform:iOS Simulator, arch:arm64, id:8C6B52C9-C68F-48F7-B131-4A7DBF40E981, OS:26.1, name:iPad Air 13-inch (M2) }
+2026-11-09T05:37:47.3632360Z { platform:iOS Simulator, arch:x86_64, id:8C6B52C9-C68F-48F7-B131-4A7DBF40E981, OS:26.1, name:iPad Air 13-inch (M2) }
+2026-11-09T05:37:47.3634060Z { platform:iOS Simulator, arch:arm64, id:EC963428-282D-4710-92F4-AF92774819A7, OS:26.2, name:iPad Air 13-inch (M2) }
+2026-11-09T05:37:47.3635520Z { platform:iOS Simulator, arch:x86_64, id:EC963428-282D-4710-92F4-AF92774819A7, OS:26.2, name:iPad Air 13-inch (M2) }
+2026-11-09T05:37:47.3636680Z { platform:iOS Simulator, arch:arm64, id:3C683F57-5CD8-44B2-880C-BFFEFBC7C35A, OS:18.5, name:iPad Air 13-inch (M3) }
+2026-11-09T05:37:47.3637350Z { platform:iOS Simulator, arch:x86_64, id:3C683F57-5CD8-44B2-880C-BFFEFBC7C35A, OS:18.5, name:iPad Air 13-inch (M3) }
+2026-11-09T05:37:47.3638010Z { platform:iOS Simulator, arch:arm64, id:16E9686E-FFA3-4CBE-A7AF-FE0CFFB54D5D, OS:18.6, name:iPad Air 13-inch (M3) }
+2026-11-09T05:37:47.3638640Z { platform:iOS Simulator, arch:x86_64, id:16E9686E-FFA3-4CBE-A7AF-FE0CFFB54D5D, OS:18.6, name:iPad Air 13-inch (M3) }
+2026-11-09T05:37:47.3639320Z { platform:iOS Simulator, arch:arm64, id:5D3D906D-D248-41EA-8D97-0F801AFB3841, OS:26.0.1, name:iPad Air 13-inch (M3) }
+2026-11-09T05:37:47.3640170Z { platform:iOS Simulator, arch:x86_64, id:5D3D906D-D248-41EA-8D97-0F801AFB3841, OS:26.0.1, name:iPad Air 13-inch (M3) }
+2026-11-09T05:37:47.3640830Z { platform:iOS Simulator, arch:arm64, id:001D073F-3837-401D-A154-B2B22F077B36, OS:26.1, name:iPad Air 13-inch (M3) }
+2026-11-09T05:37:47.3641470Z { platform:iOS Simulator, arch:x86_64, id:001D073F-3837-401D-A154-B2B22F077B36, OS:26.1, name:iPad Air 13-inch (M3) }
+2026-11-09T05:37:47.3642080Z { platform:iOS Simulator, arch:arm64, id:697390A7-516F-4E42-BC81-BAE7B3D9899F, OS:26.2, name:iPad Air 13-inch (M3) }
+2026-11-09T05:37:47.3642710Z { platform:iOS Simulator, arch:x86_64, id:697390A7-516F-4E42-BC81-BAE7B3D9899F, OS:26.2, name:iPad Air 13-inch (M3) }
+2026-11-09T05:37:47.3643350Z { platform:iOS Simulator, arch:arm64, id:4958D4DC-061A-4B2E-8FCB-F5711F024581, OS:18.5, name:iPad Pro 11-inch (M4) }
+2026-11-09T05:37:47.3643970Z { platform:iOS Simulator, arch:x86_64, id:4958D4DC-061A-4B2E-8FCB-F5711F024581, OS:18.5, name:iPad Pro 11-inch (M4) }
+2026-11-09T05:37:47.3644620Z { platform:iOS Simulator, arch:arm64, id:77F1E59E-130D-4B93-895A-55BBCE876BBC, OS:18.6, name:iPad Pro 11-inch (M4) }
+2026-11-09T05:37:47.3645260Z { platform:iOS Simulator, arch:x86_64, id:77F1E59E-130D-4B93-895A-55BBCE876BBC, OS:18.6, name:iPad Pro 11-inch (M4) }
+2026-11-09T05:37:47.3645960Z { platform:iOS Simulator, arch:arm64, id:0C66C372-6626-40B4-9AE9-ED256711BA37, OS:26.0.1, name:iPad Pro 11-inch (M4) }
+2026-11-09T05:37:47.3646610Z { platform:iOS Simulator, arch:x86_64, id:0C66C372-6626-40B4-9AE9-ED256711BA37, OS:26.0.1, name:iPad Pro 11-inch (M4) }
+2026-11-09T05:37:47.3647260Z { platform:iOS Simulator, arch:arm64, id:9726AC26-E6F0-48DD-ADFD-04B73D808008, OS:26.1, name:iPad Pro 11-inch (M4) }
+2026-11-09T05:37:47.3647890Z { platform:iOS Simulator, arch:x86_64, id:9726AC26-E6F0-48DD-ADFD-04B73D808008, OS:26.1, name:iPad Pro 11-inch (M4) }
+2026-11-09T05:37:47.3648510Z { platform:iOS Simulator, arch:arm64, id:02E8A1AA-FFE7-472E-82B1-99CEDB718216, OS:26.2, name:iPad Pro 11-inch (M4) }
+2026-11-09T05:37:47.3649170Z { platform:iOS Simulator, arch:x86_64, id:02E8A1AA-FFE7-472E-82B1-99CEDB718216, OS:26.2, name:iPad Pro 11-inch (M4) }
+2026-11-09T05:37:47.3649790Z { platform:iOS Simulator, arch:arm64, id:3E81FA92-6C7B-471E-ACE8-DEB1BC933801, OS:26.0.1, name:iPad Pro 11-inch (M5) }
+2026-11-09T05:37:47.3654020Z { platform:iOS Simulator, arch:x86_64, id:3E81FA92-6C7B-471E-ACE8-DEB1BC933801, OS:26.0.1, name:iPad Pro 11-inch (M5) }
+2026-11-09T05:37:47.3654690Z { platform:iOS Simulator, arch:arm64, id:E57CC80A-38E2-4A3D-928C-86E7092A16AF, OS:26.1, name:iPad Pro 11-inch (M5) }
+2026-11-09T05:37:47.3655340Z { platform:iOS Simulator, arch:x86_64, id:E57CC80A-38E2-4A3D-928C-86E7092A16AF, OS:26.1, name:iPad Pro 11-inch (M5) }
+2026-11-09T05:37:47.3655950Z { platform:iOS Simulator, arch:arm64, id:F67B0B21-7494-4851-8FEA-F5FECE154B6D, OS:26.2, name:iPad Pro 11-inch (M5) }
+2026-11-09T05:37:47.3656580Z { platform:iOS Simulator, arch:x86_64, id:F67B0B21-7494-4851-8FEA-F5FECE154B6D, OS:26.2, name:iPad Pro 11-inch (M5) }
+2026-11-09T05:37:47.3657270Z { platform:iOS Simulator, arch:arm64, id:052118CF-7C93-4A8B-82B7-DFA9962FDAB2, OS:18.5, name:iPad Pro 13-inch (M4) }
+2026-11-09T05:37:47.3657970Z { platform:iOS Simulator, arch:x86_64, id:052118CF-7C93-4A8B-82B7-DFA9962FDAB2, OS:18.5, name:iPad Pro 13-inch (M4) }
+2026-11-09T05:37:47.3659910Z { platform:iOS Simulator, arch:arm64, id:DE5BA191-0219-48E4-B01B-47385071328C, OS:18.6, name:iPad Pro 13-inch (M4) }
+2026-11-09T05:37:47.3662210Z { platform:iOS Simulator, arch:x86_64, id:DE5BA191-0219-48E4-B01B-47385071328C, OS:18.6, name:iPad Pro 13-inch (M4) }
+2026-11-09T05:37:47.3663760Z { platform:iOS Simulator, arch:arm64, id:2C460862-96F5-4F13-B4D1-44430DB8CE67, OS:26.0.1, name:iPad Pro 13-inch (M4) }
+2026-11-09T05:37:47.3664390Z { platform:iOS Simulator, arch:x86_64, id:2C460862-96F5-4F13-B4D1-44430DB8CE67, OS:26.0.1, name:iPad Pro 13-inch (M4) }
+2026-11-09T05:37:47.3665190Z { platform:iOS Simulator, arch:arm64, id:B23C6DAE-1AD2-446F-A3E4-72FAA287D289, OS:26.1, name:iPad Pro 13-inch (M4) }
+2026-11-09T05:37:47.3666110Z { platform:iOS Simulator, arch:x86_64, id:B23C6DAE-1AD2-446F-A3E4-72FAA287D289, OS:26.1, name:iPad Pro 13-inch (M4) }
+2026-11-09T05:37:47.3666780Z { platform:iOS Simulator, arch:arm64, id:04A9C222-F4D9-4FD4-98BE-4054EEE6F66B, OS:26.2, name:iPad Pro 13-inch (M4) }
+2026-11-09T05:37:47.3667430Z { platform:iOS Simulator, arch:x86_64, id:04A9C222-F4D9-4FD4-98BE-4054EEE6F66B, OS:26.2, name:iPad Pro 13-inch (M4) }
+2026-11-09T05:37:47.3668090Z { platform:iOS Simulator, arch:arm64, id:326BE850-69D0-468D-BE9F-82ACA2315CCF, OS:26.0.1, name:iPad Pro 13-inch (M5) }
+2026-11-09T05:37:47.3668740Z { platform:iOS Simulator, arch:x86_64, id:326BE850-69D0-468D-BE9F-82ACA2315CCF, OS:26.0.1, name:iPad Pro 13-inch (M5) }
+2026-11-09T05:37:47.3669400Z { platform:iOS Simulator, arch:arm64, id:F68EDA96-8019-48A5-9380-06BB81115A6D, OS:26.1, name:iPad Pro 13-inch (M5) }
+2026-11-09T05:37:47.3670020Z { platform:iOS Simulator, arch:x86_64, id:F68EDA96-8019-48A5-9380-06BB81115A6D, OS:26.1, name:iPad Pro 13-inch (M5) }
+2026-11-09T05:37:47.3670660Z { platform:iOS Simulator, arch:arm64, id:73C19119-B10E-4309-872E-C53EF3F0EF27, OS:26.2, name:iPad Pro 13-inch (M5) }
+2026-11-09T05:37:47.3671280Z { platform:iOS Simulator, arch:x86_64, id:73C19119-B10E-4309-872E-C53EF3F0EF27, OS:26.2, name:iPad Pro 13-inch (M5) }
+2026-11-09T05:37:47.3671930Z { platform:iOS Simulator, arch:arm64, id:A1691E65-52BF-41DF-B182-2B17CEFC96B7, OS:18.5, name:iPad mini (A17 Pro) }
+2026-11-09T05:37:47.3672560Z { platform:iOS Simulator, arch:x86_64, id:A1691E65-52BF-41DF-B182-2B17CEFC96B7, OS:18.5, name:iPad mini (A17 Pro) }
+2026-11-09T05:37:47.3673180Z { platform:iOS Simulator, arch:arm64, id:2A250684-88E3-4EDB-A21E-B7726B4C69F6, OS:18.6, name:iPad mini (A17 Pro) }
+2026-11-09T05:37:47.3673800Z { platform:iOS Simulator, arch:x86_64, id:2A250684-88E3-4EDB-A21E-B7726B4C69F6, OS:18.6, name:iPad mini (A17 Pro) }
+2026-11-09T05:37:47.3674430Z { platform:iOS Simulator, arch:arm64, id:94AF59C4-E64A-47E2-B5FC-FAD1A99BBD6A, OS:26.0.1, name:iPad mini (A17 Pro) }
+2026-11-09T05:37:47.3675090Z { platform:iOS Simulator, arch:x86_64, id:94AF59C4-E64A-47E2-B5FC-FAD1A99BBD6A, OS:26.0.1, name:iPad mini (A17 Pro) }
+2026-11-09T05:37:47.3675730Z { platform:iOS Simulator, arch:arm64, id:1F1A982F-A6AB-4622-A71C-08FC8732B949, OS:26.1, name:iPad mini (A17 Pro) }
+2026-11-09T05:37:47.3676380Z { platform:iOS Simulator, arch:x86_64, id:1F1A982F-A6AB-4622-A71C-08FC8732B949, OS:26.1, name:iPad mini (A17 Pro) }
+2026-11-09T05:37:47.3677140Z { platform:iOS Simulator, arch:arm64, id:B8FDD452-636F-4559-AF6E-83AC73F482CF, OS:26.2, name:iPad mini (A17 Pro) }
+2026-11-09T05:37:47.3677730Z { platform:iOS Simulator, arch:x86_64, id:B8FDD452-636F-4559-AF6E-83AC73F482CF, OS:26.2, name:iPad mini (A17 Pro) }
+2026-11-09T05:37:47.3678330Z { platform:iOS Simulator, arch:arm64, id:341D689A-78F6-4171-9723-8609B5394AD8, OS:18.5, name:iPhone 16 }
+2026-11-09T05:37:47.3678900Z { platform:iOS Simulator, arch:x86_64, id:341D689A-78F6-4171-9723-8609B5394AD8, OS:18.5, name:iPhone 16 }
+2026-11-09T05:37:47.3679460Z { platform:iOS Simulator, arch:arm64, id:8FC8BB1D-7A0A-48F8-B639-7B74A77F4610, OS:18.6, name:iPhone 16 }
+2026-11-09T05:37:47.3680010Z { platform:iOS Simulator, arch:x86_64, id:8FC8BB1D-7A0A-48F8-B639-7B74A77F4610, OS:18.6, name:iPhone 16 }
+2026-11-09T05:37:47.3680770Z { platform:iOS Simulator, arch:arm64, id:1AFB8BF6-A8B2-4D78-95F9-3A0455425CBA, OS:26.0.1, name:iPhone 16 }
+2026-11-09T05:37:47.3681340Z { platform:iOS Simulator, arch:x86_64, id:1AFB8BF6-A8B2-4D78-95F9-3A0455425CBA, OS:26.0.1, name:iPhone 16 }
+2026-11-09T05:37:47.3681910Z { platform:iOS Simulator, arch:arm64, id:C5E1B940-5C22-47EC-917E-BF8ABE51F416, OS:26.1, name:iPhone 16 }
+2026-11-09T05:37:47.3682470Z { platform:iOS Simulator, arch:x86_64, id:C5E1B940-5C22-47EC-917E-BF8ABE51F416, OS:26.1, name:iPhone 16 }
+2026-11-09T05:37:47.3683050Z { platform:iOS Simulator, arch:arm64, id:309F4F0C-F632-4F5C-BB25-BD783E57455C, OS:26.2, name:iPhone 16 }
+2026-11-09T05:37:47.3683590Z { platform:iOS Simulator, arch:x86_64, id:309F4F0C-F632-4F5C-BB25-BD783E57455C, OS:26.2, name:iPhone 16 }
+2026-11-09T05:37:47.3689060Z { platform:iOS Simulator, arch:arm64, id:F853CBCE-C2DF-4188-AAF4-B3F3E24815B9, OS:18.5, name:iPhone 16 Plus }
+2026-11-09T05:37:47.3690820Z { platform:iOS Simulator, arch:x86_64, id:F853CBCE-C2DF-4188-AAF4-B3F3E24815B9, OS:18.5, name:iPhone 16 Plus }
+2026-11-09T05:37:47.3691800Z { platform:iOS Simulator, arch:arm64, id:35C76145-757E-4FBA-9609-EFC435E61AFD, OS:18.6, name:iPhone 16 Plus }
+2026-11-09T05:37:47.3693620Z { platform:iOS Simulator, arch:x86_64, id:35C76145-757E-4FBA-9609-EFC435E61AFD, OS:18.6, name:iPhone 16 Plus }
+2026-11-09T05:37:47.3695240Z { platform:iOS Simulator, arch:arm64, id:54E17A43-0D26-4F2A-A8A3-1F1F13CE79A9, OS:26.0.1, name:iPhone 16 Plus }
+2026-11-09T05:37:47.3696850Z { platform:iOS Simulator, arch:x86_64, id:54E17A43-0D26-4F2A-A8A3-1F1F13CE79A9, OS:26.0.1, name:iPhone 16 Plus }
+2026-11-09T05:37:47.3697630Z { platform:iOS Simulator, arch:arm64, id:D0C50032-034B-4493-A9E9-9459E4F481B9, OS:26.1, name:iPhone 16 Plus }
+2026-11-09T05:37:47.3698400Z { platform:iOS Simulator, arch:x86_64, id:D0C50032-034B-4493-A9E9-9459E4F481B9, OS:26.1, name:iPhone 16 Plus }
+2026-11-09T05:37:47.3699680Z { platform:iOS Simulator, arch:arm64, id:C20E3165-9F7B-4F04-88BB-CACE712B88AB, OS:26.2, name:iPhone 16 Plus }
+2026-11-09T05:37:47.3700700Z { platform:iOS Simulator, arch:x86_64, id:C20E3165-9F7B-4F04-88BB-CACE712B88AB, OS:26.2, name:iPhone 16 Plus }
+2026-11-09T05:37:47.3701590Z { platform:iOS Simulator, arch:arm64, id:4A57FB15-6E7C-49CC-BE93-450B18BD286E, OS:18.5, name:iPhone 16 Pro }
+2026-11-09T05:37:47.3702870Z { platform:iOS Simulator, arch:x86_64, id:4A57FB15-6E7C-49CC-BE93-450B18BD286E, OS:18.5, name:iPhone 16 Pro }
+2026-11-09T05:37:47.3704420Z { platform:iOS Simulator, arch:arm64, id:C67F9F5E-2E67-4ACC-BB60-44A8DB0130E6, OS:18.6, name:iPhone 16 Pro }
+2026-11-09T05:37:47.3707080Z { platform:iOS Simulator, arch:x86_64, id:C67F9F5E-2E67-4ACC-BB60-44A8DB0130E6, OS:18.6, name:iPhone 16 Pro }
+2026-11-09T05:37:47.3709910Z { platform:iOS Simulator, arch:arm64, id:FC50CACD-1298-4935-ACD6-1F604E0217CA, OS:26.0.1, name:iPhone 16 Pro }
+2026-11-09T05:37:47.3712330Z { platform:iOS Simulator, arch:x86_64, id:FC50CACD-1298-4935-ACD6-1F604E0217CA, OS:26.0.1, name:iPhone 16 Pro }
+2026-11-09T05:37:47.3713890Z { platform:iOS Simulator, arch:arm64, id:B14C5257-D09F-498F-977A-C7FEF383B1FC, OS:26.1, name:iPhone 16 Pro }
+2026-11-09T05:37:47.3714680Z { platform:iOS Simulator, arch:x86_64, id:B14C5257-D09F-498F-977A-C7FEF383B1FC, OS:26.1, name:iPhone 16 Pro }
+2026-11-09T05:37:47.3715290Z { platform:iOS Simulator, arch:arm64, id:8F571767-87A3-448E-AF82-29C992EC2D5E, OS:26.2, name:iPhone 16 Pro }
+2026-11-09T05:37:47.3715900Z { platform:iOS Simulator, arch:x86_64, id:8F571767-87A3-448E-AF82-29C992EC2D5E, OS:26.2, name:iPhone 16 Pro }
+2026-11-09T05:37:47.3716580Z { platform:iOS Simulator, arch:arm64, id:41E4762F-B20D-41AC-BFA5-AE0DB661BB84, OS:18.5, name:iPhone 16 Pro Max }
+2026-11-09T05:37:47.3718480Z { platform:iOS Simulator, arch:x86_64, id:41E4762F-B20D-41AC-BFA5-AE0DB661BB84, OS:18.5, name:iPhone 16 Pro Max }
+2026-11-09T05:37:47.3720520Z { platform:iOS Simulator, arch:arm64, id:0F7CBE14-42EE-46F3-A4D0-F370B4A3D3D5, OS:18.6, name:iPhone 16 Pro Max }
+2026-11-09T05:37:47.3722280Z { platform:iOS Simulator, arch:x86_64, id:0F7CBE14-42EE-46F3-A4D0-F370B4A3D3D5, OS:18.6, name:iPhone 16 Pro Max }
+2026-11-09T05:37:47.3739110Z { platform:iOS Simulator, arch:arm64, id:CE8530BB-2FEC-4D03-B9D1-6DC2E6B0C3DF, OS:26.0.1, name:iPhone 16 Pro Max }
+2026-11-09T05:37:47.3739800Z { platform:iOS Simulator, arch:x86_64, id:CE8530BB-2FEC-4D03-B9D1-6DC2E6B0C3DF, OS:26.0.1, name:iPhone 16 Pro Max }
+2026-11-09T05:37:47.3740440Z { platform:iOS Simulator, arch:arm64, id:4FD6FC0F-54E2-4861-B95B-51103D587ABA, OS:26.1, name:iPhone 16 Pro Max }
+2026-11-09T05:37:47.3741070Z { platform:iOS Simulator, arch:x86_64, id:4FD6FC0F-54E2-4861-B95B-51103D587ABA, OS:26.1, name:iPhone 16 Pro Max }
+2026-11-09T05:37:47.3741720Z { platform:iOS Simulator, arch:arm64, id:FA1105A3-CFB2-45AC-B4DB-EBAC55DD946D, OS:26.2, name:iPhone 16 Pro Max }
+2026-11-09T05:37:47.3742690Z { platform:iOS Simulator, arch:x86_64, id:FA1105A3-CFB2-45AC-B4DB-EBAC55DD946D, OS:26.2, name:iPhone 16 Pro Max }
+2026-11-09T05:37:47.3743310Z { platform:iOS Simulator, arch:arm64, id:328DB690-3288-4E7C-9BFA-9A095901884B, OS:18.5, name:iPhone 16e }
+2026-11-09T05:37:47.3743920Z { platform:iOS Simulator, arch:x86_64, id:328DB690-3288-4E7C-9BFA-9A095901884B, OS:18.5, name:iPhone 16e }
+2026-11-09T05:37:47.3744480Z { platform:iOS Simulator, arch:arm64, id:08AF5DF9-7769-4A03-B452-270A53FD3EBC, OS:18.6, name:iPhone 16e }
+2026-11-09T05:37:47.3745060Z { platform:iOS Simulator, arch:x86_64, id:08AF5DF9-7769-4A03-B452-270A53FD3EBC, OS:18.6, name:iPhone 16e }
+2026-11-09T05:37:47.3745660Z { platform:iOS Simulator, arch:arm64, id:1D1796B0-028E-4FED-AD5C-7FEBA6D941AE, OS:26.0.1, name:iPhone 16e }
+2026-11-09T05:37:47.3746230Z { platform:iOS Simulator, arch:x86_64, id:1D1796B0-028E-4FED-AD5C-7FEBA6D941AE, OS:26.0.1, name:iPhone 16e }
+2026-11-09T05:37:47.3746820Z { platform:iOS Simulator, arch:arm64, id:61AC349B-469C-4CFD-BAF5-3E6A7EAF5593, OS:26.1, name:iPhone 16e }
+2026-11-09T05:37:47.3747420Z { platform:iOS Simulator, arch:x86_64, id:61AC349B-469C-4CFD-BAF5-3E6A7EAF5593, OS:26.1, name:iPhone 16e }
+2026-11-09T05:37:47.3747970Z { platform:iOS Simulator, arch:arm64, id:F2D2FAF0-3DC7-43F6-8E67-CFF6C774105B, OS:26.2, name:iPhone 16e }
+2026-11-09T05:37:47.3748530Z { platform:iOS Simulator, arch:x86_64, id:F2D2FAF0-3DC7-43F6-8E67-CFF6C774105B, OS:26.2, name:iPhone 16e }
+2026-11-09T05:37:47.3749090Z { platform:iOS Simulator, arch:arm64, id:1F9C81D1-869F-438D-9616-2472BE5F5A77, OS:26.0.1, name:iPhone 17 }
+2026-11-09T05:37:47.3749670Z { platform:iOS Simulator, arch:x86_64, id:1F9C81D1-869F-438D-9616-2472BE5F5A77, OS:26.0.1, name:iPhone 17 }
+2026-11-09T05:37:47.3750250Z { platform:iOS Simulator, arch:arm64, id:DD2C5966-4861-4552-9C50-EC1C74BD88FC, OS:26.1, name:iPhone 17 }
+2026-11-09T05:37:47.3750810Z { platform:iOS Simulator, arch:x86_64, id:DD2C5966-4861-4552-9C50-EC1C74BD88FC, OS:26.1, name:iPhone 17 }
+2026-11-09T05:37:47.3751400Z { platform:iOS Simulator, arch:arm64, id:BC7CEBFB-6B90-4D7E-B85E-BB0102C99F06, OS:26.2, name:iPhone 17 }
+2026-11-09T05:37:47.3751990Z { platform:iOS Simulator, arch:x86_64, id:BC7CEBFB-6B90-4D7E-B85E-BB0102C99F06, OS:26.2, name:iPhone 17 }
+2026-11-09T05:37:47.3752580Z { platform:iOS Simulator, arch:arm64, id:25C22EBC-57CC-4272-8C91-050D3D572B32, OS:26.0.1, name:iPhone 17 Pro }
+2026-11-09T05:37:47.3753160Z { platform:iOS Simulator, arch:x86_64, id:25C22EBC-57CC-4272-8C91-050D3D572B32, OS:26.0.1, name:iPhone 17 Pro }
+2026-11-09T05:37:47.3753790Z { platform:iOS Simulator, arch:arm64, id:324AEBE7-7D9B-4053-B4DD-9F8134A82707, OS:26.1, name:iPhone 17 Pro }
+2026-11-09T05:37:47.3754430Z { platform:iOS Simulator, arch:x86_64, id:324AEBE7-7D9B-4053-B4DD-9F8134A82707, OS:26.1, name:iPhone 17 Pro }
+2026-11-09T05:37:47.3755020Z { platform:iOS Simulator, arch:arm64, id:2FEACF5E-886C-4FB8-A137-C571FBA5CF5C, OS:26.2, name:iPhone 17 Pro }
+2026-11-09T05:37:47.3755670Z { platform:iOS Simulator, arch:x86_64, id:2FEACF5E-886C-4FB8-A137-C571FBA5CF5C, OS:26.2, name:iPhone 17 Pro }
+2026-11-09T05:37:47.3756350Z { platform:iOS Simulator, arch:arm64, id:95803967-AE3E-452F-A127-131AAC00A3FE, OS:26.0.1, name:iPhone 17 Pro Max }
+2026-11-09T05:37:47.3757400Z { platform:iOS Simulator, arch:x86_64, id:95803967-AE3E-452F-A127-131AAC00A3FE, OS:26.0.1, name:iPhone 17 Pro Max }
+2026-11-09T05:37:47.3758480Z { platform:iOS Simulator, arch:arm64, id:BCB27533-D210-43AE-B001-BE3F033158BC, OS:26.1, name:iPhone 17 Pro Max }
+2026-11-09T05:37:47.3759270Z { platform:iOS Simulator, arch:x86_64, id:BCB27533-D210-43AE-B001-BE3F033158BC, OS:26.1, name:iPhone 17 Pro Max }
+2026-11-09T05:37:47.3760040Z { platform:iOS Simulator, arch:arm64, id:17F0E734-D183-4810-AB97-F27FD9968039, OS:26.2, name:iPhone 17 Pro Max }
+2026-11-09T05:37:47.3760640Z { platform:iOS Simulator, arch:x86_64, id:17F0E734-D183-4810-AB97-F27FD9968039, OS:26.2, name:iPhone 17 Pro Max }
+2026-11-09T05:37:47.3761280Z { platform:iOS Simulator, arch:arm64, id:99D68128-611B-44D4-A06F-5157B11BF0BC, OS:26.0.1, name:iPhone Air }
+2026-11-09T05:37:47.3763140Z { platform:iOS Simulator, arch:x86_64, id:99D68128-611B-44D4-A06F-5157B11BF0BC, OS:26.0.1, name:iPhone Air }
+2026-11-09T05:37:47.3763800Z { platform:iOS Simulator, arch:arm64, id:846ED2AD-EB87-4B0F-9A65-00E6A822CB9E, OS:26.1, name:iPhone Air }
+2026-11-09T05:37:47.3764420Z { platform:iOS Simulator, arch:x86_64, id:846ED2AD-EB87-4B0F-9A65-00E6A822CB9E, OS:26.1, name:iPhone Air }
+2026-11-09T05:37:47.3765030Z { platform:iOS Simulator, arch:arm64, id:00447DBE-32CF-4171-A4DB-0C2EAE058F02, OS:26.2, name:iPhone Air }
+2026-11-09T05:37:47.3765580Z { platform:iOS Simulator, arch:x86_64, id:00447DBE-32CF-4171-A4DB-0C2EAE058F02, OS:26.2, name:iPhone Air }
+2026-11-09T05:37:47.3766180Z { platform:iOS Simulator, arch:arm64, id:66571EB4-A450-4628-ABB9-3D215AFEDD58, OS:18.5, name:iPhone SE (3rd generation) }
+2026-11-09T05:37:47.3766920Z { platform:iOS Simulator, arch:x86_64, id:66571EB4-A450-4628-ABB9-3D215AFEDD58, OS:18.5, name:iPhone SE (3rd generation) }
+2026-11-09T05:37:47.3768750Z { platform:iOS Simulator, arch:arm64, id:C3630581-519B-49DA-9400-67A78DCD42C8, OS:18.6, name:iPhone SE (3rd generation) }
+2026-11-09T05:37:47.3769410Z { platform:iOS Simulator, arch:x86_64, id:C3630581-519B-49DA-9400-67A78DCD42C8, OS:18.6, name:iPhone SE (3rd generation) }
+2026-11-09T05:37:47.3770490Z { platform:iOS Simulator, arch:arm64, id:ADCAA360-5B3E-46D1-B604-46ADD143FBD9, OS:26.0.1, name:iPhone SE (3rd generation) }
+2026-11-09T05:37:47.3771180Z { platform:iOS Simulator, arch:x86_64, id:ADCAA360-5B3E-46D1-B604-46ADD143FBD9, OS:26.0.1, name:iPhone SE (3rd generation) }
+2026-11-09T05:37:47.3771850Z { platform:iOS Simulator, arch:arm64, id:649B8FBD-A8D5-4CA8-B862-4322DD5DCD78, OS:26.1, name:iPhone SE (3rd generation) }
+2026-11-09T05:37:47.3772500Z { platform:iOS Simulator, arch:x86_64, id:649B8FBD-A8D5-4CA8-B862-4322DD5DCD78, OS:26.1, name:iPhone SE (3rd generation) }
+2026-11-09T05:37:47.3773170Z { platform:iOS Simulator, arch:arm64, id:A1285399-F2F4-46E9-8CF2-4AA227FF7EF3, OS:26.2, name:iPhone SE (3rd generation) }
+2026-11-09T05:37:47.3773830Z { platform:iOS Simulator, arch:x86_64, id:A1285399-F2F4-46E9-8CF2-4AA227FF7EF3, OS:26.2, name:iPhone SE (3rd generation) }
+2026-11-09T05:37:47.5374720Z note: Using codesigning identity override: 
+2026-11-09T05:37:48.1510010Z ComputePackagePrebuildTargetDependencyGraph
+2026-11-09T05:37:48.2112860Z 
+2026-11-09T05:37:48.2213440Z Prepare packages
+2026-11-09T05:37:48.2313730Z 
+2026-11-09T05:37:48.2415020Z CreateBuildRequest
+2026-11-09T05:37:48.2521950Z 
+2026-11-09T05:37:48.2622900Z SendProjectDescription
+2026-11-09T05:37:48.2724080Z 
+2026-11-09T05:37:48.2747120Z CreateBuildOperation
+2026-11-09T05:37:48.2747570Z 
+2026-11-09T05:37:48.2852590Z ComputeTargetDependencyGraph
+2026-11-09T05:37:48.2953490Z note: Building targets in dependency order
+2026-11-09T05:37:48.3054410Z note: Target dependency graph (1 target)
+2026-11-09T05:37:48.3158520Z     Target 'RealShot' in project 'RealShot' (no dependencies)
+2026-11-09T05:37:48.3259130Z 
+2026-11-09T05:37:48.3359780Z GatherProvisioningInputs
+2026-11-09T05:37:48.3460500Z 
+2026-11-09T05:37:48.3562510Z CreateBuildDescription
+2026-11-09T05:37:48.3663600Z 
+2026-11-09T05:37:48.3766690Z ExecuteExternalTool /Applications/Xcode_16.4.app/Contents/Developer/usr/bin/actool --print-asset-tag-combinations --output-format xml1 /Users/runner/work/realshot-ios/realshot-ios/RealShot/Assets.xcassets
+2026-11-09T05:37:51.8651470Z 
+2026-11-09T05:37:51.8754240Z ExecuteExternalTool /Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang -v -E -dM -isysroot /Applications/Xcode_16.4.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS18.5.sdk -x c -c /dev/null
+2026-11-09T05:37:51.8854760Z 
+2026-11-09T05:37:51.8957350Z ExecuteExternalTool /Applications/Xcode_16.4.app/Contents/Developer/usr/bin/actool --version --output-format xml1
+2026-11-09T05:37:51.9059100Z 
+2026-11-09T05:37:51.9163810Z ExecuteExternalTool /Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc --version
+2026-11-09T05:37:52.2620790Z 
+2026-11-09T05:37:52.2721070Z ExecuteExternalTool /Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ld -version_details
+2026-11-09T05:37:52.3023490Z 
+2026-11-09T05:37:52.3227790Z Build description signature: d95ebee4ff59bdb3670cddfc63f1eca3
+2026-11-09T05:37:52.3329570Z Build description path: /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/IntermediateBuildFilesPath/XCBuildData/d95ebee4ff59bdb3670cddfc63f1eca3.xcbuilddata
+2026-11-09T05:37:52.3651080Z CreateBuildDirectory /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/IntermediateBuildFilesPath
+2026-11-09T05:37:52.3756510Z     cd /Users/runner/work/realshot-ios/realshot-ios/RealShot.xcodeproj
+2026-11-09T05:37:52.3859990Z     builtin-create-build-directory /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/IntermediateBuildFilesPath
+2026-11-09T05:37:52.3962690Z 
+2026-11-09T05:37:52.4049840Z CreateBuildDirectory /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/InstallationBuildProductsLocation
+2026-11-09T05:37:52.4108380Z     cd /Users/runner/work/realshot-ios/realshot-ios/RealShot.xcodeproj
+2026-11-09T05:37:52.4204680Z     builtin-create-build-directory /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/InstallationBuildProductsLocation
+2026-11-09T05:37:52.4293750Z 
+2026-11-09T05:37:52.4372670Z CreateBuildDirectory /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/BuildProductsPath
+2026-11-09T05:37:52.4410580Z     cd /Users/runner/work/realshot-ios/realshot-ios/RealShot.xcodeproj
+2026-11-09T05:37:52.4512690Z     builtin-create-build-directory /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/BuildProductsPath
+2026-11-09T05:37:52.4614980Z 
+2026-11-09T05:37:52.4718790Z ClangStatCache /Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang-stat-cache /Applications/Xcode_16.4.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS18.5.sdk /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/SDKStatCaches.noindex/iphoneos18.5-22F76-a529daf784b3616c7c04a36aeb7f5c05.sdkstatcache
+2026-11-09T05:37:52.4812990Z     cd /Users/runner/work/realshot-ios/realshot-ios/RealShot.xcodeproj
+2026-11-09T05:37:52.4915080Z     /Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang-stat-cache /Applications/Xcode_16.4.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS18.5.sdk -o /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/SDKStatCaches.noindex/iphoneos18.5-22F76-a529daf784b3616c7c04a36aeb7f5c05.sdkstatcache
+2026-11-09T05:37:54.8163490Z 
+2026-11-09T05:37:54.8165630Z WriteAuxiliaryFile /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/IntermediateBuildFilesPath/RealShot.build/Release-iphoneos/RealShot-bf59eacd34e9429e02561c794c32827b-VFS-iphoneos/all-product-headers.yaml
+2026-11-09T05:37:54.8170030Z     cd /Users/runner/work/realshot-ios/realshot-ios/RealShot.xcodeproj
+2026-11-09T05:37:54.8172060Z     write-file /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/IntermediateBuildFilesPath/RealShot.build/Release-iphoneos/RealShot-bf59eacd34e9429e02561c794c32827b-VFS-iphoneos/all-product-headers.yaml
+2026-11-09T05:37:54.8173060Z 
+2026-11-09T05:37:54.8175160Z CreateBuildDirectory /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/IntermediateBuildFilesPath/EagerLinkingTBDs/Release-iphoneos
+2026-11-09T05:37:54.8180230Z     cd /Users/runner/work/realshot-ios/realshot-ios/RealShot.xcodeproj
+2026-11-09T05:37:54.8181340Z     builtin-create-build-directory /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/IntermediateBuildFilesPath/EagerLinkingTBDs/Release-iphoneos
+2026-11-09T05:37:54.8182320Z 
+2026-11-09T05:37:54.8182890Z CreateBuildDirectory /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/BuildProductsPath/Release-iphoneos
+2026-11-09T05:37:54.8183670Z     cd /Users/runner/work/realshot-ios/realshot-ios/RealShot.xcodeproj
+2026-11-09T05:37:54.8184610Z     builtin-create-build-directory /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/BuildProductsPath/Release-iphoneos
+2026-11-09T05:37:54.8185310Z 
+2026-11-09T05:37:54.8186170Z WriteAuxiliaryFile /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/IntermediateBuildFilesPath/RealShot.build/Release-iphoneos/RealShot.build/empty-RealShot.plist (in target 'RealShot' from project 'RealShot')
+2026-11-09T05:37:54.8187220Z     cd /Users/runner/work/realshot-ios/realshot-ios
+2026-11-09T05:37:54.8188140Z     write-file /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/IntermediateBuildFilesPath/RealShot.build/Release-iphoneos/RealShot.build/empty-RealShot.plist
+2026-11-09T05:37:54.8188890Z 
+2026-11-09T05:37:54.8189750Z WriteAuxiliaryFile /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/IntermediateBuildFilesPath/RealShot.build/Release-iphoneos/RealShot.build/RealShot.hmap (in target 'RealShot' from project 'RealShot')
+2026-11-09T05:37:54.8190830Z     cd /Users/runner/work/realshot-ios/realshot-ios
+2026-11-09T05:37:54.8191910Z     write-file /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/IntermediateBuildFilesPath/RealShot.build/Release-iphoneos/RealShot.build/RealShot.hmap
+2026-11-09T05:37:54.8192600Z 
+2026-11-09T05:37:54.8193550Z WriteAuxiliaryFile /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/IntermediateBuildFilesPath/RealShot.build/Release-iphoneos/RealShot.build/RealShot.DependencyStaticMetadataFileList (in target 'RealShot' from project 'RealShot')
+2026-11-09T05:37:54.8195930Z     cd /Users/runner/work/realshot-ios/realshot-ios
+2026-11-09T05:37:54.8196980Z     write-file /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/IntermediateBuildFilesPath/RealShot.build/Release-iphoneos/RealShot.build/RealShot.DependencyStaticMetadataFileList
+2026-11-09T05:37:54.8197810Z 
+2026-11-09T05:37:54.8199550Z WriteAuxiliaryFile /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/IntermediateBuildFilesPath/RealShot.build/Release-iphoneos/RealShot.build/RealShot.DependencyMetadataFileList (in target 'RealShot' from project 'RealShot')
+2026-11-09T05:37:54.8201330Z     cd /Users/runner/work/realshot-ios/realshot-ios
+2026-11-09T05:37:54.8202340Z     write-file /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/IntermediateBuildFilesPath/RealShot.build/Release-iphoneos/RealShot.build/RealShot.DependencyMetadataFileList
+2026-11-09T05:37:54.8204400Z 
+2026-11-09T05:37:54.8205270Z WriteAuxiliaryFile /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/IntermediateBuildFilesPath/RealShot.build/Release-iphoneos/RealShot.build/RealShot-project-headers.hmap (in target 'RealShot' from project 'RealShot')
+2026-11-09T05:37:54.8206630Z     cd /Users/runner/work/realshot-ios/realshot-ios
+2026-11-09T05:37:54.8207760Z     write-file /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/IntermediateBuildFilesPath/RealShot.build/Release-iphoneos/RealShot.build/RealShot-project-headers.hmap
+2026-11-09T05:37:54.8208660Z 
+2026-11-09T05:37:54.8209540Z WriteAuxiliaryFile /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/IntermediateBuildFilesPath/RealShot.build/Release-iphoneos/RealShot.build/RealShot-own-target-headers.hmap (in target 'RealShot' from project 'RealShot')
+2026-11-09T05:37:54.8210740Z     cd /Users/runner/work/realshot-ios/realshot-ios
+2026-11-09T05:37:54.8211690Z     write-file /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/IntermediateBuildFilesPath/RealShot.build/Release-iphoneos/RealShot.build/RealShot-own-target-headers.hmap
+2026-11-09T05:37:54.8212630Z 
+2026-11-09T05:37:54.8213920Z WriteAuxiliaryFile /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/IntermediateBuildFilesPath/RealShot.build/Release-iphoneos/RealShot.build/RealShot-generated-files.hmap (in target 'RealShot' from project 'RealShot')
+2026-11-09T05:37:54.8215050Z     cd /Users/runner/work/realshot-ios/realshot-ios
+2026-11-09T05:37:54.8215980Z     write-file /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/IntermediateBuildFilesPath/RealShot.build/Release-iphoneos/RealShot.build/RealShot-generated-files.hmap
+2026-11-09T05:37:54.8217030Z 
+2026-11-09T05:37:54.8218010Z WriteAuxiliaryFile /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/IntermediateBuildFilesPath/RealShot.build/Release-iphoneos/RealShot.build/RealShot-all-target-headers.hmap (in target 'RealShot' from project 'RealShot')
+2026-11-09T05:37:54.8219520Z     cd /Users/runner/work/realshot-ios/realshot-ios
+2026-11-09T05:37:54.8220400Z     write-file /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/IntermediateBuildFilesPath/RealShot.build/Release-iphoneos/RealShot.build/RealShot-all-target-headers.hmap
+2026-11-09T05:37:54.8221220Z 
+2026-11-09T05:37:54.8222520Z WriteAuxiliaryFile /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/IntermediateBuildFilesPath/RealShot.build/Release-iphoneos/RealShot.build/RealShot-all-non-framework-target-headers.hmap (in target 'RealShot' from project 'RealShot')
+2026-11-09T05:37:54.8224040Z     cd /Users/runner/work/realshot-ios/realshot-ios
+2026-11-09T05:37:54.8225750Z     write-file /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/IntermediateBuildFilesPath/RealShot.build/Release-iphoneos/RealShot.build/RealShot-all-non-framework-target-headers.hmap
+2026-11-09T05:37:54.8226640Z 
+2026-11-09T05:37:54.8227530Z WriteAuxiliaryFile /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/IntermediateBuildFilesPath/RealShot.build/Release-iphoneos/RealShot.build/Objects-normal/arm64/RealShot_const_extract_protocols.json (in target 'RealShot' from project 'RealShot')
+2026-11-09T05:37:54.8228910Z     cd /Users/runner/work/realshot-ios/realshot-ios
+2026-11-09T05:37:54.8231280Z     write-file /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/IntermediateBuildFilesPath/RealShot.build/Release-iphoneos/RealShot.build/Objects-normal/arm64/RealShot_const_extract_protocols.json
+2026-11-09T05:37:54.8232290Z 
+2026-11-09T05:37:54.8234620Z WriteAuxiliaryFile /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/IntermediateBuildFilesPath/RealShot.build/Release-iphoneos/RealShot.build/Objects-normal/arm64/RealShot.SwiftFileList (in target 'RealShot' from project 'RealShot')
+2026-11-09T05:37:54.8237640Z     cd /Users/runner/work/realshot-ios/realshot-ios
+2026-11-09T05:37:54.8238870Z     write-file /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/IntermediateBuildFilesPath/RealShot.build/Release-iphoneos/RealShot.build/Objects-normal/arm64/RealShot.SwiftFileList
+2026-11-09T05:37:54.8239730Z 
+2026-11-09T05:37:54.8240720Z WriteAuxiliaryFile /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/IntermediateBuildFilesPath/RealShot.build/Release-iphoneos/RealShot.build/Objects-normal/arm64/RealShot.SwiftConstValuesFileList (in target 'RealShot' from project 'RealShot')
+2026-11-09T05:37:54.8241890Z     cd /Users/runner/work/realshot-ios/realshot-ios
+2026-11-09T05:37:54.8243000Z     write-file /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/IntermediateBuildFilesPath/RealShot.build/Release-iphoneos/RealShot.build/Objects-normal/arm64/RealShot.SwiftConstValuesFileList
+2026-11-09T05:37:54.8243920Z 
+2026-11-09T05:37:54.8244910Z WriteAuxiliaryFile /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/IntermediateBuildFilesPath/RealShot.build/Release-iphoneos/RealShot.build/Objects-normal/arm64/RealShot.LinkFileList (in target 'RealShot' from project 'RealShot')
+2026-11-09T05:37:54.8246540Z     cd /Users/runner/work/realshot-ios/realshot-ios
+2026-11-09T05:37:54.8247620Z     write-file /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/IntermediateBuildFilesPath/RealShot.build/Release-iphoneos/RealShot.build/Objects-normal/arm64/RealShot.LinkFileList
+2026-11-09T05:37:54.8248750Z 
+2026-11-09T05:37:54.8249860Z WriteAuxiliaryFile /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/IntermediateBuildFilesPath/RealShot.build/Release-iphoneos/RealShot.build/Objects-normal/arm64/RealShot-OutputFileMap.json (in target 'RealShot' from project 'RealShot')
+2026-11-09T05:37:54.8251090Z     cd /Users/runner/work/realshot-ios/realshot-ios
+2026-11-09T05:37:54.8252170Z     write-file /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/IntermediateBuildFilesPath/RealShot.build/Release-iphoneos/RealShot.build/Objects-normal/arm64/RealShot-OutputFileMap.json
+2026-11-09T05:37:54.8253280Z 
+2026-11-09T05:37:54.8254360Z SymLink /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/BuildProductsPath/Release-iphoneos/RealShot.app ../../InstallationBuildProductsLocation/Applications/RealShot.app (in target 'RealShot' from project 'RealShot')
+2026-11-09T05:37:54.8255500Z     cd /Users/runner/work/realshot-ios/realshot-ios
+2026-11-09T05:37:54.8256420Z     /bin/ln -sfh ../../InstallationBuildProductsLocation/Applications/RealShot.app /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/BuildProductsPath/Release-iphoneos/RealShot.app
+2026-11-09T05:37:54.8257470Z 
+2026-11-09T05:37:54.8258270Z MkDir /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/InstallationBuildProductsLocation/Applications/RealShot.app (in target 'RealShot' from project 'RealShot')
+2026-11-09T05:37:54.8259460Z     cd /Users/runner/work/realshot-ios/realshot-ios
+2026-11-09T05:37:54.8260300Z     /bin/mkdir -p /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/InstallationBuildProductsLocation/Applications/RealShot.app
+2026-11-09T05:37:54.8262170Z 
+2026-11-09T05:37:54.8263350Z MkDir /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/IntermediateBuildFilesPath/RealShot.build/Release-iphoneos/RealShot.build/assetcatalog_output/unthinned (in target 'RealShot' from project 'RealShot')
+2026-11-09T05:37:54.8264620Z     cd /Users/runner/work/realshot-ios/realshot-ios
+2026-11-09T05:37:54.8265620Z     /bin/mkdir -p /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/IntermediateBuildFilesPath/RealShot.build/Release-iphoneos/RealShot.build/assetcatalog_output/unthinned
+2026-11-09T05:37:54.8266410Z 
+2026-11-09T05:37:54.8267320Z MkDir /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/IntermediateBuildFilesPath/RealShot.build/Release-iphoneos/RealShot.build/assetcatalog_output/thinned (in target 'RealShot' from project 'RealShot')
+2026-11-09T05:37:54.8268360Z     cd /Users/runner/work/realshot-ios/realshot-ios
+2026-11-09T05:37:54.8269290Z     /bin/mkdir -p /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/IntermediateBuildFilesPath/RealShot.build/Release-iphoneos/RealShot.build/assetcatalog_output/thinned
+2026-11-09T05:37:54.8270060Z 
+2026-11-09T05:37:54.8270490Z GenerateAssetSymbols /Users/runner/work/realshot-ios/realshot-ios/RealShot/Assets.xcassets (in target 'RealShot' from project 'RealShot')
+2026-11-09T05:37:54.8271890Z     cd /Users/runner/work/realshot-ios/realshot-ios
+2026-11-09T05:37:54.8279770Z     /Applications/Xcode_16.4.app/Contents/Developer/usr/bin/actool /Users/runner/work/realshot-ios/realshot-ios/RealShot/Assets.xcassets --compile /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/InstallationBuildProductsLocation/Applications/RealShot.app --output-format human-readable-text --notices --warnings --export-dependency-info /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/IntermediateBuildFilesPath/RealShot.build/Release-iphoneos/RealShot.build/assetcatalog_dependencies --output-partial-info-plist /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/IntermediateBuildFilesPath/RealShot.build/Release-iphoneos/RealShot.build/assetcatalog_generated_info.plist --app-icon AppIcon --compress-pngs --enable-on-demand-resources YES --development-region en --target-device iphone --target-device ipad --minimum-deployment-target 17.0 --platform iphoneos --bundle-identifier com.example.realshot --generate-swift-asset-symbols /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/IntermediateBuildFilesPath/RealShot.build/Release-iphoneos/RealShot.build/DerivedSources/GeneratedAssetSymbols.swift --generate-objc-asset-symbols /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/IntermediateBuildFilesPath/RealShot.build/Release-iphoneos/RealShot.build/DerivedSources/GeneratedAssetSymbols.h --generate-asset-symbol-index /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/IntermediateBuildFilesPath/RealShot.build/Release-iphoneos/RealShot.build/DerivedSources/GeneratedAssetSymbols-Index.plist
+2026-11-09T05:37:54.8286980Z /* com.apple.actool.compilation-results */
+2026-11-09T05:37:54.8287920Z /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/IntermediateBuildFilesPath/RealShot.build/Release-iphoneos/RealShot.build/DerivedSources/GeneratedAssetSymbols-Index.plist
+2026-11-09T05:37:54.8289830Z /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/IntermediateBuildFilesPath/RealShot.build/Release-iphoneos/RealShot.build/DerivedSources/GeneratedAssetSymbols.h
+2026-11-09T05:37:54.8292760Z /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/IntermediateBuildFilesPath/RealShot.build/Release-iphoneos/RealShot.build/DerivedSources/GeneratedAssetSymbols.swift
+2026-11-09T05:37:54.8293680Z 
+2026-11-09T05:37:54.8293680Z 
+2026-11-09T05:37:54.8294690Z CompileAssetCatalogVariant thinned /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/InstallationBuildProductsLocation/Applications/RealShot.app /Users/runner/work/realshot-ios/realshot-ios/RealShot/Assets.xcassets (in target 'RealShot' from project 'RealShot')
+2026-11-09T05:37:54.8295970Z     cd /Users/runner/work/realshot-ios/realshot-ios
+2026-11-09T05:37:54.8300170Z     /Applications/Xcode_16.4.app/Contents/Developer/usr/bin/actool /Users/runner/work/realshot-ios/realshot-ios/RealShot/Assets.xcassets --compile /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/IntermediateBuildFilesPath/RealShot.build/Release-iphoneos/RealShot.build/assetcatalog_output/thinned --output-format human-readable-text --notices --warnings --export-dependency-info /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/IntermediateBuildFilesPath/RealShot.build/Release-iphoneos/RealShot.build/assetcatalog_dependencies_thinned --output-partial-info-plist /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/IntermediateBuildFilesPath/RealShot.build/Release-iphoneos/RealShot.build/assetcatalog_generated_info.plist_thinned --app-icon AppIcon --compress-pngs --enable-on-demand-resources YES --development-region en --target-device iphone --target-device ipad --minimum-deployment-target 17.0 --platform iphoneos
+2026-11-09T05:38:03.2783860Z /* com.apple.actool.compilation-results */
+2026-11-09T05:38:03.2928020Z /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/IntermediateBuildFilesPath/RealShot.build/Release-iphoneos/RealShot.build/assetcatalog_generated_info.plist_thinned
+2026-11-09T05:38:03.2989520Z /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/IntermediateBuildFilesPath/RealShot.build/Release-iphoneos/RealShot.build/assetcatalog_output/thinned/AppIcon60x60@2x.png
+2026-11-09T05:38:03.2996620Z /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/IntermediateBuildFilesPath/RealShot.build/Release-iphoneos/RealShot.build/assetcatalog_output/thinned/AppIcon76x76@2x~ipad.png
+2026-11-09T05:38:03.2998860Z /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/IntermediateBuildFilesPath/RealShot.build/Release-iphoneos/RealShot.build/assetcatalog_output/thinned/Assets.car
+2026-11-09T05:38:03.2999790Z 
+2026-11-09T05:38:03.3000480Z 
+2026-11-09T05:38:03.3000810Z SwiftDriver RealShot normal arm64 com.apple.xcode.tools.swift.compiler (in target 'RealShot' from project 'RealShot')
+2026-11-09T05:38:03.3001420Z     cd /Users/runner/work/realshot-ios/realshot-ios
+2026-11-09T05:38:03.3046430Z     builtin-SwiftDriver -- /Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc -module-name RealShot -O -whole-module-optimization -enforce-exclusivity\=checked @/Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/IntermediateBuildFilesPath/RealShot.build/Release-iphoneos/RealShot.build/Objects-normal/arm64/RealShot.SwiftFileList -enable-bare-slash-regex -enable-experimental-feature DebugDescriptionMacro -sdk /Applications/Xcode_16.4.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS18.5.sdk -target arm64-apple-ios17.0 -g -module-cache-path /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/ModuleCache.noindex -Xfrontend -serialize-debugging-options -swift-version 5 -I /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/BuildProductsPath/Release-iphoneos -F /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/BuildProductsPath/Release-iphoneos -emit-localized-strings -emit-localized-strings-path /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/IntermediateBuildFilesPath/RealShot.build/Release-iphoneos/RealShot.build/Objects-normal/arm64 -c -num-threads 3 -Xcc -ivfsstatcache -Xcc /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/SDKStatCaches.noindex/iphoneos18.5-22F76-a529daf784b3616c7c04a36aeb7f5c05.sdkstatcache -output-file-map /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/IntermediateBuildFilesPath/RealShot.build/Release-iphoneos/RealShot.build/Objects-normal/arm64/RealShot-OutputFileMap.json -use-frontend-parseable-output -save-temps -no-color-diagnostics -serialize-diagnostics -emit-dependencies -emit-module -emit-module-path /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/IntermediateBuildFilesPath/RealShot.build/Release-iphoneos/RealShot.build/Objects-normal/arm64/RealShot.swiftmodule -validate-clang-modules-once -clang-build-session-file /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/ModuleCache.noindex/Session.modulevalidation -Xcc -I/Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/IntermediateBuildFilesPath/RealShot.build/Release-iphoneos/RealShot.build/swift-overrides.hmap -emit-const-values -Xfrontend -const-gather-protocols-file -Xfrontend /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/IntermediateBuildFilesPath/RealShot.build/Release-iphoneos/RealShot.build/Objects-normal/arm64/RealShot_const_extract_protocols.json -Xcc -iquote -Xcc /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/IntermediateBuildFilesPath/RealShot.build/Release-iphoneos/RealShot.build/RealShot-generated-files.hmap -Xcc -I/Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/IntermediateBuildFilesPath/RealShot.build/Release-iphoneos/RealShot.build/RealShot-own-target-headers.hmap -Xcc -I/Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/IntermediateBuildFilesPath/RealShot.build/Release-iphoneos/RealShot.build/RealShot-all-target-headers.hmap -Xcc -iquote -Xcc /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/IntermediateBuildFilesPath/RealShot.build/Release-iphoneos/RealShot.build/RealShot-project-headers.hmap -Xcc -I/Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/BuildProductsPath/Release-iphoneos/include -Xcc -I/Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/IntermediateBuildFilesPath/RealShot.build/Release-iphoneos/RealShot.build/DerivedSources-normal/arm64 -Xcc -I/Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/IntermediateBuildFilesPath/RealShot.build/Release-iphoneos/RealShot.build/DerivedSources/arm64 -Xcc -I/Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/IntermediateBuildFilesPath/RealShot.build/Release-iphoneos/RealShot.build/DerivedSources -emit-objc-header -emit-objc-header-path /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/IntermediateBuildFilesPath/RealShot.build/Release-iphoneos/RealShot.build/Objects-normal/arm64/RealShot-Swift.h -working-directory /Users/runner/work/realshot-ios/realshot-ios -no-emit-module-separately-wmo
+2026-11-09T05:38:03.3063150Z 
+2026-11-09T05:38:03.3076060Z SwiftCompile normal arm64 Compiling\ Theme.swift,\ ExifWriter.swift,\ FrameAdapter.swift,\ BatchViewModel.swift,\ JpegDegrader.swift,\ EditorViewModel.swift,\ RealismEngine.swift,\ RootView.swift,\ CameraPreset.swift,\ BatchView.swift,\ FrameMode.swift,\ CompareSlider.swift,\ RealismParameters.swift,\ EditorView.swift,\ HelpView.swift,\ ImageLoader.swift,\ ImportView.swift,\ PhotoLibrarySaver.swift,\ ParameterPanel.swift,\ Haptics.swift,\ RealShotApp.swift,\ GeneratedAssetSymbols.swift /Users/runner/work/realshot-ios/realshot-ios/RealShot/Support/Theme.swift /Users/runner/work/realshot-ios/realshot-ios/RealShot/Engine/ExifWriter.swift /Users/runner/work/realshot-ios/realshot-ios/RealShot/Engine/FrameAdapter.swift /Users/runner/work/realshot-ios/realshot-ios/RealShot/ViewModels/BatchViewModel.swift /Users/runner/work/realshot-ios/realshot-ios/RealShot/Engine/JpegDegrader.swift /Users/runner/work/realshot-ios/realshot-ios/RealShot/ViewModels/EditorViewModel.swift /Users/runner/work/realshot-ios/realshot-ios/RealShot/Engine/RealismEngine.swift /Users/runner/work/realshot-ios/realshot-ios/RealShot/RootView.swift /Users/runner/work/realshot-ios/realshot-ios/RealShot/Models/CameraPreset.swift /Users/runner/work/realshot-ios/realshot-ios/RealShot/Views/BatchView.swift /Users/runner/work/realshot-ios/realshot-ios/RealShot/Models/FrameMode.swift /Users/runner/work/realshot-ios/realshot-ios/RealShot/Views/CompareSlider.swift /Users/runner/work/realshot-ios/realshot-ios/RealShot/Models/RealismParameters.swift /Users/runner/work/realshot-ios/realshot-ios/RealShot/Views/EditorView.swift /Users/runner/work/realshot-ios/realshot-ios/RealShot/Views/HelpView.swift /Users/runner/work/realshot-ios/realshot-ios/RealShot/Services/ImageLoader.swift /Users/runner/work/realshot-ios/realshot-ios/RealShot/Views/ImportView.swift /Users/runner/work/realshot-ios/realshot-ios/RealShot/Services/PhotoLibrarySaver.swift /Users/runner/work/realshot-ios/realshot-ios/RealShot/Views/ParameterPanel.swift /Users/runner/work/realshot-ios/realshot-ios/RealShot/Support/Haptics.swift /Users/runner/work/realshot-ios/realshot-ios/RealShot/RealShotApp.swift /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/IntermediateBuildFilesPath/RealShot.build/Release-iphoneos/RealShot.build/DerivedSources/GeneratedAssetSymbols.swift (in target 'RealShot' from project 'RealShot')
+2026-11-09T05:38:03.3090150Z CompileSwift normal arm64 (in target 'RealShot' from project 'RealShot')
+2026-11-09T05:38:03.3090860Z     cd /Users/runner/work/realshot-ios/realshot-ios
+2026-11-09T05:38:03.3091750Z     
+2026-11-09T05:38:09.4845820Z /Users/runner/work/realshot-ios/realshot-ios/RealShot/ViewModels/EditorViewModel.swift:116:56: warning: capture of 'ci' with non-sendable type 'CIImage' in a '@Sendable' closure
+2026-11-09T05:38:09.4945920Z                     let result = engine.makeComparison(ci, request: request, maxDimension: 1100)
+2026-11-09T05:38:09.4950810Z                                                        ^
+2026-11-09T05:38:09.4952890Z /Applications/Xcode_16.4.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS18.5.sdk/System/Library/Frameworks/CoreImage.framework/Headers/CIImage.h:34:12: note: class 'CIImage' does not conform to the 'Sendable' protocol
+2026-11-09T05:38:09.4954160Z @interface CIImage : NSObject <NSSecureCoding, NSCopying>
+2026-11-09T05:38:09.4956080Z            ^
+2026-11-09T05:38:09.4957330Z /Users/runner/work/realshot-ios/realshot-ios/RealShot/ViewModels/EditorViewModel.swift:2:1: warning: add '@preconcurrency' to suppress 'Sendable'-related warnings from module 'CoreImage'
+2026-11-09T05:38:09.4958180Z import CoreImage
+2026-11-09T05:38:09.4958510Z ^
+2026-11-09T05:38:09.4958820Z @preconcurrency 
+2026-11-09T05:38:09.5010420Z /Users/runner/work/realshot-ios/realshot-ios/RealShot/ViewModels/EditorViewModel.swift:142:65: warning: capture of 'ci' with non-sendable type 'CIImage' in a '@Sendable' closure
+2026-11-09T05:38:09.5054070Z                 continuation.resume(returning: engine.makeFinal(ci, request: request))
+2026-11-09T05:38:09.5055110Z                                                                 ^
+2026-11-09T05:38:09.5072150Z /Applications/Xcode_16.4.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS18.5.sdk/System/Library/Frameworks/CoreImage.framework/Headers/CIImage.h:34:12: note: class 'CIImage' does not conform to the 'Sendable' protocol
+2026-11-09T05:38:09.5073280Z @interface CIImage : NSObject <NSSecureCoding, NSCopying>
+2026-11-09T05:38:09.5073670Z            ^
+2026-11-09T05:38:09.5074030Z 
+2026-11-09T05:38:09.5074490Z SwiftDriver\ Compilation RealShot normal arm64 com.apple.xcode.tools.swift.compiler (in target 'RealShot' from project 'RealShot')
+2026-11-09T05:38:09.5179360Z     cd /Users/runner/work/realshot-ios/realshot-ios
+2026-11-09T05:38:09.5254870Z     builtin-Swift-Compilation -- /Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc -module-name RealShot -O -whole-module-optimization -enforce-exclusivity\=checked @/Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/IntermediateBuildFilesPath/RealShot.build/Release-iphoneos/RealShot.build/Objects-normal/arm64/RealShot.SwiftFileList -enable-bare-slash-regex -enable-experimental-feature DebugDescriptionMacro -sdk /Applications/Xcode_16.4.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS18.5.sdk -target arm64-apple-ios17.0 -g -module-cache-path /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/ModuleCache.noindex -Xfrontend -serialize-debugging-options -swift-version 5 -I /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/BuildProductsPath/Release-iphoneos -F /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/BuildProductsPath/Release-iphoneos -emit-localized-strings -emit-localized-strings-path /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/IntermediateBuildFilesPath/RealShot.build/Release-iphoneos/RealShot.build/Objects-normal/arm64 -c -num-threads 3 -Xcc -ivfsstatcache -Xcc /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/SDKStatCaches.noindex/iphoneos18.5-22F76-a529daf784b3616c7c04a36aeb7f5c05.sdkstatcache -output-file-map /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/IntermediateBuildFilesPath/RealShot.build/Release-iphoneos/RealShot.build/Objects-normal/arm64/RealShot-OutputFileMap.json -use-frontend-parseable-output -save-temps -no-color-diagnostics -serialize-diagnostics -emit-dependencies -emit-module -emit-module-path /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/IntermediateBuildFilesPath/RealShot.build/Release-iphoneos/RealShot.build/Objects-normal/arm64/RealShot.swiftmodule -validate-clang-modules-once -clang-build-session-file /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/ModuleCache.noindex/Session.modulevalidation -Xcc -I/Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/IntermediateBuildFilesPath/RealShot.build/Release-iphoneos/RealShot.build/swift-overrides.hmap -emit-const-values -Xfrontend -const-gather-protocols-file -Xfrontend /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/IntermediateBuildFilesPath/RealShot.build/Release-iphoneos/RealShot.build/Objects-normal/arm64/RealShot_const_extract_protocols.json -Xcc -iquote -Xcc /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/IntermediateBuildFilesPath/RealShot.build/Release-iphoneos/RealShot.build/RealShot-generated-files.hmap -Xcc -I/Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/IntermediateBuildFilesPath/RealShot.build/Release-iphoneos/RealShot.build/RealShot-own-target-headers.hmap -Xcc -I/Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/IntermediateBuildFilesPath/RealShot.build/Release-iphoneos/RealShot.build/RealShot-all-target-headers.hmap -Xcc -iquote -Xcc /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/IntermediateBuildFilesPath/RealShot.build/Release-iphoneos/RealShot.build/RealShot-project-headers.hmap -Xcc -I/Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/BuildProductsPath/Release-iphoneos/include -Xcc -I/Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/IntermediateBuildFilesPath/RealShot.build/Release-iphoneos/RealShot.build/DerivedSources-normal/arm64 -Xcc -I/Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/IntermediateBuildFilesPath/RealShot.build/Release-iphoneos/RealShot.build/DerivedSources/arm64 -Xcc -I/Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/IntermediateBuildFilesPath/RealShot.build/Release-iphoneos/RealShot.build/DerivedSources -emit-objc-header -emit-objc-header-path /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/IntermediateBuildFilesPath/RealShot.build/Release-iphoneos/RealShot.build/Objects-normal/arm64/RealShot-Swift.h -working-directory /Users/runner/work/realshot-ios/realshot-ios -no-emit-module-separately-wmo
+2026-11-09T05:38:09.5297550Z 
+2026-11-09T05:38:09.5303110Z LinkAssetCatalog /Users/runner/work/realshot-ios/realshot-ios/RealShot/Assets.xcassets (in target 'RealShot' from project 'RealShot')
+2026-11-09T05:38:09.5307200Z     cd /Users/runner/work/realshot-ios/realshot-ios
+2026-11-09T05:38:09.5414420Z     builtin-linkAssetCatalog --thinned /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/IntermediateBuildFilesPath/RealShot.build/Release-iphoneos/RealShot.build/assetcatalog_output/thinned --thinned-dependencies /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/IntermediateBuildFilesPath/RealShot.build/Release-iphoneos/RealShot.build/assetcatalog_dependencies_thinned --thinned-info-plist-content /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/IntermediateBuildFilesPath/RealShot.build/Release-iphoneos/RealShot.build/assetcatalog_generated_info.plist_thinned --unthinned /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/IntermediateBuildFilesPath/RealShot.build/Release-iphoneos/RealShot.build/assetcatalog_output/unthinned --unthinned-dependencies /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/IntermediateBuildFilesPath/RealShot.build/Release-iphoneos/RealShot.build/assetcatalog_dependencies_unthinned --unthinned-info-plist-content /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/IntermediateBuildFilesPath/RealShot.build/Release-iphoneos/RealShot.build/assetcatalog_generated_info.plist_unthinned --output /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/InstallationBuildProductsLocation/Applications/RealShot.app --plist-output /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/IntermediateBuildFilesPath/RealShot.build/Release-iphoneos/RealShot.build/assetcatalog_generated_info.plist
+2026-11-09T05:38:09.5481860Z note: Emplaced /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/InstallationBuildProductsLocation/Applications/RealShot.app/AppIcon60x60@2x.png (in target 'RealShot' from project 'RealShot')
+2026-11-09T05:38:09.5605990Z note: Emplaced /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/InstallationBuildProductsLocation/Applications/RealShot.app/Assets.car (in target 'RealShot' from project 'RealShot')
+2026-11-09T05:38:09.5656660Z note: Emplaced /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/InstallationBuildProductsLocation/Applications/RealShot.app/AppIcon76x76@2x~ipad.png (in target 'RealShot' from project 'RealShot')
+2026-11-09T05:38:09.5703630Z 
+2026-11-09T05:38:09.5730140Z ProcessInfoPlistFile /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/InstallationBuildProductsLocation/Applications/RealShot.app/Info.plist /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/IntermediateBuildFilesPath/RealShot.build/Release-iphoneos/RealShot.build/empty-RealShot.plist (in target 'RealShot' from project 'RealShot')
+2026-11-09T05:38:09.5733780Z     cd /Users/runner/work/realshot-ios/realshot-ios
+2026-11-09T05:38:09.5738210Z     builtin-infoPlistUtility /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/IntermediateBuildFilesPath/RealShot.build/Release-iphoneos/RealShot.build/empty-RealShot.plist -producttype com.apple.product-type.application -genpkginfo /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/InstallationBuildProductsLocation/Applications/RealShot.app/PkgInfo -expandbuildsettings -format binary -platform iphoneos -additionalcontentfile /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/IntermediateBuildFilesPath/RealShot.build/Release-iphoneos/RealShot.build/assetcatalog_generated_info.plist -requiredArchitecture arm64 -o /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/InstallationBuildProductsLocation/Applications/RealShot.app/Info.plist
+2026-11-09T05:38:09.5761700Z 
+2026-11-09T05:38:09.5777510Z SwiftDriverJobDiscovery normal arm64 Compiling Theme.swift, ExifWriter.swift, FrameAdapter.swift, BatchViewModel.swift, JpegDegrader.swift, EditorViewModel.swift, RealismEngine.swift, RootView.swift, CameraPreset.swift, BatchView.swift, FrameMode.swift, CompareSlider.swift, RealismParameters.swift, EditorView.swift, HelpView.swift, ImageLoader.swift, ImportView.swift, PhotoLibrarySaver.swift, ParameterPanel.swift, Haptics.swift, RealShotApp.swift, GeneratedAssetSymbols.swift (in target 'RealShot' from project 'RealShot')
+2026-11-09T05:38:09.5781290Z 
+2026-11-09T05:38:09.5781940Z SwiftDriver\ Compilation\ Requirements RealShot normal arm64 com.apple.xcode.tools.swift.compiler (in target 'RealShot' from project 'RealShot')
+2026-11-09T05:38:09.5803000Z     cd /Users/runner/work/realshot-ios/realshot-ios
+2026-11-09T05:38:09.5825710Z     builtin-Swift-Compilation-Requirements -- /Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc -module-name RealShot -O -whole-module-optimization -enforce-exclusivity\=checked @/Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/IntermediateBuildFilesPath/RealShot.build/Release-iphoneos/RealShot.build/Objects-normal/arm64/RealShot.SwiftFileList -enable-bare-slash-regex -enable-experimental-feature DebugDescriptionMacro -sdk /Applications/Xcode_16.4.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS18.5.sdk -target arm64-apple-ios17.0 -g -module-cache-path /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/ModuleCache.noindex -Xfrontend -serialize-debugging-options -swift-version 5 -I /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/BuildProductsPath/Release-iphoneos -F /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/BuildProductsPath/Release-iphoneos -emit-localized-strings -emit-localized-strings-path /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/IntermediateBuildFilesPath/RealShot.build/Release-iphoneos/RealShot.build/Objects-normal/arm64 -c -num-threads 3 -Xcc -ivfsstatcache -Xcc /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/SDKStatCaches.noindex/iphoneos18.5-22F76-a529daf784b3616c7c04a36aeb7f5c05.sdkstatcache -output-file-map /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/IntermediateBuildFilesPath/RealShot.build/Release-iphoneos/RealShot.build/Objects-normal/arm64/RealShot-OutputFileMap.json -use-frontend-parseable-output -save-temps -no-color-diagnostics -serialize-diagnostics -emit-dependencies -emit-module -emit-module-path /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/IntermediateBuildFilesPath/RealShot.build/Release-iphoneos/RealShot.build/Objects-normal/arm64/RealShot.swiftmodule -validate-clang-modules-once -clang-build-session-file /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/ModuleCache.noindex/Session.modulevalidation -Xcc -I/Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/IntermediateBuildFilesPath/RealShot.build/Release-iphoneos/RealShot.build/swift-overrides.hmap -emit-const-values -Xfrontend -const-gather-protocols-file -Xfrontend /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/IntermediateBuildFilesPath/RealShot.build/Release-iphoneos/RealShot.build/Objects-normal/arm64/RealShot_const_extract_protocols.json -Xcc -iquote -Xcc /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/IntermediateBuildFilesPath/RealShot.build/Release-iphoneos/RealShot.build/RealShot-generated-files.hmap -Xcc -I/Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/IntermediateBuildFilesPath/RealShot.build/Release-iphoneos/RealShot.build/RealShot-own-target-headers.hmap -Xcc -I/Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/IntermediateBuildFilesPath/RealShot.build/Release-iphoneos/RealShot.build/RealShot-all-target-headers.hmap -Xcc -iquote -Xcc /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/IntermediateBuildFilesPath/RealShot.build/Release-iphoneos/RealShot.build/RealShot-project-headers.hmap -Xcc -I/Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/BuildProductsPath/Release-iphoneos/include -Xcc -I/Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/IntermediateBuildFilesPath/RealShot.build/Release-iphoneos/RealShot.build/DerivedSources-normal/arm64 -Xcc -I/Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/IntermediateBuildFilesPath/RealShot.build/Release-iphoneos/RealShot.build/DerivedSources/arm64 -Xcc -I/Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/IntermediateBuildFilesPath/RealShot.build/Release-iphoneos/RealShot.build/DerivedSources -emit-objc-header -emit-objc-header-path /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/IntermediateBuildFilesPath/RealShot.build/Release-iphoneos/RealShot.build/Objects-normal/arm64/RealShot-Swift.h -working-directory /Users/runner/work/realshot-ios/realshot-ios -no-emit-module-separately-wmo
+2026-11-09T05:38:09.5844550Z 
+2026-11-09T05:38:09.5888520Z SwiftMergeGeneratedHeaders /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/IntermediateBuildFilesPath/RealShot.build/Release-iphoneos/RealShot.build/DerivedSources/RealShot-Swift.h /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/IntermediateBuildFilesPath/RealShot.build/Release-iphoneos/RealShot.build/Objects-normal/arm64/RealShot-Swift.h (in target 'RealShot' from project 'RealShot')
+2026-11-09T05:38:09.5892550Z     cd /Users/runner/work/realshot-ios/realshot-ios
+2026-11-09T05:38:09.5894870Z     builtin-swiftHeaderTool -arch arm64 /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/IntermediateBuildFilesPath/RealShot.build/Release-iphoneos/RealShot.build/Objects-normal/arm64/RealShot-Swift.h -o /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/IntermediateBuildFilesPath/RealShot.build/Release-iphoneos/RealShot.build/DerivedSources/RealShot-Swift.h
+2026-11-09T05:38:09.5937400Z 
+2026-11-09T05:38:09.5971220Z Copy /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/BuildProductsPath/Release-iphoneos/RealShot.swiftmodule/arm64-apple-ios.swiftmodule /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/IntermediateBuildFilesPath/RealShot.build/Release-iphoneos/RealShot.build/Objects-normal/arm64/RealShot.swiftmodule (in target 'RealShot' from project 'RealShot')
+2026-11-09T05:38:09.5976230Z     cd /Users/runner/work/realshot-ios/realshot-ios
+2026-11-09T05:38:09.6017250Z     builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -resolve-src-symlinks -rename /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/IntermediateBuildFilesPath/RealShot.build/Release-iphoneos/RealShot.build/Objects-normal/arm64/RealShot.swiftmodule /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/BuildProductsPath/Release-iphoneos/RealShot.swiftmodule/arm64-apple-ios.swiftmodule
+2026-11-09T05:38:09.6050060Z 
+2026-11-09T05:38:09.6113690Z Copy /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/BuildProductsPath/Release-iphoneos/RealShot.swiftmodule/arm64-apple-ios.swiftdoc /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/IntermediateBuildFilesPath/RealShot.build/Release-iphoneos/RealShot.build/Objects-normal/arm64/RealShot.swiftdoc (in target 'RealShot' from project 'RealShot')
+2026-11-09T05:38:09.6119250Z     cd /Users/runner/work/realshot-ios/realshot-ios
+2026-11-09T05:38:09.6121670Z     builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -resolve-src-symlinks -rename /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/IntermediateBuildFilesPath/RealShot.build/Release-iphoneos/RealShot.build/Objects-normal/arm64/RealShot.swiftdoc /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/BuildProductsPath/Release-iphoneos/RealShot.swiftmodule/arm64-apple-ios.swiftdoc
+2026-11-09T05:38:09.6123450Z 
+2026-11-09T05:38:09.6124990Z Copy /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/BuildProductsPath/Release-iphoneos/RealShot.swiftmodule/arm64-apple-ios.abi.json /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/IntermediateBuildFilesPath/RealShot.build/Release-iphoneos/RealShot.build/Objects-normal/arm64/RealShot.abi.json (in target 'RealShot' from project 'RealShot')
+2026-11-09T05:38:09.6126730Z     cd /Users/runner/work/realshot-ios/realshot-ios
+2026-11-09T05:38:09.6128590Z     builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -resolve-src-symlinks -rename /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/IntermediateBuildFilesPath/RealShot.build/Release-iphoneos/RealShot.build/Objects-normal/arm64/RealShot.abi.json /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/BuildProductsPath/Release-iphoneos/RealShot.swiftmodule/arm64-apple-ios.abi.json
+2026-11-09T05:38:09.6130380Z 
+2026-11-09T05:38:09.6131150Z Ld /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/InstallationBuildProductsLocation/Applications/RealShot.app/RealShot normal (in target 'RealShot' from project 'RealShot')
+2026-11-09T05:38:09.6132210Z     cd /Users/runner/work/realshot-ios/realshot-ios
+2026-11-09T05:38:09.6140140Z     /Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang -Xlinker -reproducible -target arm64-apple-ios17.0 -isysroot /Applications/Xcode_16.4.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS18.5.sdk -Os -L/Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/IntermediateBuildFilesPath/EagerLinkingTBDs/Release-iphoneos -L/Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/BuildProductsPath/Release-iphoneos -F/Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/IntermediateBuildFilesPath/EagerLinkingTBDs/Release-iphoneos -F/Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/BuildProductsPath/Release-iphoneos -filelist /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/IntermediateBuildFilesPath/RealShot.build/Release-iphoneos/RealShot.build/Objects-normal/arm64/RealShot.LinkFileList -Xlinker -rpath -Xlinker @executable_path/Frameworks -dead_strip -Xlinker -object_path_lto -Xlinker /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/IntermediateBuildFilesPath/RealShot.build/Release-iphoneos/RealShot.build/Objects-normal/arm64/RealShot_lto.o -Xlinker -final_output -Xlinker /Applications/RealShot.app/RealShot -Xlinker -dependency_info -Xlinker /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/IntermediateBuildFilesPath/RealShot.build/Release-iphoneos/RealShot.build/Objects-normal/arm64/RealShot_dependency_info.dat -fobjc-link-runtime -L/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/iphoneos -L/usr/lib/swift -Xlinker -add_ast_path -Xlinker /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/IntermediateBuildFilesPath/RealShot.build/Release-iphoneos/RealShot.build/Objects-normal/arm64/RealShot.swiftmodule -o /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/InstallationBuildProductsLocation/Applications/RealShot.app/RealShot
+2026-11-09T05:38:09.9389130Z 
+2026-11-09T05:38:09.9438800Z ExtractAppIntentsMetadata (in target 'RealShot' from project 'RealShot')
+2026-11-09T05:38:09.9442710Z     cd /Users/runner/work/realshot-ios/realshot-ios
+2026-11-09T05:38:09.9463570Z     /Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/appintentsmetadataprocessor --toolchain-dir /Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain --module-name RealShot --sdk-root /Applications/Xcode_16.4.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS18.5.sdk --xcode-version 16F6 --platform-family iOS --deployment-target 17.0 --bundle-identifier com.example.realshot --output /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/InstallationBuildProductsLocation/Applications/RealShot.app --target-triple arm64-apple-ios17.0 --binary-file /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/InstallationBuildProductsLocation/Applications/RealShot.app/RealShot --dependency-file /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/IntermediateBuildFilesPath/RealShot.build/Release-iphoneos/RealShot.build/Objects-normal/arm64/RealShot_dependency_info.dat --stringsdata-file /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/IntermediateBuildFilesPath/RealShot.build/Release-iphoneos/RealShot.build/Objects-normal/arm64/ExtractedAppShortcutsMetadata.stringsdata --source-file-list /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/IntermediateBuildFilesPath/RealShot.build/Release-iphoneos/RealShot.build/Objects-normal/arm64/RealShot.SwiftFileList --metadata-file-list /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/IntermediateBuildFilesPath/RealShot.build/Release-iphoneos/RealShot.build/RealShot.DependencyMetadataFileList --static-metadata-file-list /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/IntermediateBuildFilesPath/RealShot.build/Release-iphoneos/RealShot.build/RealShot.DependencyStaticMetadataFileList --swift-const-vals-list /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/IntermediateBuildFilesPath/RealShot.build/Release-iphoneos/RealShot.build/Objects-normal/arm64/RealShot.SwiftConstValuesFileList --compile-time-extraction --deployment-aware-processing --validate-assistant-intents --no-app-shortcuts-localization
+2026-11-09T05:38:10.2569220Z 2026-11-09 05:38:10.216 appintentsmetadataprocessor[7155:26792] Starting appintentsmetadataprocessor export
+2026-11-09T05:38:10.2670710Z 2026-11-09 05:38:10.236 appintentsmetadataprocessor[7155:26792] warning: Metadata extraction skipped. No AppIntents.framework dependency found.
+2026-11-09T05:38:10.2773350Z 
+2026-11-09T05:38:10.2885030Z GenerateDSYMFile /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/BuildProductsPath/Release-iphoneos/RealShot.app.dSYM /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/InstallationBuildProductsLocation/Applications/RealShot.app/RealShot (in target 'RealShot' from project 'RealShot')
+2026-11-09T05:38:10.2993540Z     cd /Users/runner/work/realshot-ios/realshot-ios
+2026-11-09T05:38:10.3097090Z     /Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/dsymutil /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/InstallationBuildProductsLocation/Applications/RealShot.app/RealShot -o /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/BuildProductsPath/Release-iphoneos/RealShot.app.dSYM
+2026-11-09T05:38:10.4710400Z 
+2026-11-09T05:38:10.4813770Z CopySwiftLibs /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/InstallationBuildProductsLocation/Applications/RealShot.app (in target 'RealShot' from project 'RealShot')
+2026-11-09T05:38:10.4915550Z     cd /Users/runner/work/realshot-ios/realshot-ios
+2026-11-09T05:38:10.5038250Z     builtin-swiftStdLibTool --copy --verbose --scan-executable /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/InstallationBuildProductsLocation/Applications/RealShot.app/RealShot --scan-folder /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/InstallationBuildProductsLocation/Applications/RealShot.app/Frameworks --scan-folder /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/InstallationBuildProductsLocation/Applications/RealShot.app/PlugIns --scan-folder /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/InstallationBuildProductsLocation/Applications/RealShot.app/SystemExtensions --scan-folder /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/InstallationBuildProductsLocation/Applications/RealShot.app/Extensions --platform iphoneos --toolchain /Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain --destination /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/InstallationBuildProductsLocation/Applications/RealShot.app/Frameworks --unsigned-destination /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/BuildProductsPath/SwiftSupport --strip-bitcode --strip-bitcode-tool /Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/bitcode_strip --emit-dependency-info /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/IntermediateBuildFilesPath/RealShot.build/Release-iphoneos/RealShot.build/SwiftStdLibToolInputDependencies.dep --filter-for-swift-os
+2026-11-09T05:38:10.5048990Z Ignoring --strip-bitcode because --sign was not passed
+2026-11-09T05:38:10.5149940Z 
+2026-11-09T05:38:10.5250980Z AppIntentsSSUTraining (in target 'RealShot' from project 'RealShot')
+2026-11-09T05:38:10.5353710Z     cd /Users/runner/work/realshot-ios/realshot-ios
+2026-11-09T05:38:10.5458740Z     /Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/appintentsnltrainingprocessor --infoplist-path /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/InstallationBuildProductsLocation/Applications/RealShot.app/Info.plist --temp-dir-path /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/IntermediateBuildFilesPath/RealShot.build/Release-iphoneos/RealShot.build/ssu --bundle-id com.example.realshot --product-path /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/InstallationBuildProductsLocation/Applications/RealShot.app --extracted-metadata-path /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/InstallationBuildProductsLocation/Applications/RealShot.app/Metadata.appintents --deployment-postprocessing --metadata-file-list /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/IntermediateBuildFilesPath/RealShot.build/Release-iphoneos/RealShot.build/RealShot.DependencyMetadataFileList --archive-ssu-assets
+2026-11-09T05:38:10.5564990Z 2026-11-09 05:38:10.296 appintentsnltrainingprocessor[7163:26826] Parsing options for appintentsnltrainingprocessor
+2026-11-09T05:38:10.5665970Z 2026-11-09 05:38:10.298 appintentsnltrainingprocessor[7163:26826] No AppShortcuts found - Skipping.
+2026-11-09T05:38:10.5768110Z 
+2026-11-09T05:38:10.5874570Z Strip /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/InstallationBuildProductsLocation/Applications/RealShot.app/RealShot (in target 'RealShot' from project 'RealShot')
+2026-11-09T05:38:10.5976130Z     cd /Users/runner/work/realshot-ios/realshot-ios
+2026-11-09T05:38:10.6087710Z     /Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/strip -D /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/InstallationBuildProductsLocation/Applications/RealShot.app/RealShot
+2026-11-09T05:38:10.6185280Z 
+2026-11-09T05:38:10.6287650Z SetOwnerAndGroup runner:staff /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/InstallationBuildProductsLocation/Applications/RealShot.app (in target 'RealShot' from project 'RealShot')
+2026-11-09T05:38:10.6391140Z     cd /Users/runner/work/realshot-ios/realshot-ios
+2026-11-09T05:38:10.6492890Z     /usr/sbin/chown -RH runner:staff /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/InstallationBuildProductsLocation/Applications/RealShot.app
+2026-11-09T05:38:10.6681910Z 
+2026-11-09T05:38:10.6818300Z SetMode u+w,go-w,a+rX /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/InstallationBuildProductsLocation/Applications/RealShot.app (in target 'RealShot' from project 'RealShot')
+2026-11-09T05:38:10.6930940Z     cd /Users/runner/work/realshot-ios/realshot-ios
+2026-11-09T05:38:10.7034340Z     /bin/chmod -RH u+w,go-w,a+rX /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/InstallationBuildProductsLocation/Applications/RealShot.app
+2026-11-09T05:38:10.7035400Z 
+2026-11-09T05:38:10.7147060Z RegisterExecutionPolicyException /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/InstallationBuildProductsLocation/Applications/RealShot.app (in target 'RealShot' from project 'RealShot')
+2026-11-09T05:38:10.7249440Z     cd /Users/runner/work/realshot-ios/realshot-ios
+2026-11-09T05:38:10.7352100Z     builtin-RegisterExecutionPolicyException /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/InstallationBuildProductsLocation/Applications/RealShot.app
+2026-11-09T05:38:10.7454120Z 
+2026-11-09T05:38:10.7555840Z Validate /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/InstallationBuildProductsLocation/Applications/RealShot.app (in target 'RealShot' from project 'RealShot')
+2026-11-09T05:38:10.7657530Z     cd /Users/runner/work/realshot-ios/realshot-ios
+2026-11-09T05:38:10.7759710Z     builtin-validationUtility /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/InstallationBuildProductsLocation/Applications/RealShot.app -validate-for-store -infoplist-subpath Info.plist
+2026-11-09T05:38:10.7865030Z warning: All interface orientations must be supported unless the app requires full screen. (in target 'RealShot' from project 'RealShot')
+2026-11-09T05:38:10.7998640Z 
+2026-11-09T05:38:10.8084690Z Touch /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/InstallationBuildProductsLocation/Applications/RealShot.app (in target 'RealShot' from project 'RealShot')
+2026-11-09T05:38:10.8154250Z     cd /Users/runner/work/realshot-ios/realshot-ios
+2026-11-09T05:38:10.8212490Z     /usr/bin/touch -c /Users/runner/work/realshot-ios/realshot-ios/build/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/RealShot/InstallationBuildProductsLocation/Applications/RealShot.app
+2026-11-09T05:38:10.8293530Z 
+2026-11-09T05:38:10.8323720Z note: Disabling previews because SWIFT_VERSION is set and SWIFT_OPTIMIZATION_LEVEL=-O, expected -Onone (in target 'RealShot' from project 'RealShot')
+2026-11-09T05:38:10.8338470Z ** ARCHIVE SUCCEEDED **
+2026-11-09T05:38:10.8339060Z 
+2026-11-09T05:38:10.8339300Z 
+2026-11-09T05:38:10.8344100Z ✓ 无签名 IPA:
+2026-11-09T05:38:10.8345580Z -rw-r--r--  1 runner  staff   939K Nov  9 05:38 /Users/runner/work/realshot-ios/realshot-ios/dist/RealShot-unsigned.ipa
+2026-11-09T05:38:10.8347160Z 
+2026-11-09T05:38:10.8350940Z 安装方式（任选其一，都会用你自己的 Apple ID 重签）：
+2026-11-09T05:38:10.8424840Z   · macOS/Windows: Sideloadly —— 拖入 ipa，填 Apple ID，连设备安装
+2026-11-09T05:38:10.8426400Z   · macOS/Windows: AltStore —— 支持自签续期
+2026-11-09T05:38:10.8427570Z   · 免费开发者账号签的包 7 天后过期，需重新签
+2026-11-09T05:38:10.8427950Z 
+2026-11-09T05:38:10.8429200Z 注意：无签名 IPA 不能直接双击安装，也不能上架 App Store。
+2026-11-09T05:38:10.8502880Z ##[group]Run ls -lh "$PROJECT_DIR/dist"
+2026-11-09T05:38:10.8503230Z [36;1mls -lh "$PROJECT_DIR/dist"[0m
+2026-11-09T05:38:10.8964480Z shell: /bin/bash -e {0}
+2026-11-09T05:38:10.8965620Z env:
+2026-11-09T05:38:10.8973060Z   PROJECT_DIR: /Users/runner/work/realshot-ios/realshot-ios
+2026-11-09T05:38:10.8974820Z ##[endgroup]
+2026-11-09T05:38:11.0603330Z total 1880
+2026-11-09T05:38:11.0705340Z -rw-r--r--  1 runner  staff   939K Nov  9 05:38 RealShot-unsigned.ipa
+2026-11-09T05:38:11.0929310Z ##[group]Run actions/upload-artifact@v4
+2026-11-09T05:38:11.0929590Z with:
+2026-11-09T05:38:11.0929750Z   name: RealShot-unsigned-ipa
+2026-11-09T05:38:11.0929960Z   path: **/dist/*.ipa
+2026-11-09T05:38:11.0930150Z   if-no-files-found: error
+2026-11-09T05:38:11.0930360Z   retention-days: 30
+2026-11-09T05:38:11.0930540Z   compression-level: 6
+2026-11-09T05:38:11.0930720Z   overwrite: false
+2026-11-09T05:38:11.0930900Z   include-hidden-files: false
+2026-11-09T05:38:11.0931130Z env:
+2026-11-09T05:38:11.0931340Z   PROJECT_DIR: /Users/runner/work/realshot-ios/realshot-ios
+2026-11-09T05:38:11.0931620Z ##[endgroup]
+2026-11-09T05:38:11.5609270Z (node:7184) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-11-09T05:38:11.5610000Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-11-09T05:38:11.6102700Z With the provided path, there will be 1 file uploaded
+2026-11-09T05:38:11.6106300Z Artifact name is valid!
+2026-11-09T05:38:11.6106650Z Root directory input is valid!
+2026-11-09T05:38:12.0486940Z (node:7184) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+2026-11-09T05:38:12.0760510Z Beginning upload of artifact content to blob storage
+2026-11-09T05:38:12.7109210Z Uploaded bytes 961027
+2026-11-09T05:38:12.7813060Z Finished uploading artifact content to blob storage!
+2026-11-09T05:38:12.7813860Z SHA256 digest of uploaded artifact zip is 3f73b8d49c22114a0b02376b13d6b8c4cf7ed5084827c0b6b5e3066152c1f135
+2026-11-09T05:38:12.7816760Z Finalizing artifact upload
+2026-11-09T05:38:13.2318310Z Artifact RealShot-unsigned-ipa.zip successfully finalized. Artifact ID 13651927539
+2026-11-09T05:38:13.2346340Z Artifact RealShot-unsigned-ipa has been successfully uploaded! Final size is 961027 bytes. Artifact ID is 13651927539
+2026-11-09T05:38:13.2359840Z Artifact download URL: https://github.com/xiaolvmao/realshot-ios/actions/runs/42568337435/artifacts/13651927539
+2026-11-09T05:38:13.2484190Z Post job cleanup.
+2026-11-09T05:38:13.3568530Z [command]/opt/homebrew/bin/git version
+2026-11-09T05:38:13.3942650Z git version 2.56.0
+2026-11-09T05:38:13.3979720Z Copying '/Users/runner/.gitconfig' to '/Users/runner/work/_temp/11f67e90-5c8b-45af-a163-33b4d9c6b63b/.gitconfig'
+2026-11-09T05:38:13.3983640Z Temporarily overriding HOME='/Users/runner/work/_temp/11f67e90-5c8b-45af-a163-33b4d9c6b63b' before making global git config changes
+2026-11-09T05:38:13.3984410Z Adding repository directory to the temporary git global config as a safe directory
+2026-11-09T05:38:13.3985120Z [command]/opt/homebrew/bin/git config --global --add safe.directory /Users/runner/work/realshot-ios/realshot-ios
+2026-11-09T05:38:13.4097440Z [command]/opt/homebrew/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-11-09T05:38:13.4171610Z [command]/opt/homebrew/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-11-09T05:38:13.5592210Z [command]/opt/homebrew/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-11-09T05:38:13.5647030Z http.https://github.com/.extraheader
+2026-11-09T05:38:13.5653730Z [command]/opt/homebrew/bin/git config --local --unset-all http.https://github.com/.extraheader
+2026-11-09T05:38:13.5715220Z [command]/opt/homebrew/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-11-09T05:38:13.6502280Z [command]/opt/homebrew/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-11-09T05:38:13.6570740Z [command]/opt/homebrew/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-11-09T05:38:13.7583920Z Cleaning up orphan processes
+2026-11-09T05:38:14.5213360Z Terminate orphan process: pid (6859) (ibtoold)
+2026-11-09T05:38:14.6164860Z Terminate orphan process: pid (6617) (ibtoold)
+2026-11-09T05:38:14.9510530Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/upload-artifact@v4. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/

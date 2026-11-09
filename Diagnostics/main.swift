@@ -89,7 +89,8 @@ for preset in CameraPreset.allCases {
                                 trimBars: true, anchor: 0.5, longEdge: 0)
 
     print("\n=== \(preset.rawValue) / \(preset.title) ===")
-    print("  grain=\(String(format: "%.2f", p.grain)) soft=\(String(format: "%.2f", p.softness)) "
+    print("  grain=\(String(format: "%.2f", p.grain)) size=\(String(format: "%.2f", p.grainSize)) "
+          + "soft=\(String(format: "%.2f", p.softness)) "
           + "ca=\(String(format: "%.2f", p.chromaAberration)) vig=\(String(format: "%.2f", p.vignette)) "
           + "bloom=\(String(format: "%.2f", p.bloom)) persp=\(String(format: "%.2f", p.perspective)) "
           + "leak=\(String(format: "%.2f", p.lightLeak)) screen=\(String(format: "%.2f", p.screenTexture)) "
@@ -218,3 +219,75 @@ for stage in RealismEngine.PipelineStage.allCases {
 }
 
 print("\n中间图已写入 \(outDir)")
+
+// MARK: - 定点排查
+//
+// 上面已经定位到 sensor 这一级。这里把「真实链路输入 + 各种参数组合」逐一测一遍，
+// 确认是颗粒、色噪，还是 grainSize 触发的模糊路径。
+
+let phoneParams = CameraPreset.phone.baseParameters.jittered(seed: 20261109)
+let fixRequest = RenderRequest(params: phoneParams, frame: .ratio4x3,
+                               trimBars: true, anchor: 0.5, longEdge: 0)
+let fixPrepared = engine.preparedImage(source, request: fixRequest)
+let opticsOut = engine.chained(fixPrepared, upTo: .optics, params: phoneParams)
+
+print("\n=== 定点排查：phone 真实链路 ===")
+print("  grain=\(String(format: "%.3f", phoneParams.grain)) "
+      + "grainSize=\(String(format: "%.3f", phoneParams.grainSize)) "
+      + "chromaNoise=\(String(format: "%.3f", phoneParams.chromaNoise))")
+
+var m0 = engine.isolate(opticsOut, stage: .sensor, params: phoneParams)
+m0.name = "sensor(原参数)"
+show(m0)
+
+print("  -- 噪点图层本身（应该是 0.5 附近、alpha 1）--")
+for m in engine.debugNoiseLayers(opticsOut, params: phoneParams) { show(m) }
+
+print("  -- 变量控制 --")
+var v1 = phoneParams; v1.grainSize = 1.0
+var v2 = phoneParams; v2.grain = 0
+var v3 = phoneParams; v3.chromaNoise = 0
+var v4 = phoneParams; v4.grainSize = 1.0; v4.chromaNoise = 0
+var v5 = phoneParams; v5.grainSize = 1.0; v5.grain = 0
+
+let variants: [(String, RealismParameters)] = [
+    ("grainSize=1.0", v1),
+    ("只颗粒 grain=0", v2),
+    ("只色噪 chroma=0", v3),
+    ("grainSize=1 & chroma=0", v4),
+    ("grainSize=1 & grain=0", v5)
+]
+for (label, pp) in variants {
+    var m = engine.isolate(opticsOut, stage: .sensor, params: pp)
+    m.name = label
+    show(m)
+}
+
+func constant(_ v: CGFloat, like image: CIImage) -> CIImage {
+    CIImage(color: CIColor(red: v, green: v, blue: v, alpha: 1)).cropped(to: image.extent)
+}
+
+print("  -- 混合语义（源图层为纯色，背景为 optics 输出）--")
+var bm = engine.debugBlend("CISoftLightBlendMode", source: constant(0.5, like: opticsOut), background: opticsOut)
+bm.name = "softlight 中灰 0.50"
+show(bm)
+bm = engine.debugBlend("CIOverlayBlendMode", source: constant(0.5, like: opticsOut), background: opticsOut)
+bm.name = "overlay 中灰 0.50"
+show(bm)
+bm = engine.debugBlend("CISoftLightBlendMode", source: constant(0.0, like: opticsOut), background: opticsOut)
+bm.name = "softlight 黑 0.00"
+show(bm)
+bm = engine.debugBlend("CIOverlayBlendMode", source: constant(0.0, like: opticsOut), background: opticsOut)
+bm.name = "overlay 黑 0.00"
+show(bm)
+
+// 用真实的噪点图层做一次混合，看是不是图层本身的问题
+print("  -- 真实噪点图层 --")
+for (kind, layer) in engine.noiseLayerImages(opticsOut, params: phoneParams) {
+    var lm = engine.debugMeasure("layer-" + kind, layer)
+    show(lm)
+    let mode = kind == "grain" ? "CISoftLightBlendMode" : "CIOverlayBlendMode"
+    var bm2 = engine.debugBlend(mode, source: layer, background: opticsOut)
+    bm2.name = kind + " over optics"
+    show(bm2)
+}

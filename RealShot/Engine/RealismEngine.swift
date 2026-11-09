@@ -124,15 +124,27 @@ final class RealismEngine: @unchecked Sendable {
 
     /// 单独跑某一级，用来确认是哪一步把画面弄黑的。
     func isolate(_ prepared: CIImage, stage: PipelineStage, params p: RealismParameters) -> StageMetric {
-        let out: CIImage
-        switch stage {
-        case .geometry: out = geometry(prepared, params: p)
-        case .color: out = color(prepared, params: p)
-        case .optics: out = optics(prepared, params: p)
-        case .sensor: out = sensor(prepared, params: p)
-        case .scene: out = scene(prepared, params: p)
+        measure("only-" + stage.rawValue, applyStage(stage, to: prepared, params: p))
+    }
+
+    /// 从准备好的图开始顺序跑，停在指定级（含）。诊断时用来拿到「真实链路输入」。
+    func chained(_ prepared: CIImage, upTo stage: PipelineStage, params p: RealismParameters) -> CIImage {
+        var img = prepared
+        for s in PipelineStage.allCases {
+            img = applyStage(s, to: img, params: p)
+            if s == stage { break }
         }
-        return measure("only-" + stage.rawValue, out)
+        return img
+    }
+
+    private func applyStage(_ stage: PipelineStage, to image: CIImage, params p: RealismParameters) -> CIImage {
+        switch stage {
+        case .geometry: return geometry(image, params: p)
+        case .color: return color(image, params: p)
+        case .optics: return optics(image, params: p)
+        case .sensor: return sensor(image, params: p)
+        case .scene: return scene(image, params: p)
+        }
     }
 
     private func measure(_ name: String, _ image: CIImage) -> StageMetric {
@@ -437,33 +449,94 @@ final class RealismEngine: @unchecked Sendable {
         guard p.grain > 0.005 || p.chromaNoise > 0.005 else { return input }
         var img = input
         let extent = img.extent
-        let unit = max(extent.width, extent.height) / 1200.0
         var rng = SeededGenerator(seed: p.seed &+ 31)
 
         let ox = CGFloat.random(in: -500...500, using: &rng)
         let oy = CGFloat.random(in: -500...500, using: &rng)
 
         // 亮度颗粒
-        if p.grain > 0.005, let noise = randomNoise(offsetX: ox, offsetY: oy, extent: extent) {
-            var grain = centered(grayscale(noise), amplitude: p.grain * 0.13)
-            if p.grainSize > 1.05 {
-                let radius = CGFloat((p.grainSize - 1.0) * 1.15) * unit
-                grain = apply("CIGaussianBlur", grain.clampedToExtent(), [kCIInputRadiusKey: radius])
-                    .cropped(to: extent)
-            }
+        if let grain = grainLayer(offsetX: ox, offsetY: oy, extent: extent, params: p) {
             img = apply("CISoftLightBlendMode", grain, [kCIInputBackgroundImageKey: img]).cropped(to: extent)
         }
 
         // 彩色噪点：先糊成大色斑，再叠回去，才像高感的暗部色噪
-        if p.chromaNoise > 0.005, let noise = randomNoise(offsetX: ox + 217, offsetY: oy + 149, extent: extent) {
-            let blobs = apply("CIGaussianBlur", noise.clampedToExtent(), [
-                kCIInputRadiusKey: max(1.6 * unit, 0.6)
-            ]).cropped(to: extent)
-            let tuned = centered(blobs, amplitude: p.chromaNoise * 0.55)
+        if let tuned = chromaLayer(offsetX: ox + 217, offsetY: oy + 149, extent: extent, params: p) {
             img = apply("CIOverlayBlendMode", tuned, [kCIInputBackgroundImageKey: img]).cropped(to: extent)
         }
 
         return img
+    }
+
+    /// 亮度颗粒层。中灰为 1，偏离中灰的幅度决定颗粒强度。
+    private func grainLayer(offsetX: CGFloat, offsetY: CGFloat,
+                            extent: CGRect, params p: RealismParameters) -> CIImage? {
+        guard p.grain > 0.005,
+              let noise = randomNoise(offsetX: offsetX, offsetY: offsetY, extent: extent) else { return nil }
+        var grain = centered(grayscale(noise), amplitude: p.grain * 0.13)
+        if p.grainSize > 1.05 {
+            let unit = max(extent.width, extent.height) / 1200.0
+            let radius = CGFloat((p.grainSize - 1.0) * 1.15) * unit
+            grain = apply("CIGaussianBlur", grain.clampedToExtent(), [kCIInputRadiusKey: radius])
+                .cropped(to: extent)
+        }
+        return grain
+    }
+
+    /// 彩色噪点层：低频色斑，中灰为 1。
+    private func chromaLayer(offsetX: CGFloat, offsetY: CGFloat,
+                             extent: CGRect, params p: RealismParameters) -> CIImage? {
+        guard p.chromaNoise > 0.005,
+              let noise = randomNoise(offsetX: offsetX, offsetY: offsetY, extent: extent) else { return nil }
+        let unit = max(extent.width, extent.height) / 1200.0
+        let blobs = apply("CIGaussianBlur", noise.clampedToExtent(), [
+            kCIInputRadiusKey: max(1.6 * unit, 0.6)
+        ]).cropped(to: extent)
+        return centered(blobs, amplitude: p.chromaNoise * 0.55)
+    }
+
+    /// 诊断用：拿到真实的噪点图层。
+    func noiseLayerImages(_ image: CIImage, params p: RealismParameters) -> [(String, CIImage)] {
+        let extent = image.extent
+        var rng = SeededGenerator(seed: p.seed &+ 31)
+        let ox = CGFloat.random(in: -500...500, using: &rng)
+        let oy = CGFloat.random(in: -500...500, using: &rng)
+
+        var out: [(String, CIImage)] = []
+        if let g = grainLayer(offsetX: ox, offsetY: oy, extent: extent, params: p) {
+            out.append(("grain", g))
+        }
+        if let c = chromaLayer(offsetX: ox + 217, offsetY: oy + 149, extent: extent, params: p) {
+            out.append(("chroma", c))
+        }
+        return out
+    }
+
+    /// 诊断用：测任意 CIImage。
+    func debugMeasure(_ name: String, _ image: CIImage) -> StageMetric {
+        measure(name, image)
+    }
+
+    /// 诊断用：把一张纯中灰以指定混合模式叠到图上，检查混合语义是否符合预期。
+    func debugBlend(_ mode: String, source: CIImage, background: CIImage) -> StageMetric {
+        let out = apply(mode, source, [kCIInputBackgroundImageKey: background])
+        return measure("blend-" + mode + "/" + String(format: "%.2f", source.extent.width), out)
+    }
+
+    /// 诊断用：把两个噪点图层本身测出来（均值应该是 0.5 附近、alpha 1）。
+    func debugNoiseLayers(_ image: CIImage, params p: RealismParameters) -> [StageMetric] {
+        let extent = image.extent
+        var rng = SeededGenerator(seed: p.seed &+ 31)
+        let ox = CGFloat.random(in: -500...500, using: &rng)
+        let oy = CGFloat.random(in: -500...500, using: &rng)
+
+        var out: [StageMetric] = []
+        if let g = grainLayer(offsetX: ox, offsetY: oy, extent: extent, params: p) {
+            out.append(measure("grain-layer", g))
+        }
+        if let c = chromaLayer(offsetX: ox + 217, offsetY: oy + 149, extent: extent, params: p) {
+            out.append(measure("chroma-layer", c))
+        }
+        return out
     }
 
     private func randomNoise(offsetX: CGFloat, offsetY: CGFloat, extent: CGRect) -> CIImage? {
