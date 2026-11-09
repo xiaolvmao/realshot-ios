@@ -43,6 +43,7 @@ struct BatchViewer: View {
             }
         }
         .statusBarHidden()
+        .overlay(alignment: .top) { toast }
         .task(id: currentID) { await reload() }
         .task {
             // 拖过一次或等几秒就收起来，别一直挡着画面
@@ -257,6 +258,28 @@ struct BatchViewer: View {
         .buttonStyle(.plain)
         .disabled(model.isRunning)
         .opacity(model.isRunning ? 0.4 : 1)
+    }
+
+    // MARK: 提示
+    //
+    // 重掷之后画面会变，但只靠画面变化还不够明确，
+    // 这里给一句和批量页一致的短提示。
+
+    private var toast: some View {
+        Group {
+            if let text = model.message {
+                Text(text)
+                    .font(.system(size: 12, weight: .medium))
+                    .foregroundStyle(Color.black)
+                    .padding(.horizontal, 13)
+                    .padding(.vertical, 8)
+                    .background(Theme.accent, in: Capsule())
+                    .shadow(color: .black.opacity(0.3), radius: 10, y: 4)
+                    .padding(.top, 58)
+                    .transition(.move(edge: .top).combined(with: .opacity))
+            }
+        }
+        .animation(.spring(response: 0.35, dampingFraction: 0.85), value: model.message)
     }
 
     // MARK: 动作
