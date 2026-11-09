@@ -245,7 +245,23 @@ final class RealismEngine: @unchecked Sendable {
         img = geometry(img, params: p)
         img = color(img, params: p)
         img = optics(img, params: p)
-        img = sensor(img, params: p)
+
+        // 混噪点前先记下亮度。混合环节一旦出问题（图层半透明、设备上语义差异），
+        // 整幅图会被压成黑图。宁可这一张少点颗粒，也不能给用户一张全黑的照片。
+        let preSensor = img
+        let sensorOut = sensor(img, params: p)
+        if p.grain > 0.005 || p.chromaNoise > 0.005 {
+            let before = meanLuma(preSensor)
+            let after = meanLuma(sensorOut)
+            if before > 0.02, after < before * 0.45 {
+                img = preSensor
+            } else {
+                img = sensorOut
+            }
+        } else {
+            img = sensorOut
+        }
+
         img = scene(img, params: p)
 
         var rect = img.extent
@@ -471,7 +487,7 @@ final class RealismEngine: @unchecked Sendable {
     private func grainLayer(offsetX: CGFloat, offsetY: CGFloat,
                             extent: CGRect, params p: RealismParameters) -> CIImage? {
         guard p.grain > 0.005,
-              let noise = randomNoise(offsetX: offsetX, offsetY: offsetY, extent: extent) else { return nil }
+              let noise = opaqueNoise(offsetX: offsetX, offsetY: offsetY, extent: extent) else { return nil }
         var grain = centered(grayscale(noise), amplitude: p.grain * 0.13)
         if p.grainSize > 1.05 {
             let unit = max(extent.width, extent.height) / 1200.0
@@ -486,12 +502,12 @@ final class RealismEngine: @unchecked Sendable {
     private func chromaLayer(offsetX: CGFloat, offsetY: CGFloat,
                              extent: CGRect, params p: RealismParameters) -> CIImage? {
         guard p.chromaNoise > 0.005,
-              let noise = randomNoise(offsetX: offsetX, offsetY: offsetY, extent: extent) else { return nil }
+              let noise = opaqueNoise(offsetX: offsetX, offsetY: offsetY, extent: extent) else { return nil }
         let unit = max(extent.width, extent.height) / 1200.0
         let blobs = apply("CIGaussianBlur", noise.clampedToExtent(), [
             kCIInputRadiusKey: max(1.6 * unit, 0.6)
         ]).cropped(to: extent)
-        return centered(blobs, amplitude: p.chromaNoise * 0.55)
+        return centered(grayscale(blobs), amplitude: p.chromaNoise * 0.55)
     }
 
     /// 诊断用：拿到真实的噪点图层。
@@ -546,17 +562,29 @@ final class RealismEngine: @unchecked Sendable {
         return moved.cropped(to: extent)
     }
 
+    /// CIRandomGenerator 的 alpha 通道也是随机的（实测均值 0.5）。
+    /// 直接拿它去做 soft light / overlay，得到的是一张半透明图层：
+    /// 混合后整幅图会被压暗到几乎全黑。所以先把它盖在一张不透明中灰上，
+    /// alpha 恒为 1，颜色回到中灰附近，混合语义才是对的。
+    private func opaqueNoise(offsetX: CGFloat, offsetY: CGFloat, extent: CGRect) -> CIImage? {
+        guard let noise = randomNoise(offsetX: offsetX, offsetY: offsetY, extent: extent) else { return nil }
+        let base = CIImage(color: CIColor(red: 0.5, green: 0.5, blue: 0.5, alpha: 1)).cropped(to: extent)
+        return apply("CISourceOverCompositing", noise, [kCIInputBackgroundImageKey: base])
+            .cropped(to: extent)
+    }
+
     private func grayscale(_ image: CIImage) -> CIImage {
         apply("CIColorMatrix", image, [
             "inputRVector": CIVector(x: 0.33, y: 0.33, z: 0.33, w: 0),
             "inputGVector": CIVector(x: 0.33, y: 0.33, z: 0.33, w: 0),
             "inputBVector": CIVector(x: 0.33, y: 0.33, z: 0.33, w: 0),
-            "inputAVector": CIVector(x: 0, y: 0, z: 0, w: 1)
+            "inputAVector": CIVector(x: 0, y: 0, z: 0, w: 0),
+            "inputBiasVector": CIVector(x: 0, y: 0, z: 0, w: 1)
         ])
     }
 
     /// 把 0...1 的噪声压到 0.5 附近，只保留 ± amplitude/2 的波动，
-    /// 这样叠加时才是“颗粒”而不是“雪花屏”。
+    /// 这样叠加时才是“颗粒”而不是“雪花屏”。alpha 恒为 1。
     private func centered(_ image: CIImage, amplitude: Double) -> CIImage {
         let a = CGFloat(min(max(amplitude, 0), 1))
         let b = 0.5 - a * 0.5
@@ -564,9 +592,29 @@ final class RealismEngine: @unchecked Sendable {
             "inputRVector": CIVector(x: a, y: 0, z: 0, w: 0),
             "inputGVector": CIVector(x: 0, y: a, z: 0, w: 0),
             "inputBVector": CIVector(x: 0, y: 0, z: a, w: 0),
-            "inputAVector": CIVector(x: 0, y: 0, z: 0, w: 1),
-            "inputBiasVector": CIVector(x: b, y: b, z: b, w: 0)
+            "inputAVector": CIVector(x: 0, y: 0, z: 0, w: 0),
+            "inputBiasVector": CIVector(x: b, y: b, z: b, w: 1)
         ])
+    }
+
+    /// 整图平均亮度。用于兜底检查：渲染结果不能突然塌成黑图。
+    private func meanLuma(_ image: CIImage) -> Double {
+        let e = image.extent
+        guard !e.isInfinite, !e.isNull, e.width > 1, e.height > 1,
+              let filter = CIFilter(name: "CIAreaAverage", parameters: [
+                  kCIInputImageKey: image,
+                  kCIInputExtentKey: CIVector(cgRect: e)
+              ]),
+              let out = filter.outputImage else { return -1 }
+
+        var px = [UInt8](repeating: 0, count: 4)
+        px.withUnsafeMutableBytes { raw in
+            guard let base = raw.baseAddress else { return }
+            context.render(out, toBitmap: base, rowBytes: 4,
+                           bounds: CGRect(x: 0, y: 0, width: 1, height: 1),
+                           format: .RGBA8, colorSpace: srgb)
+        }
+        return (0.2126 * Double(px[0]) + 0.7152 * Double(px[1]) + 0.0722 * Double(px[2])) / 255.0
     }
 
     // MARK: - 场景叠加
