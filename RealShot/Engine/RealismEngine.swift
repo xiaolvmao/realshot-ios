@@ -481,53 +481,40 @@ final class RealismEngine: @unchecked Sendable {
 
         // 亮度颗粒
         if let grain = grainLayer(offsetX: ox, offsetY: oy, extent: extent, params: p) {
-            img = addLayer(grain, over: img)
+            img = multiply(grain, over: img)
         }
 
         // 彩色噪点：先糊成大色斑，再叠回去，才像高感的暗部色噪
         if let chroma = chromaLayer(offsetX: ox + 217, offsetY: oy + 149, extent: extent, params: p) {
-            img = addLayer(chroma, over: img)
+            img = multiply(chroma, over: img)
         }
 
-        // 叠加会带进一点整体偏移（Core Image 的工作空间是线性的，加性噪声的
-        // 均值换算到显示空间不是常数）。测一次，把偏移补回去：噪点只该贡献纹理，
-        // 不该改变整幅图的明暗。
-        let before = meanLuma(input)
-        let after = meanLuma(img)
-        if before > 0.02, after > 0.01 {
-            let delta = before - after
-            if abs(delta) > 0.006 {
-                let d = CGFloat(delta)
-                img = apply("CIColorMatrix", img, [
-                    "inputBiasVector": CIVector(x: d, y: d, z: d, w: 0)
-                ])
-            }
-        }
         return img
     }
 
-    /// 噪点图层：取值 [0, amplitude]、alpha 恒为 1。
+    /// 噪声增益图层：取值 [1−a/2, 1+a/2]、alpha 恒为 1。
     ///
     /// 注意：这里刻意不用 soft light / overlay 这类混合模式。
     /// Core Image 的 blend 滤镜在本工程的配置下会把整幅图算成 0
     /// （实测：中灰 0.5 叠上去成片全黑），加性叠加是唯一可控的做法。
-    private func noiseLayer(_ shape: CIImage, amplitude: Double, monochrome: Bool) -> CIImage {
+    private func gainLayer(_ shape: CIImage, amplitude: Double, monochrome: Bool) -> CIImage {
         let a = CGFloat(min(max(amplitude, 0), 1))
         let source = monochrome ? grayscale(shape) : shape
+        // rgb = a·x + (1 − a/2)：以 1.0 为中心，乘法叠加时整体亮度不变。
+        let base = 1 - a / 2
         return apply("CIColorMatrix", source, [
             "inputRVector": CIVector(x: a, y: 0, z: 0, w: 0),
             "inputGVector": CIVector(x: 0, y: a, z: 0, w: 0),
             "inputBVector": CIVector(x: 0, y: 0, z: a, w: 0),
             "inputAVector": CIVector(x: 0, y: 0, z: 0, w: 0),
-            "inputBiasVector": CIVector(x: 0, y: 0, z: 0, w: 1)
+            "inputBiasVector": CIVector(x: base, y: base, z: base, w: 1)
         ])
     }
 
-    /// 加性叠加。图层非负、alpha 为 1，直接相加。
-    /// 叠加带来的整体偏移由 sensor 末尾测均值补回，这里不做预压暗 ——
-    /// 预压暗在 CI 的线性工作空间里会放大成不成比例的变暗。
-    private func addLayer(_ layer: CIImage, over image: CIImage) -> CIImage {
-        apply("CIAdditionCompositing", layer, [kCIInputBackgroundImageKey: image])
+    /// 乘法叠加。增益图层以 1.0 为中心，x·1 = x，所以整体亮度天然不变 ——
+    /// 加性叠加在 CI 的工作空间里会有不成比例的整体偏移，乘法没有这个问题。
+    private func multiply(_ gain: CIImage, over image: CIImage) -> CIImage {
+        apply("CIMultiplyCompositing", gain, [kCIInputBackgroundImageKey: image])
             .cropped(to: image.extent)
     }
 
@@ -543,7 +530,7 @@ final class RealismEngine: @unchecked Sendable {
             shape = apply("CIGaussianBlur", shape.clampedToExtent(), [kCIInputRadiusKey: radius])
                 .cropped(to: extent)
         }
-        return noiseLayer(shape, amplitude: p.grain * 0.10, monochrome: true)
+        return gainLayer(shape, amplitude: p.grain * 0.18, monochrome: true)
     }
 
     /// 彩色噪点层：低频色斑，RGB 三通道各自独立。
@@ -555,7 +542,7 @@ final class RealismEngine: @unchecked Sendable {
         let blobs = apply("CIGaussianBlur", noise.clampedToExtent(), [
             kCIInputRadiusKey: max(1.6 * unit, 0.6)
         ]).cropped(to: extent)
-        return noiseLayer(blobs, amplitude: p.chromaNoise * 0.14, monochrome: false)
+        return gainLayer(blobs, amplitude: p.chromaNoise * 0.30, monochrome: false)
     }
 
     /// 诊断用：拿到真实的噪点图层。
