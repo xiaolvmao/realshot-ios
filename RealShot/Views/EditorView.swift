@@ -136,6 +136,20 @@ struct EditorView: View {
                 }
                 .buttonStyle(.plain)
 
+                // 回退到上一次随机的那组参数。换随机是探索，撤销是保底。
+                Button {
+                    model.undo()
+                } label: {
+                    Image(systemName: "arrow.uturn.backward")
+                        .font(.system(size: 12, weight: .semibold))
+                        .foregroundStyle(model.canUndo ? Theme.text : Theme.faint)
+                        .frame(width: 30, height: 30)
+                        .background(Theme.surfaceRaised, in: Circle())
+                }
+                .buttonStyle(.plain)
+                .disabled(!model.canUndo)
+                .opacity(model.canUndo ? 1 : 0.4)
+
                 Button {
                     model.compare = model.compare > 0.5 ? 0.0 : 1.0
                     Haptics.select()
@@ -195,8 +209,11 @@ struct EditorView: View {
                            frame: $model.frame,
                            trimBars: $model.trimBars,
                            anchor: $model.anchor,
+                           cropX: $model.cropX,
+                           cropScale: $model.cropScale,
                            longEdge: $model.longEdge,
-                           writeExif: $model.writeExif)
+                           writeExif: $model.writeExif,
+                           saveToAlbum: $model.saveToAlbum)
         }
         .padding(.top, 10)
     }

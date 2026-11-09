@@ -9,6 +9,10 @@ struct RenderRequest {
     var frame: FrameMode
     var trimBars: Bool
     var anchor: Double
+    /// 水平构图位置，0 = 偏左，1 = 偏右
+    var cropX: Double = 0.5
+    /// 向内放大的倍数，1 = 不裁
+    var cropScale: Double = 1.0
     /// 0 表示保持原始像素尺寸
     var longEdge: CGFloat
 }
@@ -198,7 +202,9 @@ final class RealismEngine: @unchecked Sendable {
         var img = FrameAdapter.apply(image,
                                      frame: request.frame,
                                      trimBars: request.trimBars,
-                                     anchor: request.anchor)
+                                     anchor: request.anchor,
+                                     cropX: request.cropX,
+                                     cropScale: request.cropScale)
 
         let e = img.extent
         img = img.transformed(by: CGAffineTransform(translationX: -e.minX, y: -e.minY))

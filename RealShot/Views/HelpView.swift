@@ -14,6 +14,7 @@ struct HelpView: View {
                     suitable
                     tuning
                     batch
+                    housekeeping
                     exif
                 }
                 .padding(.horizontal, 20)
@@ -55,7 +56,7 @@ struct HelpView: View {
             heading("三步上手")
 
             step(1, "选图", "从相册选，或从剪贴板粘贴。相册面板本身支持多选：只选一张就直接进编辑，选两张以上自动进入批量。")
-            step(2, "挑预设再微调", "六个预设对应六种器材。先选最接近的一个，再动滑杆。")
+            step(2, "挑预设再微调", "六个预设对应六种器材。先选最接近的一个，再动滑杆。「换一种随机」不满意时，左边的箭头能退回上一组。")
             step(3, "保存", "点右上角「保存」写入相册。想先看效果，拖动中间的竖线对比原图。")
         }
     }
@@ -99,6 +100,8 @@ struct HelpView: View {
             .background(Theme.surface, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
 
             tip("同一个预设连续处理十张不会得到十份相同的颗粒 —— 每次渲染都会在基准值附近做随机扰动。点「换一种随机」可以主动重掷。")
+
+            tip("截图裁成 4:3 之后，画幅里的「水平位置」和「向内缩放」还能救回构图：前者决定保留哪一条边，后者把画面推近一点。")
         }
     }
 
@@ -108,7 +111,7 @@ struct HelpView: View {
         VStack(alignment: .leading, spacing: 10) {
             heading("批量处理")
 
-            Text("在相册面板里选两张以上，就会自动进到这里，一次最多 20 张。选好后先挑预设和画幅，再点「开始处理并保存」，它会逐张渲染并直接写进相册，缩略图上打勾的就是完成的。")
+            Text("在相册面板里选两张以上，就会自动进到这里，一次最多 20 张；到了批量页还能点右上角的「＋」继续往里加，整队上限 40 张。选好后先挑预设和画幅，再点「开始处理并保存」，它会逐张渲染并直接写进相册，缩略图上打勾的就是完成的。")
                 .font(.system(size: 13))
                 .foregroundStyle(Theme.subtext)
                 .lineSpacing(3)
@@ -117,10 +120,33 @@ struct HelpView: View {
                 bullet("调参", "底部「参数」里能改质感、光学、色彩、画幅四类，和编辑器是同一套滑杆。改完所有张都用这套值。", Theme.accent)
                 bullet("看大图", "点任意缩略图全屏查看。按住图中间的分割线左右拖动，就能任意比例地对比原图和成片，和单张编辑时的用法一样；底部缩略图条可以直接换张。", Theme.accent)
                 bullet("重掷", "「单张随机」只换当前这一张的颗粒与抖动，「全部随机」把整队都换掉。预览会立刻跟着变。", Theme.accent)
+                bullet("中途取消", "处理中进度条右边有「取消」，已经写进相册的不会被撤回，剩下的直接跳过。", Color.orange)
                 bullet("顺手的事", "全屏里能单独分享当前这一张；长按缩略图或点右上角的垃圾桶可以删除。", Color.orange)
             }
 
             tip("预览和最终保存用的是同一组参数和同一个随机种子 —— 你在全屏里看到的那张，就是会存进相册的那张。处理中失败的那一张会标红，不影响其它张。")
+
+            tip("处理完再改参数，之前那些绿勾会自动退回待处理：界面上的画面已经变了，旧的那批不能再算作「已完成」。")
+        }
+    }
+
+    // MARK: 记忆与缓存
+
+    private var housekeeping: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            heading("设置、相簿与缓存")
+
+            Text("上次用的预设、参数、画幅会在下次打开时自动恢复，编辑器和批量各记各的。")
+                .font(.system(size: 13))
+                .foregroundStyle(Theme.subtext)
+                .lineSpacing(3)
+
+            VStack(alignment: .leading, spacing: 11) {
+                bullet("相簿归类", "画幅里打开「归类到 RealShot 相簿」，成片会收进同名相簿，不在时间线里和其他照片混着。这需要完整相册权限；不给也能正常保存，只是不归类。", Theme.accent)
+                bullet("清理缓存", "首页底部的「清理缓存」会删掉导出和分享时产生的临时图片，并清空预览缓存。相册里的照片不受影响，删掉的临时文件下次用到会重新生成。", Color.orange)
+            }
+
+            tip("清理缓存不会动你的相册，也不会重置参数设置。")
         }
     }
 

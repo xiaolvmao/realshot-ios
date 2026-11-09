@@ -26,19 +26,29 @@ struct BatchItem: Identifiable {
 @MainActor
 final class BatchViewModel: ObservableObject {
 
+    static let maxItems = 40
+
     @Published var items: [BatchItem] = []
-    @Published var preset: CameraPreset = .phone
-    @Published var frame: FrameMode = .ratio4x3 { didSet { dropPreviews() } }
-    @Published var trimBars: Bool = true { didSet { dropPreviews() } }
     @Published var isRunning: Bool = false
+    @Published var isCancelling: Bool = false
     @Published var progress: Double = 0
     @Published var message: String?
 
-    // 与编辑器同一套参数，批量页也能逐项微调
-    @Published var params: RealismParameters = CameraPreset.phone.baseParameters { didSet { dropPreviews() } }
-    @Published var anchor: Double = 0.5 { didSet { dropPreviews() } }
-    @Published var longEdge: Double = 0 { didSet { dropPreviews() } }
-    @Published var writeExif: Bool = true
+    // 与编辑器同一套参数，批量页也能逐项微调。
+    // 每个 didSet 都会让已经处理过的结果作废 —— 见 invalidateResults。
+    @Published var preset: CameraPreset = .phone
+    @Published var frame: FrameMode = .ratio4x3 { didSet { invalidateResults() } }
+    @Published var trimBars: Bool = true { didSet { invalidateResults() } }
+    @Published var params: RealismParameters = CameraPreset.phone.baseParameters {
+        didSet { invalidateResults() }
+    }
+    @Published var anchor: Double = 0.5 { didSet { invalidateResults() } }
+    @Published var cropX: Double = 0.5 { didSet { invalidateResults() } }
+    @Published var cropScale: Double = 1.0 { didSet { invalidateResults() } }
+    @Published var longEdge: Double = 0 { didSet { invalidateResults() } }
+    /// 只影响导出，不影响预览，所以不必让预览失效
+    @Published var writeExif: Bool = true { didSet { markStale() } }
+    @Published var saveToAlbum: Bool = false { didSet { markStale() } }
 
     var isEmpty: Bool { items.isEmpty }
     var doneCount: Int { items.filter { $0.state == .done }.count }
@@ -49,6 +59,10 @@ final class BatchViewModel: ObservableObject {
 
     private let engine = RealismEngine()
     private var toastTask: Task<Void, Never>?
+    private var persistTask: Task<Void, Never>?
+    private var memoryToken: NSObjectProtocol?
+    private var cancelRequested = false
+    private var staleNoticeShown = false
 
     /// 成片预览缓存。看过的那张再切回来是瞬时的；
     /// 改参数、换画幅、重掷之后自动失效。
@@ -57,13 +71,62 @@ final class BatchViewModel: ObservableObject {
     private var previewOrder: [UUID] = []
     private let previewCacheLimit = 8
 
+    init() {
+        if let saved = SettingsStore.loadBatch() {
+            preset = saved.preset
+            params = saved.params.clamped()
+            frame = saved.frame
+            trimBars = saved.trimBars
+            anchor = saved.anchor
+            cropX = saved.cropX
+            cropScale = saved.cropScale
+            longEdge = saved.longEdge
+            writeExif = saved.writeExif
+            saveToAlbum = saved.saveToAlbum
+        }
+
+        // 收到内存警告就把预览缓存放掉：重新渲染一次只要几百毫秒，
+        // 但被系统以内存为由杀掉就没有第二次机会了。
+        memoryToken = NotificationCenter.default.addObserver(
+            forName: UIApplication.didReceiveMemoryWarningNotification,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            Task { @MainActor in self?.dropPreviews() }
+        }
+    }
+
+    deinit {
+        if let memoryToken {
+            NotificationCenter.default.removeObserver(memoryToken)
+        }
+    }
+
     // MARK: - 队列
 
     func load(_ payloads: [(data: Data, thumb: UIImage)]) {
-        items = payloads.map { BatchItem(data: $0.data, thumb: $0.thumb) }
+        items = payloads.prefix(Self.maxItems).map { BatchItem(data: $0.data, thumb: $0.thumb) }
         dropPreviews()
         progress = 0
         message = nil
+        staleNoticeShown = false
+    }
+
+    /// 从相册追加几张，不用退出去重选整批。
+    func append(_ payloads: [(data: Data, thumb: UIImage)]) {
+        guard !isRunning, !payloads.isEmpty else { return }
+
+        let room = Self.maxItems - items.count
+        guard room > 0 else {
+            show("队列最多 \(Self.maxItems) 张")
+            return
+        }
+        let slice = Array(payloads.prefix(room))
+        items.append(contentsOf: slice.map { BatchItem(data: $0.data, thumb: $0.thumb) })
+        dropPreviews()
+        progress = 0
+        staleNoticeShown = false
+        show(slice.count < payloads.count ? "已添加 \(slice.count) 张，超出上限的已忽略" : "已添加 \(slice.count) 张")
     }
 
     /// 换预设时同步刷新整套参数，和编辑器的行为保持一致。
@@ -87,6 +150,7 @@ final class BatchViewModel: ObservableObject {
         dropPreviews()
         progress = 0
         isRunning = false
+        isCancelling = false
         message = nil
     }
 
@@ -116,12 +180,43 @@ final class BatchViewModel: ObservableObject {
         show("全部换了一种随机")
     }
 
+    // MARK: - 结果失效
+
+    /// 参数一变，之前存进相册的那批就不再对应当前画面：
+    /// 预览要重算，已经打勾的条目也要退回待处理。
+    /// 否则界面会一直显示「12/12 已完成」，而实际存进去的是另一套参数。
+    private func invalidateResults() {
+        dropPreviews()
+        markStale()
+        persistSoon()
+    }
+
+    private func markStale() {
+        guard !isRunning else { return }
+        var changed = false
+        for index in items.indices where items[index].state != .pending {
+            items[index].state = .pending
+            changed = true
+        }
+        guard changed || progress > 0 else { return }
+        progress = 0
+        if !staleNoticeShown {
+            staleNoticeShown = true
+            show("参数已改，需要重新处理")
+        }
+    }
+
     // MARK: - 预览
 
     private func dropPreviews() {
         previewCache.removeAll()
         previewOrder.removeAll()
         previewGeneration += 1
+    }
+
+    /// 供「清理缓存」用。
+    func clearPreviews() {
+        dropPreviews()
     }
 
     private func evictPreview(_ id: UUID) {
@@ -153,10 +248,12 @@ final class BatchViewModel: ObservableObject {
                  maxDimension: CGFloat = 1100) async -> (before: UIImage, after: UIImage)? {
         if let hit = cachedPreview(for: item.id) { return hit }
 
-        let request = RenderRequest(params: params.jittered(seed: item.seed),
+        let request = RenderRequest(params: params.clamped().jittered(seed: item.seed),
                                     frame: frame,
                                     trimBars: trimBars,
                                     anchor: anchor,
+                                    cropX: cropX,
+                                    cropScale: cropScale,
                                     longEdge: 0)
         let data = item.data
 
@@ -181,10 +278,12 @@ final class BatchViewModel: ObservableObject {
     /// 全尺寸渲染 + 编码，用于分享。
     func renderFinal(for item: BatchItem) async -> Data? {
         await encode(data: item.data,
-                     params: params.jittered(seed: item.seed),
+                     params: params.clamped().jittered(seed: item.seed),
                      frame: frame,
                      trimBars: trimBars,
                      anchor: anchor,
+                     cropX: cropX,
+                     cropScale: cropScale,
                      longEdge: CGFloat(longEdge),
                      preset: preset,
                      writeExif: writeExif)
@@ -195,6 +294,8 @@ final class BatchViewModel: ObservableObject {
                         frame: FrameMode,
                         trimBars: Bool,
                         anchor: Double,
+                        cropX: Double,
+                        cropScale: Double,
                         longEdge: CGFloat,
                         preset: CameraPreset,
                         writeExif: Bool) async -> Data? {
@@ -202,13 +303,19 @@ final class BatchViewModel: ObservableObject {
                                     frame: frame,
                                     trimBars: trimBars,
                                     anchor: anchor,
+                                    cropX: cropX,
+                                    cropScale: cropScale,
                                     longEdge: longEdge)
         let quality = max(params.jpegQuality, 0.72)
+        // 解码上限要和单张编辑一致，否则同一张图两条路径出来的尺寸不同。
+        // 选了更小的目标长边时，先按工作尺寸解码，再在管线里缩下去。
+        let decodePixel = max(ImageLoader.workingPixel, longEdge > 1 ? longEdge : 0)
+        let date = ImageLoader.captureDate(of: data) ?? Date()
 
         // 解码 + 渲染 + 编码整段丢到后台，主线程只管进度条
         return await withCheckedContinuation { (continuation: CheckedContinuation<Data?, Never>) in
             DispatchQueue.global(qos: .userInitiated).async { [engine] in
-                guard let ui = ImageLoader.image(from: data, maxPixel: 3200),
+                guard let ui = ImageLoader.image(from: data, maxPixel: decodePixel),
                       let ci = CIImage(image: ui),
                       let cg = engine.makeFinal(ci, request: request) else {
                     continuation.resume(returning: nil)
@@ -216,7 +323,7 @@ final class BatchViewModel: ObservableObject {
                 }
                 if writeExif,
                    let encoded = ExifWriter.write(cg,
-                                                  metadata: CameraMetadata.make(for: preset),
+                                                  metadata: CameraMetadata.make(for: preset, date: date),
                                                   quality: quality) {
                     continuation.resume(returning: encoded)
                     return
@@ -228,59 +335,135 @@ final class BatchViewModel: ObservableObject {
 
     // MARK: - 批处理
 
+    func cancel() {
+        guard isRunning else { return }
+        isCancelling = true
+        cancelRequested = true
+        show("正在取消…")
+    }
+
     /// 逐张处理并写入相册。
     /// 每张都用同一套参数 + 自己的随机种子，所以批量出来的
     /// 颗粒/漏光/抖动各不相同，不会像同一个滤镜刷了 N 遍。
     func run() async {
         guard !items.isEmpty, !isRunning else { return }
         isRunning = true
+        isCancelling = false
+        cancelRequested = false
+        staleNoticeShown = false
         progress = 0
         toastTask?.cancel()
         message = nil
         for index in items.indices { items[index].state = .pending }
 
-        let base = params
+        let base = params.clamped()
         let snapshotPreset = preset
         let snapshotFrame = frame
         let trim = trimBars
         let snapshotAnchor = anchor
+        let snapshotCropX = cropX
+        let snapshotCropScale = cropScale
         let snapshotLongEdge = CGFloat(longEdge)
         let snapshotExif = writeExif
+        let album = saveToAlbum ? "RealShot" : nil
+
         var saved = 0
         var failed = 0
+        var processed = 0
+        var cancelled = false
 
-        for index in items.indices {
-            let output = await encode(data: items[index].data,
-                                      params: base.jittered(seed: items[index].seed),
-                                      frame: snapshotFrame,
-                                      trimBars: trim,
-                                      anchor: snapshotAnchor,
-                                      longEdge: snapshotLongEdge,
-                                      preset: snapshotPreset,
-                                      writeExif: snapshotExif)
+        // 每 5 张合并成一次相册事务：20 张各开一次 performChanges 在高负载下会很拖，
+        // 分块又能把一批 JPEG 的内存控制在 20MB 上下。
+        let chunkSize = 5
+        var cursor = 0
 
-            if let output {
-                let stamp = Int(Date().timeIntervalSince1970)
-                do {
-                    try await PhotoLibrarySaver.save(data: output,
-                                                     filename: "RealShot-\(stamp)-\(index + 1).jpg")
-                    items[index].state = .done
-                    saved += 1
-                } catch {
-                    items[index].state = .failed
-                    failed += 1
-                }
-            } else {
-                items[index].state = .failed
-                failed += 1
+        while cursor < items.count {
+            if cancelRequested {
+                cancelled = true
+                break
             }
 
-            progress = Double(index + 1) / Double(items.count)
+            let end = min(cursor + chunkSize, items.count)
+            var pending: [(index: Int, file: PhotoLibrarySaver.File)] = []
+
+            for index in cursor..<end {
+                if cancelRequested {
+                    cancelled = true
+                    break
+                }
+
+                let output = await encode(data: items[index].data,
+                                          params: base.jittered(seed: items[index].seed),
+                                          frame: snapshotFrame,
+                                          trimBars: trim,
+                                          anchor: snapshotAnchor,
+                                          cropX: snapshotCropX,
+                                          cropScale: snapshotCropScale,
+                                          longEdge: snapshotLongEdge,
+                                          preset: snapshotPreset,
+                                          writeExif: snapshotExif)
+
+                if let output {
+                    pending.append((index: index,
+                                    file: PhotoLibrarySaver.File(data: output,
+                                                                 filename: OutputName.jpeg())))
+                } else {
+                    items[index].state = .failed
+                    failed += 1
+                    processed += 1
+                    progress = Double(processed) / Double(items.count)
+                }
+            }
+
+            if !pending.isEmpty {
+                let results = await PhotoLibrarySaver.saveAll(pending.map { $0.file }, albumName: album)
+                for (offset, entry) in pending.enumerated() {
+                    let ok = offset < results.count && results[offset]
+                    items[entry.index].state = ok ? .done : .failed
+                    if ok { saved += 1 } else { failed += 1 }
+                    processed += 1
+                    progress = Double(processed) / Double(items.count)
+                }
+            }
+
+            cursor = end
         }
 
         isRunning = false
-        show(failed == 0 ? "已保存 \(saved) 张到相册" : "成功 \(saved) 张，失败 \(failed) 张")
-        Haptics.success()
+        isCancelling = false
+        cancelRequested = false
+
+        if cancelled {
+            show(saved > 0 ? "已取消 · 已保存 \(saved) 张" : "已取消，没有保存")
+            Haptics.warning()
+        } else {
+            show(failed == 0 ? "已保存 \(saved) 张到相册" : "成功 \(saved) 张，失败 \(failed) 张")
+            if failed == 0 { Haptics.success() } else { Haptics.warning() }
+        }
+    }
+
+    // MARK: - 设置持久化
+
+    private func persistSoon() {
+        persistTask?.cancel()
+        persistTask = Task { [weak self] in
+            try? await Task.sleep(nanoseconds: 400_000_000)
+            guard let self, !Task.isCancelled else { return }
+            self.persistNow()
+        }
+    }
+
+    private func persistNow() {
+        SettingsStore.saveBatch(.init(preset: preset,
+                                      params: params,
+                                      frame: frame,
+                                      trimBars: trimBars,
+                                      anchor: anchor,
+                                      cropX: cropX,
+                                      cropScale: cropScale,
+                                      longEdge: longEdge,
+                                      writeExif: writeExif,
+                                      saveToAlbum: saveToAlbum))
     }
 
     // MARK: - 提示

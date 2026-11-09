@@ -474,3 +474,66 @@ if let zero = evTable.first(where: { abs($0.ev) < 0.001 })?.mean {
                      row.ev, ratio, row.mean / zero))
     }
 }
+
+// MARK: - 参数区间断言
+//
+// 参数越界在 Core Image 里不会报错，只会悄悄算出异常画面。
+// 之前「成片全黑」就是这一类问题的变种，所以进渲染前必须夹一遍、
+// 并且在这里用断言把口子堵住，别再靠肉眼发现。
+
+print("\n=== 参数区间 ===")
+
+func outOfRange(_ p: RealismParameters) -> [String] {
+    var bad: [String] = []
+    func check(_ name: String, _ v: Double, _ lo: Double, _ hi: Double) {
+        if v < lo - 1e-9 || v > hi + 1e-9 {
+            bad.append("\(name)=\(String(format: "%.3f", v)) 不在 \(lo)…\(hi)")
+        }
+    }
+    check("grain", p.grain, 0, 1)
+    check("grainSize", p.grainSize, 0.8, 2.4)
+    check("chromaNoise", p.chromaNoise, 0, 0.9)
+    check("jpegQuality", p.jpegQuality, 0.45, 0.95)
+    check("jpegPasses", Double(p.jpegPasses), 0, 3)
+    check("softness", p.softness, 0, 1)
+    check("chromaAberration", p.chromaAberration, 0, 0.9)
+    check("vignette", p.vignette, 0, 0.9)
+    check("bloom", p.bloom, 0, 0.9)
+    check("motionBlur", p.motionBlur, 0, 0.6)
+    check("sharpen", p.sharpen, 0, 0.9)
+    check("warmth", p.warmth, 0.2, 0.8)
+    check("tint", p.tint, -0.1, 0.1)
+    check("exposure", p.exposure, -0.4, 0.4)
+    check("contrast", p.contrast, 0.85, 1.2)
+    check("saturation", p.saturation, 0.7, 1.35)
+    check("vibrance", p.vibrance, -0.1, 0.3)
+    check("blackLift", p.blackLift, 0, 0.7)
+    check("highlightRolloff", p.highlightRolloff, 0, 0.9)
+    check("rotation", p.rotation, -1, 1)
+    check("perspective", p.perspective, 0, 0.8)
+    check("lightLeak", p.lightLeak, 0, 0.9)
+    check("screenTexture", p.screenTexture, 0, 0.9)
+    return bad
+}
+
+// 1. 极端输入过一遍 clamped()
+var wild = CameraPreset.phone.baseParameters
+wild.grain = 99
+wild.exposure = 12
+wild.jpegQuality = -3
+wild.jpegPasses = 9
+wild.contrast = 40
+let wildBad = outOfRange(wild.clamped())
+print("  极端输入 → clamped 后越界：\(wildBad.isEmpty ? "无 ✓" : wildBad.joined(separator: "；"))")
+
+// 2. 每个预设 × 200 个种子，jitter 后的值都必须在区间内
+var badSeeds = 0
+var checkedSeeds = 0
+for preset in CameraPreset.allCases {
+    for seed in UInt64(1)...UInt64(200) {
+        let p = preset.baseParameters.jittered(seed: seed)
+        checkedSeeds += 1
+        if !outOfRange(p).isEmpty { badSeeds += 1 }
+    }
+}
+print("  \(checkedSeeds) 组随机扰动 → 越界 \(badSeeds) 组 \(badSeeds == 0 ? "✓" : "✗")")

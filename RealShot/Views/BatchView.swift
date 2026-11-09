@@ -1,4 +1,5 @@
 import SwiftUI
+import PhotosUI
 import UIKit
 
 struct BatchView: View {
@@ -9,6 +10,8 @@ struct BatchView: View {
     @State private var viewerSeed: ViewerSeed?
     @State private var showParams = false
     @State private var showHelp = false
+    @State private var appendItems: [PhotosPickerItem] = []
+    @State private var isAppending = false
 
     var body: some View {
         VStack(spacing: 0) {
@@ -24,6 +27,10 @@ struct BatchView: View {
         .sheet(isPresented: $showHelp) { HelpView() }
         .fullScreenCover(item: $viewerSeed) { seed in
             BatchViewer(model: model, startID: seed.id)
+        }
+        .onChange(of: appendItems) { _, newValue in
+            guard !newValue.isEmpty else { return }
+            append(newValue)
         }
     }
 
@@ -68,6 +75,20 @@ struct BatchView: View {
                         .foregroundStyle(Theme.accent)
                         .monospacedDigit()
                         .frame(width: 34)
+
+                    // 不用退出去重选整批，直接往队列里加
+                    PhotosPicker(selection: $appendItems,
+                                 maxSelectionCount: 20,
+                                 matching: .images,
+                                 photoLibrary: .shared()) {
+                        Image(systemName: isAppending ? "ellipsis" : "plus")
+                            .font(.system(size: 13, weight: .semibold))
+                            .foregroundStyle(Theme.subtext)
+                            .frame(width: 34, height: 34)
+                            .background(Theme.surfaceRaised, in: Circle())
+                    }
+                    .disabled(model.isRunning || isAppending)
+                    .opacity(model.isRunning ? 0.4 : 1)
 
                     Button {
                         showHelp = true
@@ -192,16 +213,36 @@ struct BatchView: View {
             .padding(.horizontal, 16)
 
             if model.isRunning {
-                VStack(spacing: 8) {
+                VStack(spacing: 7) {
                     ProgressView(value: model.progress)
                         .tint(Theme.accent)
-                    Text("正在处理第 \(Int(model.progress * Double(model.items.count)).clamped(to: 1...max(model.items.count, 1))) 张 · \(Int(model.progress * 100))%")
-                        .font(.system(size: 11, weight: .medium, design: .rounded))
-                        .foregroundStyle(Theme.subtext)
-                        .monospacedDigit()
+
+                    HStack(spacing: 10) {
+                        Text("正在处理第 \(Int(model.progress * Double(model.items.count)).clamped(to: 1...max(model.items.count, 1))) 张 · \(Int(model.progress * 100))%")
+                            .font(.system(size: 11, weight: .medium, design: .rounded))
+                            .foregroundStyle(Theme.subtext)
+                            .monospacedDigit()
+
+                        Spacer(minLength: 0)
+
+                        // 20 张一批，中途发现选错图不用干等到底
+                        Button {
+                            model.cancel()
+                            Haptics.warning()
+                        } label: {
+                            Text(model.isCancelling ? "取消中…" : "取消")
+                                .font(.system(size: 11.5, weight: .semibold))
+                                .foregroundStyle(model.isCancelling ? Theme.faint : Color.orange)
+                                .padding(.horizontal, 12)
+                                .frame(height: 26)
+                                .background(Color.orange.opacity(model.isCancelling ? 0.06 : 0.14), in: Capsule())
+                        }
+                        .buttonStyle(.plain)
+                        .disabled(model.isCancelling)
+                    }
                 }
                 .padding(.horizontal, 18)
-                .frame(height: 52)
+                .frame(height: 60)
             } else {
                 Button {
                     Task { await model.run() }
@@ -264,8 +305,11 @@ struct BatchView: View {
                            frame: $model.frame,
                            trimBars: $model.trimBars,
                            anchor: $model.anchor,
+                           cropX: $model.cropX,
+                           cropScale: $model.cropScale,
                            longEdge: $model.longEdge,
                            writeExif: $model.writeExif,
+                           saveToAlbum: $model.saveToAlbum,
                            height: nil)
         }
         .background(Theme.background)
@@ -289,6 +333,48 @@ struct BatchView: View {
                     .padding(.top, 52)
                     .transition(.move(edge: .top).combined(with: .opacity))
             }
+        }
+    }
+
+    // MARK: 追加照片
+
+    /// 从相册补几张进来。重复的图不会被去重 —— 用户可能就是想再处理一遍。
+    private func append(_ selection: [PhotosPickerItem]) {
+        let items = Array(selection.prefix(20))
+        guard !items.isEmpty else {
+            appendItems = []
+            return
+        }
+
+        isAppending = true
+        Task { @MainActor in
+            defer {
+                isAppending = false
+                appendItems = []
+            }
+
+            var payloads: [(data: Data, thumb: UIImage)] = []
+            var skipped = 0
+            for item in items {
+                guard let data = try? await item.loadTransferable(type: Data.self),
+                      let thumb = ImageLoader.image(from: data, maxPixel: ImageLoader.thumbnailPixel) else {
+                    skipped += 1
+                    continue
+                }
+                payloads.append((data: data, thumb: thumb))
+            }
+
+            guard !payloads.isEmpty else {
+                model.show("这些图片读不出来")
+                Haptics.warning()
+                return
+            }
+
+            model.append(payloads)
+            if skipped > 0 {
+                model.show("有 \(skipped) 张读不出来，已跳过")
+            }
+            Haptics.success()
         }
     }
 }

@@ -324,9 +324,7 @@ struct BatchViewer: View {
             Haptics.warning()
             return
         }
-        let stamp = Int(Date().timeIntervalSince1970)
-        let url = FileManager.default.temporaryDirectory
-            .appendingPathComponent("RealShot-\(stamp).jpg")
+        let url = FileManager.default.temporaryDirectory.appendingPathComponent(OutputName.jpeg())
         do {
             try data.write(to: url, options: .atomic)
             shareFile = ShareFile(url: url)

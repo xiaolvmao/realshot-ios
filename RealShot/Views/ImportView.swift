@@ -14,6 +14,8 @@ struct ImportView: View {
     @State private var readDone = 0
     @State private var readTotal = 0
     @State private var showHelp = false
+    @State private var confirmClear = false
+    @State private var cacheBytes = 0
 
     /// 与相册面板的上限保持一致，也是批量队列的上限。
     private static let maxSelection = 20
@@ -26,12 +28,20 @@ struct ImportView: View {
             actions
             Spacer(minLength: 16)
             footnote
+            cacheRow
         }
         .padding(.horizontal, 26)
         .padding(.bottom, 18)
         .overlay(alignment: .topTrailing) { helpButton }
         .sheet(isPresented: $showHelp) {
             HelpView()
+        }
+        .onAppear { cacheBytes = CacheCleaner.footprint() }
+        .confirmationDialog("清理缓存？", isPresented: $confirmClear, titleVisibility: .visible) {
+            Button("清理", role: .destructive) { clearCache() }
+            Button("取消", role: .cancel) {}
+        } message: {
+            Text("删除导出和分享时产生的临时图片，以及预览缓存。相册里的照片不受影响。")
         }
         .onChange(of: pickedItems) { _, newValue in
             guard !newValue.isEmpty else { return }
@@ -174,6 +184,35 @@ struct ImportView: View {
         .multilineTextAlignment(.center)
     }
 
+    /// 临时文件和预览缓存会慢慢堆积，给个看得见体积的出口。
+    private var cacheRow: some View {
+        Button {
+            confirmClear = true
+            Haptics.tap()
+        } label: {
+            HStack(spacing: 5) {
+                Image(systemName: "trash")
+                    .font(.system(size: 10, weight: .medium))
+                Text(cacheBytes > 0 ? "清理缓存 · \(CacheCleaner.formatted(cacheBytes))" : "清理缓存")
+                    .font(.system(size: 11))
+            }
+            .foregroundStyle(Theme.subtext)
+            .padding(.horizontal, 12)
+            .frame(height: 28)
+            .background(Theme.surface.opacity(0.6), in: Capsule())
+        }
+        .buttonStyle(.plain)
+        .padding(.top, 12)
+    }
+
+    private func clearCache() {
+        let freed = CacheCleaner.clear()
+        batch.clearPreviews()
+        cacheBytes = CacheCleaner.footprint()
+        model.show(freed > 0 ? "已清理 \(CacheCleaner.formatted(freed))" : "没有可清理的内容")
+        Haptics.success()
+    }
+
     // MARK: 动作
 
     /// 统一的入口：一张进编辑器，多张进批量队列。
@@ -204,7 +243,7 @@ struct ImportView: View {
                     Haptics.warning()
                     return
                 }
-                model.load(image)
+                model.load(image, sourceData: data)
                 Haptics.success()
                 return
             }

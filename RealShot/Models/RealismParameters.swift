@@ -100,6 +100,44 @@ extension RealismParameters {
         p.rotation = Double.random(in: -0.5...0.5, using: &rng)
         p.motionAngle = Double.random(in: 0...360, using: &rng)
         p.seed = newSeed
+        return p.clamped()
+    }
+
+    /// 把每个参数夹回合法区间。
+    ///
+    /// 从 UserDefaults 读回来的旧数据、以及手改过的参数都可能越界，
+    /// 而超范围的取值在 Core Image 里不会报错，只会静悄悄地算出异常画面
+    /// （历史上整幅发黑就是这类问题）。所有进入渲染的值都先过一遍这里。
+    func clamped() -> RealismParameters {
+        func c(_ v: Double, _ lo: Double, _ hi: Double) -> Double {
+            min(max(v, lo), hi)
+        }
+
+        var p = self
+        p.grain = c(grain, 0, 1)
+        p.grainSize = c(grainSize, 0.8, 2.4)
+        p.chromaNoise = c(chromaNoise, 0, 0.9)
+        p.jpegQuality = c(jpegQuality, 0.45, 0.95)
+        p.jpegPasses = min(max(jpegPasses, 0), 3)
+        p.softness = c(softness, 0, 1)
+        p.chromaAberration = c(chromaAberration, 0, 0.9)
+        p.vignette = c(vignette, 0, 0.9)
+        p.bloom = c(bloom, 0, 0.9)
+        p.motionBlur = c(motionBlur, 0, 0.6)
+        p.sharpen = c(sharpen, 0, 0.9)
+        p.warmth = c(warmth, 0.2, 0.8)
+        p.tint = c(tint, -0.1, 0.1)
+        p.exposure = c(exposure, -0.4, 0.4)
+        p.contrast = c(contrast, 0.85, 1.2)
+        p.saturation = c(saturation, 0.7, 1.35)
+        p.vibrance = c(vibrance, -0.1, 0.3)
+        p.blackLift = c(blackLift, 0, 0.7)
+        p.highlightRolloff = c(highlightRolloff, 0, 0.9)
+        p.rotation = c(rotation, -1, 1)
+        p.perspective = c(perspective, 0, 0.8)
+        p.lightLeak = c(lightLeak, 0, 0.9)
+        p.screenTexture = c(screenTexture, 0, 0.9)
+        p.seed = seed == 0 ? 1 : seed
         return p
     }
 }

@@ -41,8 +41,11 @@ struct ParameterPanel: View {
     @Binding var frame: FrameMode
     @Binding var trimBars: Bool
     @Binding var anchor: Double
+    @Binding var cropX: Double
+    @Binding var cropScale: Double
     @Binding var longEdge: Double
     @Binding var writeExif: Bool
+    @Binding var saveToAlbum: Bool
 
     /// nil 表示由外部容器决定高度（例如放在 sheet 里）。
     var height: CGFloat? = 246
@@ -191,9 +194,17 @@ struct ParameterPanel: View {
             .tint(Theme.accent)
 
             if frame != .original {
-                ParameterSlider(title: "构图位置", value: $anchor) {
+                ParameterSlider(title: "垂直位置", value: $anchor) {
                     $0 < 0.45 ? "偏下" : ($0 > 0.55 ? "偏上" : "居中")
                 }
+                // 源图比目标画幅宽时，之前只能从正中间裁，两边的内容白白丢掉
+                ParameterSlider(title: "水平位置", value: $cropX) {
+                    $0 < 0.45 ? "偏左" : ($0 > 0.55 ? "偏右" : "居中")
+                }
+            }
+
+            ParameterSlider(title: "向内缩放", value: $cropScale, range: 1.0...2.0) {
+                String(format: "%.2f×", $0)
             }
 
             VStack(alignment: .leading, spacing: 6) {
@@ -206,6 +217,10 @@ struct ParameterPanel: View {
                     Text("3024").tag(3024.0)
                 }
                 .pickerStyle(.segmented)
+
+                Text("「原始」即原图长边（上限 4200），超过会等比缩小")
+                    .font(.system(size: 10))
+                    .foregroundStyle(Theme.faint)
             }
 
             Toggle(isOn: $writeExif) {
@@ -214,6 +229,18 @@ struct ParameterPanel: View {
                         .font(.system(size: 12.5))
                         .foregroundStyle(Theme.text)
                     Text("机身、镜头、光圈、快门，仅用于风格一致")
+                        .font(.system(size: 10.5))
+                        .foregroundStyle(Theme.faint)
+                }
+            }
+            .tint(Theme.accent)
+
+            Toggle(isOn: $saveToAlbum) {
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("归类到「RealShot」相簿")
+                        .font(.system(size: 12.5))
+                        .foregroundStyle(Theme.text)
+                    Text("需要完整相册权限；不给也能正常保存，只是不归类")
                         .font(.system(size: 10.5))
                         .foregroundStyle(Theme.faint)
                 }
