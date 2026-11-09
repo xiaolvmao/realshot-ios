@@ -481,18 +481,18 @@ final class RealismEngine: @unchecked Sendable {
 
         // 亮度颗粒
         if let grain = grainLayer(offsetX: ox, offsetY: oy, extent: extent, params: p) {
-            img = addLayer(grain, over: img)
+            img = addLayer(grain, over: img, amplitude: p.grain * 0.10)
         }
 
         // 彩色噪点：先糊成大色斑，再叠回去，才像高感的暗部色噪
         if let chroma = chromaLayer(offsetX: ox + 217, offsetY: oy + 149, extent: extent, params: p) {
-            img = addLayer(chroma, over: img)
+            img = addLayer(chroma, over: img, amplitude: p.chromaNoise * 0.14)
         }
 
         return img
     }
 
-    /// 噪点图层：均值为 0、幅度为 ±amplitude/2、alpha 恒为 1。
+    /// 噪点图层：取值 [0, amplitude]、alpha 恒为 1，由 addLayer 配平。
     ///
     /// 注意：这里刻意不用 soft light / overlay 这类混合模式。
     /// Core Image 的 blend 滤镜在本工程的配置下会把整幅图算成 0
@@ -505,14 +505,21 @@ final class RealismEngine: @unchecked Sendable {
             "inputGVector": CIVector(x: 0, y: a, z: 0, w: 0),
             "inputBVector": CIVector(x: 0, y: 0, z: a, w: 0),
             "inputAVector": CIVector(x: 0, y: 0, z: 0, w: 0),
-            "inputBiasVector": CIVector(x: -a / 2, y: -a / 2, z: -a / 2, w: 1)
+            "inputBiasVector": CIVector(x: 0, y: 0, z: 0, w: 1)
         ])
     }
 
-    /// 加性叠加：图层本身均值为 0，直接相加即可，
-    /// 净效果 = 原图 + amplitude·(n − 0.5)，不会整体偏亮或偏暗。
-    private func addLayer(_ layer: CIImage, over image: CIImage) -> CIImage {
-        apply("CIAdditionCompositing", layer, [kCIInputBackgroundImageKey: image])
+    /// 加性叠加：图层是 [0, amplitude]，底图先压暗 amplitude/2，再相加。
+    /// 净效果 = 原图 + amplitude·(n − 0.5)，均值和黑位都不变。
+    ///
+    /// 注意不能让图层带负值：CIAdditionCompositing 的输入会被截断到 [0,1]，
+    /// 负半轴被砍掉之后就只剩“提亮”，整张图会灰掉。
+    private func addLayer(_ layer: CIImage, over image: CIImage, amplitude: Double) -> CIImage {
+        let a = CGFloat(min(max(amplitude, 0), 1)) / 2
+        let shifted = apply("CIColorMatrix", image, [
+            "inputBiasVector": CIVector(x: -a, y: -a, z: -a, w: 0)
+        ])
+        return apply("CIAdditionCompositing", layer, [kCIInputBackgroundImageKey: shifted])
             .cropped(to: image.extent)
     }
 
